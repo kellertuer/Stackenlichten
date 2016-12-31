@@ -1,5 +1,5 @@
 # Stackenlichten
-<div align="right"> by [@kellertuer](https://twitter,com/kellertuer), [@k4sp4r](https://twitter.com/k4sp4r)</div>
+<div align="right">by[@kellertuer](https://twitter.com/kellertuer), [@k4sp4r](https://twitter.com/k4sp4r)</div>
 <div align="center"><img src="png/logo.png" width="300"></div>
 
 ## Motivation
