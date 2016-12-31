@@ -1,0 +1,37 @@
+\documentclass[border=3mm]{standalone}
+\usepackage[no-math]{fontspec}
+\usepackage{xunicode,xltxtra}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\defaultfontfeatures{Mapping=tex-text}
+\setromanfont[Ligatures={Common},ItalicFont={Vollkorn-Italic},BoldFont={Vollkorn-Bold}, BoldItalicFont={Vollkorn-BoldItalic}]{Vollkorn}
+%
+\tikzset{base/.style={cyan!30}}
+\tikzset{main/.style={thick}}
+\newcommand\wTh{0.4} %woodThickness, short W in comments
+\begin{document}
+  \begin{tikzpicture}
+    \draw[fill=cyan,fill opacity=.25,cyan!50] (0,{4/3*sqrt(3)}) circle ({4/3*sqrt(3)-\wTh});
+    \draw[fill=cyan,fill opacity=.5,cyan!50] (0,{4/3*sqrt(3)}) circle (1.5);
+    \draw[fill=cyan,fill opacity=.75,cyan!50] (0,{4/3*sqrt(3)}) circle (1);
+    % Neopixel in Scale
+    \draw[fill=cyan,fill opacity=1,cyan!50] (0,{4/3*sqrt(3)}) circle (.5);
+    \draw[base] ({- ( 4- \wTh*cot(60) )}, \wTh) -- ({4- \wTh*cot(60)},\wTh);
+    \draw[main] (-4,0) -- (-2.5,0) -- (-2.5,\wTh) -- (-1.5,\wTh) -- (-1.5,0) --
+      (-.5,0) -- (-.5,\wTh) -- (.5,\wTh) -- (.5,0) -- (1.5,0) -- (1.5,\wTh) -- 
+      (2.5,\wTh) -- (2.5,0) -- (4,0);
+    \begin{scope}[shift={(-2,{2*sqrt(3)})},rotate=60] % shift left and halft trig height
+      \draw[base] ({- ( 4- \wTh*cot(60) )},-\wTh) -- ({4- \wTh*cot(60)},-\wTh);
+    \draw[main] (-4,0) -- (-2.5,0) -- (-2.5,-\wTh) -- (-1.5,-\wTh) -- (-1.5,0) --
+      (-.5,0) -- (-.5,-\wTh) -- (.5,-\wTh) -- (.5,0) -- (1.5,0) -- (1.5,-\wTh) -- 
+      (2.5,-\wTh) -- (2.5,0) -- (4,0);
+    \end{scope}
+    \begin{scope}[shift={(2,{2*sqrt(3)})},rotate=-60] % shift left and halft trig height
+      \draw[base] ({- ( 4- \wTh*cot(60) )},-\wTh) -- ({4- \wTh*cot(60)},-\wTh);
+    \draw[main] (-4,0) -- (-2.5,0) -- (-2.5,-\wTh) -- (-1.5,-\wTh) -- (-1.5,0) --
+      (-.5,0) -- (-.5,-\wTh) -- (.5,-\wTh) -- (.5,0) -- (1.5,0) -- (1.5,-\wTh) -- 
+      (2.5,-\wTh) -- (2.5,0) -- (4,0);
+    \end{scope}
+    \node (A) at (0,-.66) {\Huge Stackenlichten};
+  \end{tikzpicture}
+\end{document}

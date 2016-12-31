@@ -1,0 +1,64 @@
+\documentclass[border=3mm]{standalone}
+\usepackage[no-math]{fontspec}
+\usepackage{xunicode,xltxtra}
+\usepackage{tikz}
+\usepackage{unicode-math}
+\usetikzlibrary{calc}
+\defaultfontfeatures{Mapping=tex-text}
+\setromanfont[Ligatures={Common},ItalicFont={Vollkorn-Italic},BoldFont={Vollkorn-Bold}, BoldItalicFont={Vollkorn-BoldItalic}]{Vollkorn}
+
+
+%
+\tikzset{base/.style={gray,densely dotted,thin}}
+\tikzset{main/.style={thick}}
+\tikzset{measure/.style={thin,|-|}}
+\tikzset{emph/.style={fill=cyan!20!white,draw=cyan!60!}}
+\tikzset{neo/.style={fill=cyan!10!white,draw=cyan!30!white}}
+\tikzset{holes/.style={thick,fill=yellow!20}}
+\tikzset{magnets/.style={thick,fill=cyan!20}}
+\tikzset{every node/.style={font=\tiny}}
+\newcommand\wTh{0.4} %woodThickness, short W in comments
+\newcommand\mTh{0.4} %MagnetThickness, short M in comments
+\begin{document}
+  \begin{tikzpicture}
+    \draw[base] (-4,0) -- (4,0);
+    \draw[base] ({- ( 4- \wTh*cot(60) )}, \wTh) -- ({4- \wTh*cot(60)},\wTh);
+    \draw[magnets] (-\mTh/2,5*\mTh/4) rectangle (\mTh/2,\mTh/4);
+    \draw[main] ({- ( 4- \wTh*cot(60) - \wTh/sin(60) )}, \wTh)
+      -- (-2-\wTh/2,\wTh) -- (-2-\wTh/2,0) -- (-2+\wTh/2,0) -- (-2+\wTh/2,\wTh)
+      -- (-\mTh/2,\wTh) -- (-\mTh/2,5*\wTh/4) -- (\mTh/2,5*\wTh/4) -- (\wTh/2,\wTh)
+      -- (2-\wTh/2,\wTh) -- (2-\wTh/2,0) -- (2+\wTh/2,0) -- (2+\wTh/2,\wTh) 
+      -- ({4- \wTh*cot(60) - \wTh/sin(60)},\wTh);
+    \begin{scope}[shift={(-2,{2*sqrt(3)})},rotate=60]
+      \draw[base] (-4,0) -- (4,0);
+      \draw[base] ({- ( 4- \wTh*cot(60) )},-\wTh) -- ({4- \wTh*cot(60)},-\wTh);
+      \draw[magnets] (-\mTh/2,-5*\mTh/4) rectangle (\mTh/2,-\mTh/4);
+    \draw[main] ({- ( 4- \wTh*cot(60) - \wTh/sin(60) )},-\wTh)
+      -- (-2-\wTh/2,-\wTh) -- (-2-\wTh/2,0) -- (-2+\wTh/2,0) -- (-2+\wTh/2,-\wTh)
+      -- (-\mTh/2,-\wTh) -- (-\mTh/2,-5*\wTh/4) -- (\mTh/2,-5*\wTh/4) -- (\wTh/2,-\wTh)
+      -- (2-\wTh/2,-\wTh) -- (2-\wTh/2,0) -- (2+\wTh/2,0) -- (2+\wTh/2,-\wTh) 
+      -- ({4- \wTh*cot(60) - \wTh/sin(60)},-\wTh);
+    \end{scope}
+    \begin{scope}[shift={(2,{2*sqrt(3)})},rotate=-60]
+      \draw[base] (-4,0) -- (4,0);
+      \draw[base] ({- ( 4- \wTh*cot(60) )},-\wTh) -- ({4- \wTh*cot(60)},-\wTh);
+      \draw[magnets] (-\mTh/2,-5*\mTh/4) rectangle (\mTh/2,-\mTh/4);
+    \draw[main] ({- ( 4- \wTh*cot(60) - \wTh/sin(60) )},-\wTh)
+      -- (-2-\wTh/2,-\wTh) -- (-2-\wTh/2,0) -- (-2+\wTh/2,0) -- (-2+\wTh/2,-\wTh)
+      -- (-\mTh/2,-\wTh) -- (-\mTh/2,-5*\wTh/4) -- (\mTh/2,-5*\wTh/4) -- (\wTh/2,-\wTh)
+      -- (2-\wTh/2,-\wTh) -- (2-\wTh/2,0) -- (2+\wTh/2,0) -- (2+\wTh/2,-\wTh) 
+      -- ({4- \wTh*cot(60) - \wTh/sin(60)},-\wTh);
+    \end{scope}
+    % Neopixel in Scale
+    \draw[neo] (0,{4/3*sqrt(3)}) circle (.5cm);
+    % Masures
+    \draw[measure] (-2-\wTh/2,-.15) -- (-2+\wTh/2,-.15) node[midway,below] {\pgfmathparse{10*\wTh}\pgfmathprintnumber{\pgfmathresult}\,mm};
+    \draw[measure] (2-\wTh/2,-.15) -- (2+\wTh/2,-.15) node[midway,below] {\pgfmathparse{10*\wTh}\pgfmathprintnumber{\pgfmathresult}\,mm};
+    \draw[measure] (-\mTh/2,-.15) -- (\mTh/2,-.15) node[midway,below] {\pgfmathparse{10*\mTh}\pgfmathprintnumber{\pgfmathresult}\,mm};
+  \draw[measure] (-2,-.8) -- (0,-.8) node[midway,below] {\(20\)\,mm}; 
+  \draw[measure] (0,-.8+.25) -- (2,-.8+.25) node[midway,below] {\(20\)\,mm}; 
+    \draw[measure] ({-( 4- \wTh*cot(60)-\wTh/sin(60) )},-1.45) -- ({4- \wTh*cot(60)-\wTh/sin(60)},-1.45)
+     node[midway,below] {\pgfmathparse{10*(8-2*\wTh*cot(60) - 2*\wTh/sin(60) )}%
+     \pgfmathprintnumber{\pgfmathresult}\,mm};
+  \end{tikzpicture}
+\end{document}
