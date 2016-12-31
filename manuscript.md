@@ -35,6 +35,10 @@ The bottom plate is placed 1cm inwards of the sides with 2 bolts for each side.
 The magnets should join into the sides by 3/4th (`3 mm`) the top one should be
 glued, the bottom one should be held by the bottom plate.
 
+## KuDos
+* [Blinkenlichten](http://blinkenlights.net)
+* [Stackenblochen](https://www.youtube.com/watch?v=QEN5-_93gQg)
+
 ## TODO
 The sketches have to be transformed into laser cutting plans and a layout of
 the jacks has to be made for a usual bottom plate (placement of the connector,
