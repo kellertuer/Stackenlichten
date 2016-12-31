@@ -45,39 +45,34 @@
           ({(4-\wTh*cot(60))},7) -- ({(4-\wTh*cot(60))-\wTh},7) --%
           ({(4-\wTh*cot(60))-\wTh},8);
   % bottom plate
-  \draw[minor] ({-(4-\wTh*cot(60))},1) rectangle ({(4-\wTh*cot(60))},1+\wTh);
-  % Magnets
-  \draw [magnets] (-\mTh/2,1) rectangle (\mTh/2,1+\mTh);  
-  \draw [magnets] (-\mTh/2,6) rectangle (\mTh/2,6+\mTh);  
+  \draw [magnets] (-2-\mTh/2,4-\mTh/2) rectangle (-2+\mTh/2,4+\mTh/2);  
+  \draw [magnets] (2-\mTh/2,4-\mTh/2) rectangle (2+\mTh/2,4+\mTh/2);  
+  \node (A) at (2,4) {\large N};
+  \node (A) at (-2,4) {\large S};
+  % 4944
   % bottom plate holes
-  \draw [holes] (-2-\wTh/2,1) rectangle (-2+\wTh/2,1+\wTh);
-  \draw [holes] (2-\wTh/2,1) rectangle (2+\wTh/2,1+\wTh);
-  \node (A) at (0,4) {\Large S};
-
+  \draw [holes] (-2.5,2-\wTh/2) rectangle (-1.5,2+\wTh/2);
+  \draw [holes] (-.5,2-\wTh/2) rectangle (.5,2+\wTh/2);
+  \draw [holes] (1.5,2-\wTh/2) rectangle (2.5,2+\wTh/2);
   %
   % Measures
   %
   % bottom
-  \draw[measure] (-2-\wTh/2,-.15) -- (-2+\wTh/2,-.15) node[midway,below] {\pgfmathparse{10*\wTh}\pgfmathprintnumber{\pgfmathresult}\,mm};
-  \draw[measure] (2-\wTh/2,-.15) -- (2+\wTh/2,-.15) node[midway,below] {\pgfmathparse{10*\wTh}\pgfmathprintnumber{\pgfmathresult}\,mm};
-  \draw[measure] (-\mTh/2,-.15) -- (\mTh/2,-.15) node[midway,below] {\pgfmathparse{10*\mTh}\pgfmathprintnumber{\pgfmathresult}\,mm};
-  \draw[measure] (-2,-.8) -- (0,-.8) node[midway,below] {\(20\)\,mm}; 
-  \draw[measure] (0,-.8+.25) -- (2,-.8+.25) node[midway,below] {\(20\)\,mm}; 
-  % top
-   \draw[measure] ({- ( 4- \wTh*cot(60) )},8.15+\wTh) -- (-2.5,8.15+\wTh)
-     node[midway,above] {\pgfmathparse{10*(1.5 - \wTh*cot(60))}%
-     \pgfmathprintnumber{\pgfmathresult}\,mm};
-    \draw[measure] (-2.5,8.15+\wTh+0.25) -- (-1.5,8.15+\wTh+0.25) node[midway, above]{\(10\)\,mm};
-    \draw[measure] (-1.5,8.15+\wTh) -- (-.5,8.15+\wTh) node [midway, above]{\(10\)\,mm};
-    \draw[measure] (-.5,8.15+\wTh+0.25) -- (.5,8.15+\wTh+0.25) node [midway, above]{\(10\)\,mm};
-    \draw[measure] (.5,8.15+\wTh) -- (1.5,8.15+\wTh) node [midway, above]{\(10\)\,mm};
-    \draw[measure] (1.5,8.15+\wTh+0.25) -- (2.5,8.15+\wTh+0.25) node [midway, above] {\(10\)\,mm};
-     \draw[measure] ({( 4- \wTh*cot(60)-\wTh )},8.15+\wTh) -- (2.5,8.15+\wTh)
-     node[midway,above] {\pgfmathparse{10*(1.5 - \wTh*cot(60)-\wTh)}%
-     \pgfmathprintnumber{\pgfmathresult}\,mm};
-  \draw[measure] ({- ( 4- \wTh*cot(60) )},8.8+\wTh) -- ({4- \wTh*cot(60)},8.8+\wTh)
-    node[midway,above] {\pgfmathparse{10*(8 - 2*\wTh*cot(60))}%
-    \pgfmathprintnumber{\pgfmathresult}\,mm};
+     \draw[measure] ({- ( 4- \wTh*cot(60) )},-.15) -- (-2.5,-.15)
+       node[midway,below] {\pgfmathparse{10*(1.5 - \wTh*cot(60))}%
+       \pgfmathprintnumber{\pgfmathresult}\,mm};
+      \draw[measure] (-2.5,-.15-.25) -- (-1.5,-.15-.25) node[midway, below]{\(10\)\,mm};
+      \draw[measure] (-1.5,-.15) -- (-.5,-.15) node [midway, below]{\(10\)\,mm};
+      \draw[measure] (-.5,-.15-.25) -- (.5,-.15-.25) node [midway, below]{\(10\)\,mm};
+      \draw[measure] (.5,-.15) -- (1.5,-.15) node [midway, below]{\(10\)\,mm};
+      \draw[measure] (1.5,-.15-.25) -- (2.5,-.15-.25) node [midway, below] {\(10\)\,mm};
+       \draw[measure] ({( 4- \wTh*cot(60) )},-.15) -- (2.5,-.15)
+       node[midway,below] {\pgfmathparse{10*(1.5 - \wTh*cot(60))}%
+       \pgfmathprintnumber{\pgfmathresult}\,mm};
+    \draw[measure] ({- ( 4- \wTh*cot(60) )},-.8) -- ({4- \wTh*cot(60)},-.8)
+      node[midway,below] {\pgfmathparse{10*(8 - 2*\wTh*cot(60))}%
+      \pgfmathprintnumber{\pgfmathresult}\,mm};
+    \draw[measure] (-4,-1.45) -- (4,-1.45) node [midway, below] {\(80\)\,mm};
   % left
   \draw[measure] (4.15+.25,8+\wTh) -- (4.15+.25,8) node[midway,right] {\pgfmathparse{10*\wTh}\pgfmathprintnumber{\pgfmathresult}\,mm};
   \draw[measure] (4.15,8) -- (4.15,7) node[midway,right] {\(10\)\,mm};
