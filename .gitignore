@@ -5,3 +5,6 @@ tex/*.pdf
 *.fls
 tex/*.log
 *.synctex.gz
+*.dpth
+*.md5
+*.auxlock
