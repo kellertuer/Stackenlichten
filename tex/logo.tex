@@ -1,37 +1,49 @@
-\documentclass[border=3mm]{standalone}
+\documentclass[border=0mm]{standalone}
 \usepackage[no-math]{fontspec}
 \usepackage{xunicode,xltxtra}
 \usepackage{tikz}
-\usetikzlibrary{calc}
+\usetikzlibrary{calc,backgrounds}
 \defaultfontfeatures{Mapping=tex-text}
 \setromanfont[Ligatures={Common},ItalicFont={Vollkorn-Italic},BoldFont={Vollkorn-Bold}, BoldItalicFont={Vollkorn-BoldItalic}]{Vollkorn}
 %
-\tikzset{base/.style={cyan!30}}
-\tikzset{main/.style={thick}}
+\definecolor{bg}{rgb}{0,0,0}
+\definecolor{fg}{rgb}{1,1,1}
+\colorlet{hl}{cyan}
+%\definecolor{hl}{rgb}{0,1,1}
+\tikzset{base/.style={hl}}
+\tikzset{main/.style={fill=bg}}
 \newcommand\wTh{0.4} %woodThickness, short W in comments
 \begin{document}
-  \begin{tikzpicture}
-    \draw[fill=cyan,fill opacity=.25,cyan!50] (0,{4/3*sqrt(3)}) circle ({4/3*sqrt(3)-\wTh});
-    \draw[fill=cyan,fill opacity=.5,cyan!50] (0,{4/3*sqrt(3)}) circle (1.5);
-    \draw[fill=cyan,fill opacity=.75,cyan!50] (0,{4/3*sqrt(3)}) circle (1);
-    % Neopixel in Scale
-    \draw[fill=cyan,fill opacity=1,cyan!50] (0,{4/3*sqrt(3)}) circle (.5);
+  \begin{tikzpicture}[background rectangle/.style={fill=bg,draw=none},show background rectangle]
+    % fix background of triangle
+    \draw[fill=fg,draw=bg] (-4,0) -- (4,0) -- (0,{4*sqrt(3)}) -- cycle;
+    % draw circles
+    \draw[fill=hl!25!fg,draw=hl!75!bg] (0,{4/3*sqrt(3)}) circle
+      ({4/3*sqrt(3)-\wTh});
+    \draw[fill=hl!50!fg,draw=hl!75!bg] (0,{4/3*sqrt(3)}) circle
+       ({3/4*(4/3*sqrt(3)-\wTh)});
+    \draw[fill=hl!75!fg,draw=hl!75!bg] (0,{4/3*sqrt(3)}) circle
+       ({1/2*(4/3*sqrt(3)-\wTh)});
+    \draw[fill=hl,draw=hl!75!bg] (0,{4/3*sqrt(3)}) circle
+       ({1/4*(4/3*sqrt(3)-\wTh)});
     \draw[base] ({- ( 4- \wTh*cot(60) )}, \wTh) -- ({4- \wTh*cot(60)},\wTh);
+    % border
     \draw[main] (-4,0) -- (-2.5,0) -- (-2.5,\wTh) -- (-1.5,\wTh) -- (-1.5,0) --
       (-.5,0) -- (-.5,\wTh) -- (.5,\wTh) -- (.5,0) -- (1.5,0) -- (1.5,\wTh) -- 
       (2.5,\wTh) -- (2.5,0) -- (4,0);
-    \begin{scope}[shift={(-2,{2*sqrt(3)})},rotate=60] % shift left and halft trig height
-      \draw[base] ({- ( 4- \wTh*cot(60) )},-\wTh) -- ({4- \wTh*cot(60)},-\wTh);
+    %
+    \begin{scope}[shift={(-2,{2*sqrt(3)})},rotate=60]
+    \draw[base] ({- ( 4- \wTh*cot(60) )},-\wTh) -- ({4- \wTh*cot(60)},-\wTh);
     \draw[main] (-4,0) -- (-2.5,0) -- (-2.5,-\wTh) -- (-1.5,-\wTh) -- (-1.5,0) --
       (-.5,0) -- (-.5,-\wTh) -- (.5,-\wTh) -- (.5,0) -- (1.5,0) -- (1.5,-\wTh) -- 
       (2.5,-\wTh) -- (2.5,0) -- (4,0);
     \end{scope}
-    \begin{scope}[shift={(2,{2*sqrt(3)})},rotate=-60] % shift left and halft trig height
-      \draw[base] ({- ( 4- \wTh*cot(60) )},-\wTh) -- ({4- \wTh*cot(60)},-\wTh);
+    \begin{scope}[shift={(2,{2*sqrt(3)})},rotate=-60]
+    \draw[base] ({- ( 4- \wTh*cot(60) )},-\wTh) -- ({4- \wTh*cot(60)},-\wTh);
     \draw[main] (-4,0) -- (-2.5,0) -- (-2.5,-\wTh) -- (-1.5,-\wTh) -- (-1.5,0) --
       (-.5,0) -- (-.5,-\wTh) -- (.5,-\wTh) -- (.5,0) -- (1.5,0) -- (1.5,-\wTh) -- 
       (2.5,-\wTh) -- (2.5,0) -- (4,0);
     \end{scope}
-    \node (A) at (0,-.66) {\Huge Stackenlichten};
+    \node (A) at (0,-.66) {\Huge\color{hl} Stackenlichten};
   \end{tikzpicture}
 \end{document}
