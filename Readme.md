@@ -39,6 +39,7 @@ glued, the bottom one should be held by the bottom plate.
 Using a 3-pole connectos, the fadecandy board can directly be provided with ground by using the ground of the LEDs. On the other hand at the end of each data line the power supply can be directly connected. If there is a need to
 power supply in between, two connectors can be used between two pixels, where
 the data line is just passed through and hence both pixels are provided with power.
+
 ## KuDos
 * [Blinkenlichten](http://blinkenlights.net)
 * [Stackenblochen](https://www.youtube.com/watch?v=QEN5-_93gQg)

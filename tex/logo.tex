@@ -1,52 +1,147 @@
 \documentclass[border=0mm]{standalone}
 \usepackage[no-math]{fontspec}
 \usepackage{xunicode,xltxtra}
-\usepackage{tikz}
-\usetikzlibrary{calc,backgrounds}
+\usepackage{tikz,pgfplots}
+\usetikzlibrary{calc,backgrounds,pgfplots.colormaps}
 \defaultfontfeatures{Mapping=tex-text}
 \setromanfont[Ligatures={Common},ItalicFont={Vollkorn-Italic},BoldFont={Vollkorn-Bold}, BoldItalicFont={Vollkorn-BoldItalic}]{Vollkorn}
 %
-% \definecolor{bg}{rgb}{0,0,0}
-% \definecolor{fg}{rgb}{1,1,1}
-% \colorlet{hl}{cyan}
-\definecolor{bg}{rgb}{1,1,1}
-%\definecolor{fg}{RGB}{68,48,34}
+\definecolor{bg}{rgb}{0,0,0}
 \definecolor{fg}{rgb}{1,1,1}
-\colorlet{hl}{cyan!75!black}
+%\definecolor{bg}{rgb}{1,1,1}
+%\definecolor{fg}{rgb}{0,0,0}
+\colorlet{hl}{cyan!90!black}
+\colorlet{neoC1}{hl!25!bg}
+\colorlet{neoC2}{hl!50!bg}
+\colorlet{neoC3}{hl!75!bg}
+\colorlet{neoC4}{hl}
 \tikzset{base/.style={hl}}
 \tikzset{main/.style={fill=bg}}
+\tikzset{mydots/.style={line width=3pt, line cap=round, dash pattern=on 0pt off 1.5\pgflinewidth}}
+\tikzset{mydotsL/.style={line width=5pt, line cap=round, dash pattern=on 0pt off 1.8085\pgflinewidth}}
+\tikzset{verts/.style={hl!50!black!50!white,line width=1.25pt}}
 \newcommand\wTh{0.4} %woodThickness, short W in comments
+\newcommand\neoOff{.074} %neoclassizism
 \begin{document}
   \begin{tikzpicture}[background rectangle/.style={fill=bg,draw=none},show background rectangle]
     % fix background of triangle
     \draw[fill=fg,draw=bg] (-4,0) -- (4,0) -- (0,{4*sqrt(3)}) -- cycle;
     % draw circles
-    \draw[fill=hl!25!fg,draw=hl!75!bg] (0,{4/3*sqrt(3)}) circle
-      ({4/3*sqrt(3)-\wTh});
-    \draw[fill=hl!50!fg,draw=hl!75!bg] (0,{4/3*sqrt(3)}) circle
-       ({3/4*(4/3*sqrt(3)-\wTh)});
-    \draw[fill=hl!75!fg,draw=hl!75!bg] (0,{4/3*sqrt(3)}) circle
-       ({1/2*(4/3*sqrt(3)-\wTh)});
-    \draw[fill=hl,draw=hl!75!bg] (0,{4/3*sqrt(3)}) circle
-       ({1/4*(4/3*sqrt(3)-\wTh)});
-    \draw[base] ({- ( 4- \wTh*cot(60) )}, \wTh) -- ({4- \wTh*cot(60)},\wTh);
     % border
-    \draw[main] (-4,0) -- (-2.5,0) -- (-2.5,\wTh) -- (-1.5,\wTh) -- (-1.5,0) --
-      (-.5,0) -- (-.5,\wTh) -- (.5,\wTh) -- (.5,0) -- (1.5,0) -- (1.5,\wTh) -- 
-      (2.5,\wTh) -- (2.5,0) -- (4,0);
+    \coordinate (A1) at (-4,0);
+    \coordinate (A2) at (-2.5,0);
+    \coordinate (A3) at (-2.5,\wTh);
+    \coordinate (A4) at (-1.5,\wTh);
+    \coordinate (A5) at (-1.5,0);
+    \coordinate (A6) at (-.5,0);
+    \coordinate (A7) at (-.5,\wTh);
+    \coordinate (A8) at (.5,\wTh);
+    \coordinate (A9) at (.5,0);
+    \coordinate (A10) at (1.5,0);
+    \coordinate (A11) at (1.5,\wTh);
+    \coordinate (A12) at (2.5,\wTh);
+    \coordinate (A13) at (2.5,0);
+    \coordinate (A14) at (4,0);
+    \path[shift={(-2,{2*sqrt(3)})},rotate=60,main] (-4,0) coordinate (B1)  (-2.5,0) coordinate (B2) (-2.5,-\wTh)
+    coordinate (B3) (-1.5,-\wTh) coordinate (B4) (-1.5,0) coordinate (B5)
+    (-.5,0) coordinate (B6) (-.5,-\wTh) coordinate (B7) (.5,-\wTh)
+    coordinate (B8) (.5,0) coordinate (B9) (1.5,0) coordinate (B10)
+    (1.5,-\wTh) coordinate (B11) (2.5,-\wTh) coordinate (B12) (2.5,0)
+    coordinate (B13) (4,0) coordinate (B14);
     %
-    \begin{scope}[shift={(-2,{2*sqrt(3)})},rotate=60]
-    \draw[base] ({- ( 4- \wTh*cot(60) )},-\wTh) -- ({4- \wTh*cot(60)},-\wTh);
-    \draw[main] (-4,0) -- (-2.5,0) -- (-2.5,-\wTh) -- (-1.5,-\wTh) -- (-1.5,0) --
-      (-.5,0) -- (-.5,-\wTh) -- (.5,-\wTh) -- (.5,0) -- (1.5,0) -- (1.5,-\wTh) -- 
-      (2.5,-\wTh) -- (2.5,0) -- (4,0);
-    \end{scope}
-    \begin{scope}[shift={(2,{2*sqrt(3)})},rotate=-60]
-    \draw[base] ({- ( 4- \wTh*cot(60) )},-\wTh) -- ({4- \wTh*cot(60)},-\wTh);
-    \draw[main] (-4,0) -- (-2.5,0) -- (-2.5,-\wTh) -- (-1.5,-\wTh) -- (-1.5,0) --
-      (-.5,0) -- (-.5,-\wTh) -- (.5,-\wTh) -- (.5,0) -- (1.5,0) -- (1.5,-\wTh) -- 
-      (2.5,-\wTh) -- (2.5,0) -- (4,0);
-    \end{scope}
-    \node (A) at (0,-.66) {\Huge\color{hl} Stackenlichten};
+    \path[shift={(2,{2*sqrt(3)})},rotate=-60,main] (-4,0) coordinate (C1)  (-2.5,0) coordinate (C2) (-2.5,-\wTh)
+    coordinate (C3) (-1.5,-\wTh) coordinate (C4) (-1.5,0) coordinate (C5)
+    (-.5,0) coordinate (C6) (-.5,-\wTh) coordinate (C7) (.5,-\wTh)
+    coordinate (C8) (.5,0) coordinate (C9) (1.5,0) coordinate (C10)
+    (1.5,-\wTh) coordinate (C11) (2.5,-\wTh) coordinate (C12) (2.5,0)
+    coordinate (C13) (4,0) coordinate (C14);
+
+    % draw circles
+    \draw[fill=hl!25!white,draw=hl] (0,{4/3*sqrt(3)}) circle
+      ({(4/5*(4/3*sqrt(3)-\wTh)});
+    \draw[fill=hl!50!white,draw=hl!75!fg] (0,{4/3*sqrt(3)}) circle
+       ({3/5*(4/3*sqrt(3)-\wTh)});
+    \draw[fill=hl!75!white,draw=hl!50!fg] (0,{4/3*sqrt(3)}) circle
+       ({2/5*(4/3*sqrt(3)-\wTh)});
+    \draw[fill=hl,draw=hl!25!fg] (0,{4/3*sqrt(3)}) circle
+       ({1/5*(4/3*sqrt(3)-\wTh)});
+
+    % \draw[hl, mydotsL] plot [smooth] coordinates { (B14) ($(B12)!0.75!(C3)$)
+    % ($(B11)!0.1!(C4)$) ($(B8)!0.7!(C7)$) ($(B7)!0.85!(C8)$) ($(B4)!0.7!(C11)$) ($(B3)!0.05!(C12)$) (A1)};
+    % \draw[fill=black,draw=none] (B14) circle (2.5pt);
+    % \draw[fill=black,draw=none] (A1) circle (2.5pt);
+
+    % \foreach \x in {3,4,7,8,11,12} {%
+    %   \draw[verts] (A\x) -- (B\x);
+    %   \draw[verts] (A\x) -- (C\x);
+    % }
+    % \draw[verts] (B3) -- (C12);
+    % \draw[verts] (B4) -- (C11);
+    % \draw[verts] (B7) -- (C8);
+    % \draw[verts] (B8) -- (C7);
+    % \draw[verts] (B11) -- (C4);
+    % \draw[verts] (B12) -- (C3);
+    % 1    
+    \draw[fill=bg,draw=fg] (A2) -- (A3) -- (A4) -- (A5);
+    \draw[fill=bg,draw=fg] (A6) -- (A7) -- (A8) -- (A9);
+    \draw[fill=bg,draw=fg] (A10) -- (A11) -- (A12) -- (A13);
+    \foreach \x[count=\xnext from 2] in {1,...,13}{
+      \draw[main] (A\x) -- (A\xnext);
+    }
+    \foreach \i in {1,2,3,4}{%
+    \draw[neoC\i] ($(A1)+(.55*\i*\neoOff,\i*\neoOff)$) -- ($(A2)+(-\i*\neoOff,\i*\neoOff)$)
+    -- ($(A3)+(-\i*\neoOff,\i*\neoOff)$) -- ($(A4) + (+\i*\neoOff,\i*\neoOff)$)
+    -- ($(A5)+(+\i*\neoOff,\i*\neoOff)$) -- ($(A6) + (-\i*\neoOff,\i*\neoOff)$)
+    -- ($(A7)+(-\i*\neoOff,\i*\neoOff)$) -- ($(A8) + (+\i*\neoOff,\i*\neoOff)$)
+    -- ($(A9)+(+\i*\neoOff,\i*\neoOff)$) -- ($(A10) + (-\i*\neoOff,\i*\neoOff)$)
+    -- ($(A11)+(-\i*\neoOff,\i*\neoOff)$) -- ($(A12) + (+\i*\neoOff,\i*\neoOff)$)
+    -- ($(A13)+(+\i*\neoOff,\i*\neoOff)$) -- ($(A14) + (-.55*\i*\neoOff,\i*\neoOff)$);
+    \draw[neoC\i]
+      ($(B1)+([rotate=60].55*\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B2)+([rotate=60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B3)+([rotate=60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B4)+([rotate=60]+\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B5)+([rotate=60]+\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B6)+([rotate=60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B7)+([rotate=60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B8)+([rotate=60]+\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B9)+([rotate=60]+\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B10)+([rotate=60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B11)+([rotate=60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B12)+([rotate=60]\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B13)+([rotate=60]\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B14)+([rotate=60]-.55*\i*\neoOff,-\i*\neoOff)$);
+    \draw[neoC\i]
+      ($(C1)+([rotate=-60].55*\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C2)+([rotate=-60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C3)+([rotate=-60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C4)+([rotate=-60]+\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C5)+([rotate=-60]+\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C6)+([rotate=-60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C7)+([rotate=-60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C8)+([rotate=-60]+\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C9)+([rotate=-60]+\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C10)+([rotate=-60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C11)+([rotate=-60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C12)+([rotate=-60]\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C13)+([rotate=-60]\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C14)+([rotate=-60]-.55*\i*\neoOff,-\i*\neoOff)$);
+    }
+    \draw[fill=bg,draw=fg] (B2) -- (B3) -- (B4) -- (B5);
+    \draw[fill=bg,draw=fg] (B6) -- (B7) -- (B8) -- (B9);
+    \draw[fill=bg,draw=fg] (B10) -- (B11) -- (B12) -- (B13);
+    \foreach \x[count=\xnext from 2] in {1,...,13}{
+      \draw[main] (B\x) -- (B\xnext);
+    }
+
+    \draw[fill=bg,draw=fg] (C2) -- (C3) -- (C4) -- (C5);
+    \draw[fill=bg,draw=fg] (C6) -- (C7) -- (C8) -- (C9);
+    \draw[fill=bg,draw=fg] (C10) -- (C11) -- (C12) -- (C13);
+    \foreach \x[count=\xnext from 2] in {1,...,13}{
+      \draw[main] (C\x) -- (C\xnext);
+    }
+    \draw[black,thick] (B2) -- (A1) -- (A2) (A13) -- (A14) -- (C13) (C2) -- (B14) -- (B13);
+    %
+    \node (A) at (0,-.66) {\Huge\color{fg} Stackenlichten};
   \end{tikzpicture}
 \end{document}
