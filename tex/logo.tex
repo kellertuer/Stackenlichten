@@ -3,8 +3,9 @@
 \usepackage{xunicode,xltxtra}
 \usepackage{tikz,pgfplots}
 \usetikzlibrary{calc,backgrounds,pgfplots.colormaps}
-\defaultfontfeatures{Mapping=tex-text}
-\setromanfont[Ligatures={Common},ItalicFont={Vollkorn-Italic},BoldFont={Vollkorn-Bold}, BoldItalicFont={Vollkorn-BoldItalic}]{Vollkorn}
+% \defaultfontfeatures{Mapping=tex-text}
+% \setromanfont[Ligatures={Common},ItalicFont={Vollkorn-Italic},BoldFont={Vollkorn-Bold}, BoldItalicFont={Vollkorn-BoldItalic}]{Vollkorn}
+\setromanfont[Ligatures={Common}]{Futura Black}
 %
 \definecolor{bg}{rgb}{0,0,0}
 \definecolor{fg}{rgb}{1,1,1}
@@ -89,14 +90,14 @@
       \draw[main] (A\x) -- (A\xnext);
     }
     \foreach \i in {1,2,3,4}{%
-    \draw[neoC\i] ($(A1)+(.55*\i*\neoOff,\i*\neoOff)$) -- ($(A2)+(-\i*\neoOff,\i*\neoOff)$)
+    \draw[neoC\i,thick] ($(A1)+(.55*\i*\neoOff,\i*\neoOff)$) -- ($(A2)+(-\i*\neoOff,\i*\neoOff)$)
     -- ($(A3)+(-\i*\neoOff,\i*\neoOff)$) -- ($(A4) + (+\i*\neoOff,\i*\neoOff)$)
     -- ($(A5)+(+\i*\neoOff,\i*\neoOff)$) -- ($(A6) + (-\i*\neoOff,\i*\neoOff)$)
     -- ($(A7)+(-\i*\neoOff,\i*\neoOff)$) -- ($(A8) + (+\i*\neoOff,\i*\neoOff)$)
     -- ($(A9)+(+\i*\neoOff,\i*\neoOff)$) -- ($(A10) + (-\i*\neoOff,\i*\neoOff)$)
     -- ($(A11)+(-\i*\neoOff,\i*\neoOff)$) -- ($(A12) + (+\i*\neoOff,\i*\neoOff)$)
     -- ($(A13)+(+\i*\neoOff,\i*\neoOff)$) -- ($(A14) + (-.55*\i*\neoOff,\i*\neoOff)$);
-    \draw[neoC\i]
+    \draw[neoC\i,thick]
       ($(B1)+([rotate=60].55*\i*\neoOff,-\i*\neoOff)$)
     -- ($(B2)+([rotate=60]-\i*\neoOff,-\i*\neoOff)$)
     -- ($(B3)+([rotate=60]-\i*\neoOff,-\i*\neoOff)$)
@@ -111,7 +112,7 @@
     -- ($(B12)+([rotate=60]\i*\neoOff,-\i*\neoOff)$)
     -- ($(B13)+([rotate=60]\i*\neoOff,-\i*\neoOff)$)
     -- ($(B14)+([rotate=60]-.55*\i*\neoOff,-\i*\neoOff)$);
-    \draw[neoC\i]
+    \draw[neoC\i,thick]
       ($(C1)+([rotate=-60].55*\i*\neoOff,-\i*\neoOff)$)
     -- ($(C2)+([rotate=-60]-\i*\neoOff,-\i*\neoOff)$)
     -- ($(C3)+([rotate=-60]-\i*\neoOff,-\i*\neoOff)$)
