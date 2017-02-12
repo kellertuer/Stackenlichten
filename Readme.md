@@ -11,8 +11,7 @@ stack different forms of Lichten.
 ## Material
 For bulding one of the pixels the following is required
 * 6 [Neodyn magnets](http://www.magnetportal.de/wuerfel/neodym-magnet-wuerfel-n45-4mm-1-3kg/a-64/) of size `4x4x4 mm` (0,10 € ab 200 Stk.)
-* 1 [connector](https://www.reichelt.de/Molex-Vielfachsteckverbinder/MOLEX-22035035/3/index.html?ACTION=3&LA=446&ARTICLE=185732) (0,14 €)
-* 1 [jack](https://www.reichelt.de/Molex-Vielfachsteckverbinder/MOLEX-50375033/3/index.html?ACTION=3&LA=446&ARTICLE=186239) (0,10 €)
+* 1 [Cables for 3 pin](https://www.adafruit.com/products/1663)
 * 1 [NeoPixel](https://www.adafruit.com/products/1559) (1,75 €) or any other WS2812 LED having the classical 4 ports +,-,in,out
 * 4mm thick wood
 * a laser cutter
