@@ -264,56 +264,62 @@
       \draw[base] (-\sL/2,0) -- (\sL/2,0);
       \draw[base] ({- (\sL/2- \wTh*cot(60)) },\wTh)--({\sL/2- \wTh*cot(60)},\wTh);
     \fi
-    \draw [magnets] (-\sL/4-\mTh/2,5*\mTh/4) rectangle (-\sL/4+\mTh/2,\mTh/4);
-    \draw [magnets] (\sL/4-\mTh/2,5*\mTh/4) rectangle (\sL/4+\mTh/2,\mTh/4);
+    \draw [magnets] (-\sL/4-\mTh/2,\mTh) rectangle (-\sL/4+\mTh/2,0);
+    \draw [magnets] (\sL/4-\mTh/2,\mTh) rectangle (\sL/4+\mTh/2,0);
     \ifshowLengths
-      \node (A2) at (-\sL/4,3*\mTh/4) {\large S};
-      \node (A1) at (\sL/4,3*\mTh/4) {\large N};
+      \node (A2) at (-\sL/4,\mTh/2) {\large S};
+      \node (A1) at (\sL/4,\mTh/2) {\large N};
     \fi
     \draw[main] ({- (\sL/2-\wTh*cot(60) - \wTh/sin(60) )}, \wTh)
       -- (-5/16*\sL,\wTh) -- (-5/16*\sL,0) -- (-3/16*\sL,0) -- (-3/16*\sL,\wTh)
       -- (-1/16*\sL,\wTh) -- (-1/16*\sL,0) -- (1/16*\sL,0) -- (1/16*\sL,\wTh)
       -- (3/16*\sL,\wTh) -- (3/16*\sL,0) -- (5/16*\sL,0) -- (5/16*\sL,\wTh) 
       -- ({\sL/2- \wTh*cot(60) - \wTh/sin(60)},\wTh);
-    \begin{scope}[shift={(-\sL/4,{2*sqrt(3)})},rotate=60]
-      \ifshowLengths
-        \draw[base] (-\sL/2,0) -- (\sL/2,0);
-        \draw[base] ({- (\sL/2-\wTh*cot(60) )},-\wTh)
-          -- ({4- \wTh*cot(60)},-\wTh);
-      \fi
-      \draw [magnets] (-\sL/4-\mTh/2,-5*\mTh/4) rectangle (-\sL/4+\mTh/2,-\mTh/4);
-      \draw [magnets] (\sL/4-\mTh/2,-5*\mTh/4) rectangle (\sL/4+\mTh/2,-\mTh/4);
-      \ifshowLengths
-        \node (A2) at (-\sL/4,-3*\mTh/4) {\large N};
-        \node (A1) at (\sL/4,-3*\mTh/4) {\large S};
-      \fi
-    \draw[main] ({- (\sL/2-\wTh*cot(60) - \wTh/sin(60) )}, -\wTh)
-    -- (-5/16*\sL,-\wTh) -- (-5/16*\sL,0) -- (-3/16*\sL,0) -- (-3/16*\sL,-\wTh)
-      -- (-1/16*\sL,-\wTh) -- (-1/16*\sL,0) -- (1/16*\sL,0) -- (1/16*\sL,-\wTh)
-      -- (3/16*\sL,-\wTh) -- (3/16*\sL,0) -- (5/16*\sL,0) -- (5/16*\sL,-\wTh) 
-      -- ({\sL/2- \wTh*cot(60) - \wTh/sin(60)},-\wTh);
-    \end{scope}
-    \begin{scope}[shift={(\sL/4,{2*sqrt(3)})},rotate=-60]
-      \ifshowLengths
-        \draw[base] (-\sL/2,0) -- (\sL/2,0);
-        \draw[base] ({- (\sL/2-\wTh*cot(60) )},-\wTh)
-          -- ({4- \wTh*cot(60)},-\wTh);
-      \fi
-    \draw [magnets] (-\sL/4-\mTh/2,-5*\mTh/4) rectangle (-\sL/4+\mTh/2,-\mTh/4);
-    \draw [magnets] (\sL/4-\mTh/2,-5*\mTh/4) rectangle (\sL/4+\mTh/2,-\mTh/4);
+    % hole for plugs
+      \draw[main] (-.7,4-.4) rectangle (.7,4+.4);
+      \draw[base] (-.605,4-.35) rectangle (.605,4+.35);
+    \begin{scope}[shift={(-\sL/4,{2*sqrt(3)})},rotate=-120]
     \ifshowLengths
-      \node (A2) at (-\sL/4,-3*\mTh/4) {\large N};
-      \node (A1) at (\sL/4,-3*\mTh/4) {\large S};
+      \draw[base] (-\sL/2,0) -- (\sL/2,0);
+      \draw[base] ({- (\sL/2- \wTh*cot(60)) },\wTh)--({\sL/2- \wTh*cot(60)},\wTh);
     \fi
-    \draw[main] ({- (\sL/2-\wTh*cot(60) - \wTh/sin(60) )}, -\wTh)
-    -- (-5/16*\sL,-\wTh) -- (-5/16*\sL,0) -- (-3/16*\sL,0) -- (-3/16*\sL,-\wTh)
-      -- (-1/16*\sL,-\wTh) -- (-1/16*\sL,0) -- (1/16*\sL,0) -- (1/16*\sL,-\wTh)
-      -- (3/16*\sL,-\wTh) -- (3/16*\sL,0) -- (5/16*\sL,0) -- (5/16*\sL,-\wTh) 
-      -- ({\sL/2- \wTh*cot(60) - \wTh/sin(60)},-\wTh);
+    \draw [magnets] (-\sL/4-\mTh/2,\mTh) rectangle (-\sL/4+\mTh/2,0);
+    \draw [magnets] (\sL/4-\mTh/2,\mTh) rectangle (\sL/4+\mTh/2,0);
+    \ifshowLengths
+      \node (A2) at (-\sL/4,\mTh/2) {\large S};
+      \node (A1) at (\sL/4,\mTh/2) {\large N};
+    \fi
+    \draw[main] ({- (\sL/2-\wTh*cot(60) - \wTh/sin(60) )}, \wTh)
+      -- (-5/16*\sL,\wTh) -- (-5/16*\sL,0) -- (-3/16*\sL,0) -- (-3/16*\sL,\wTh)
+      -- (-1/16*\sL,\wTh) -- (-1/16*\sL,0) -- (1/16*\sL,0) -- (1/16*\sL,\wTh)
+      -- (3/16*\sL,\wTh) -- (3/16*\sL,0) -- (5/16*\sL,0) -- (5/16*\sL,\wTh) 
+      -- ({\sL/2- \wTh*cot(60) - \wTh/sin(60)},\wTh);
+      \draw[main] (-.7,4-.4) rectangle (.7,4+.4);
+      \draw[base] (-.605,4-.35) rectangle (.605,4+.35);
+    \end{scope}
+    \begin{scope}[shift={(\sL/4,{2*sqrt(3)})},rotate=120]
+    \ifshowLengths
+      \draw[base] (-\sL/2,0) -- (\sL/2,0);
+      \draw[base] ({- (\sL/2- \wTh*cot(60)) },\wTh)--({\sL/2- \wTh*cot(60)},\wTh);
+    \fi
+    \draw [magnets] (-\sL/4-\mTh/2,\mTh) rectangle (-\sL/4+\mTh/2,0);
+    \draw [magnets] (\sL/4-\mTh/2,\mTh) rectangle (\sL/4+\mTh/2,0);
+    \ifshowLengths
+      \node (A2) at (-\sL/4,\mTh/2) {\large S};
+      \node (A1) at (\sL/4,\mTh/2) {\large N};
+    \fi
+    \draw[main] ({- (\sL/2-\wTh*cot(60) - \wTh/sin(60) )}, \wTh)
+      -- (-5/16*\sL,\wTh) -- (-5/16*\sL,0) -- (-3/16*\sL,0) -- (-3/16*\sL,\wTh)
+      -- (-1/16*\sL,\wTh) -- (-1/16*\sL,0) -- (1/16*\sL,0) -- (1/16*\sL,\wTh)
+      -- (3/16*\sL,\wTh) -- (3/16*\sL,0) -- (5/16*\sL,0) -- (5/16*\sL,\wTh) 
+      -- ({\sL/2- \wTh*cot(60) - \wTh/sin(60)},\wTh);
+      \draw[main] (-.7,4-.4) rectangle (.7,4+.4);
+      \draw[base] (-.605,4-.35) rectangle (.605,4+.35);
     \end{scope}
     \ifshowLengths
     % Neopixel in Scale
     \draw[neo] (0,{4/3*sqrt(3)}) circle (.5cm);
+    \draw[base] (0,{4/3*sqrt(3)}) circle (.5cm);
     % Masures
       \draw[measure] (-5/16*\sL,-.15) -- (-3/16*\sL,-.15)
         node[midway, below] {\pgfmathparse{10/8*\sL}%
