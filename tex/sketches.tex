@@ -13,6 +13,11 @@
 \usepackage{unicode-math}
 \usetikzlibrary{calc,external}
 \tikzexternalize
+\tikzset{
+    external/system call={%
+    xelatex \tikzexternalcheckshellescape
+    -halt-on-error -interaction=batchmode --shell-escape
+    -jobname "\image" "\texsource"}}
 % Font
 \defaultfontfeatures{Mapping=tex-text}
 \setromanfont[Ligatures={Common},ItalicFont={Vollkorn-Italic},BoldFont={Vollkorn-Bold}, BoldItalicFont={Vollkorn-BoldItalic}]{Vollkorn}
@@ -154,40 +159,40 @@
     \tikzsetnextfilename{side}
     \begin{tikzpicture}
       \ifshowLengths\draw[base] (-\sL/2,\h) rectangle (\sL/2,0);\fi
-      \draw[main] ({-(\sL/2-\wTh*cot(60))},\h) -- (-5*\sL/16,\h)
+      \draw[main] ({-(\sL/2-\wTh*cot(60)+\wTh)},\h) -- (-5*\sL/16,\h)
         -- (-5*\sL/16,\h+\pTh) -- (-3*\sL/16,8+\pTh)
         -- (-3*\sL/16,\h) -- (-\sL/16,\h) -- (-\sL/16,\h+\pTh)
         -- (\sL/16,\h+\pTh) -- (\sL/16,\h) -- (3*\sL/16,\h)
         -- (3*\sL/16,\h+\pTh) -- (5*\sL/16,\h+\pTh) -- (5*\sL/16,\h)
-        -- ({\sL/2- \wTh*cot(60)-\wTh},\h);
+        -- ({\sL/2- \wTh*cot(60)-2*\wTh},\h);
         %start top left - main frame
-        \draw[main] ({-(\sL/2-\wTh*cot(60))},\h)
-        -- ({-(\sL/2-\wTh*cot(60))},7/8*\h)
-      -- ({-(\sL/2-\wTh*cot(60))+\wTh},7/8*\h)
-        -- ({-(\sL/2-\wTh*cot(60))+\wTh},3/4*\h)
-      -- ({-(\sL/2-\wTh*cot(60))},3/4*\h)
-        -- ({-(\sL/2-\wTh*cot(60))},5/8*\h)
-      -- ({-(\sL/2-\wTh*cot(60))+\wTh},5/8*\h)
-        -- ({-(\sL/2-\wTh*cot(60))+\wTh},1/2*\h)
-      -- ({-(\sL/2-\wTh*cot(60))},1/2*\h)
-        -- ({-(\sL/2-\wTh*cot(60))},3/8*\h)
-      -- ({-(\sL/2-\wTh*cot(60))+\wTh},3/8*\h)
-        -- ({-(\sL/2-\wTh*cot(60))+\wTh},1/4*\h)
-      -- ({-(\sL/2-\wTh*cot(60))},1/4*\h)
-        -- ({-(\sL/2-\wTh*cot(60))},1/8*\h)
-      -- ({-(\sL/2-\wTh*cot(60))+\wTh},1/8*\h)
-        -- ({-(\sL/2-\wTh*cot(60))+\wTh},0) --%
+        \draw[main] ({-(\sL/2-\wTh*cot(60)-\wTh)},\h)
+        -- ({-(\sL/2-\wTh*cot(60)-\wTh)},7/8*\h)
+      -- ({-(\sL/2-\wTh*cot(60)-\wTh)+\wTh},7/8*\h)
+        -- ({-(\sL/2-\wTh*cot(60)-\wTh)+\wTh},3/4*\h)
+      -- ({-(\sL/2-\wTh*cot(60)-\wTh)},3/4*\h)
+        -- ({-(\sL/2-\wTh*cot(60)-\wTh)},5/8*\h)
+      -- ({-(\sL/2-\wTh*cot(60)-\wTh)+\wTh},5/8*\h)
+        -- ({-(\sL/2-\wTh*cot(60)-\wTh)+\wTh},1/2*\h)
+      -- ({-(\sL/2-\wTh*cot(60)-\wTh)},1/2*\h)
+        -- ({-(\sL/2-\wTh*cot(60)-\wTh)},3/8*\h)
+      -- ({-(\sL/2-\wTh*cot(60)-\wTh)+\wTh},3/8*\h)
+        -- ({-(\sL/2-\wTh*cot(60)-\wTh)+\wTh},1/4*\h)
+      -- ({-(\sL/2-\wTh*cot(60)-\wTh)},1/4*\h)
+        -- ({-(\sL/2-\wTh*cot(60)-\wTh)},1/8*\h)
+      -- ({-(\sL/2-\wTh*cot(60)-\wTh)+\wTh},1/8*\h)
+        -- ({-(\sL/2-\wTh*cot(60)-\wTh)+\wTh},0) --%
       % bottom line
-      ({(\sL/2-\wTh*cot(60))},0)
+      ({(\sL/2-\wTh*cot(60)-\wTh)},0)
       % and upwards
-      -- ({(\sL/2-\wTh*cot(60))},1/8*\h) -- ({(\sL/2-\wTh*cot(60))-\wTh},1/8*\h)
-      -- ({(\sL/2-\wTh*cot(60))-\wTh},1/4*\h) -- ({(\sL/2-\wTh*cot(60))},1/4*\h)
-      -- ({(\sL/2-\wTh*cot(60))},3/8*\h) -- ({(\sL/2-\wTh*cot(60))-\wTh},3/8*\h)
-      -- ({(\sL/2-\wTh*cot(60))-\wTh},1/2*\h) -- ({(\sL/2-\wTh*cot(60))},1/2*\h)
-      -- ({(\sL/2-\wTh*cot(60))},5/8*\h) -- ({(\sL/2-\wTh*cot(60))-\wTh},5/8*\h)
-      -- ({(\sL/2-\wTh*cot(60))-\wTh},3/4*\h) -- ({(\sL/2-\wTh*cot(60))},3/4*\h)
-      -- ({(\sL/2-\wTh*cot(60))},7/8*\h) -- ({(\sL/2-\wTh*cot(60))-\wTh},7/8*\h)
-      -- ({(\sL/2-\wTh*cot(60))-\wTh},\h);
+      -- ({(\sL/2-\wTh*cot(60)-\wTh)},1/8*\h) -- ({(\sL/2-\wTh*cot(60)-\wTh)-\wTh},1/8*\h)
+      -- ({(\sL/2-\wTh*cot(60)-\wTh)-\wTh},1/4*\h) -- ({(\sL/2-\wTh*cot(60)-\wTh)},1/4*\h)
+      -- ({(\sL/2-\wTh*cot(60)-\wTh)},3/8*\h) -- ({(\sL/2-\wTh*cot(60)-\wTh)-\wTh},3/8*\h)
+      -- ({(\sL/2-\wTh*cot(60)-\wTh)-\wTh},1/2*\h) -- ({(\sL/2-\wTh*cot(60)-\wTh)},1/2*\h)
+      -- ({(\sL/2-\wTh*cot(60)-\wTh)},5/8*\h) -- ({(\sL/2-\wTh*cot(60)-\wTh)-\wTh},5/8*\h)
+      -- ({(\sL/2-\wTh*cot(60)-\wTh)-\wTh},3/4*\h) -- ({(\sL/2-\wTh*cot(60)-\wTh)},3/4*\h)
+      -- ({(\sL/2-\wTh*cot(60)-\wTh)},7/8*\h) -- ({(\sL/2-\wTh*cot(60)-\wTh)-\wTh},7/8*\h)
+      -- ({(\sL/2-\wTh*cot(60)-\wTh)-\wTh},\h);
       % % bottom plate
     \draw [magnets] (-\sL/4-\mTh/2,\h/2-\mTh/2)
       rectangle (-\sL/4+\mTh/2,\h/2+\mTh/2);
@@ -206,8 +211,8 @@
     %
     \ifshowLengths
     % bottom    
-    \draw[measure] ({-(\sL/2- \wTh*cot(60) )},-.15) -- (-5/16*\sL,-.15)
-      node[midway,below] {\pgfmathparse{10*(3/16*\sL - \wTh*cot(60))}%
+    \draw[measure] ({-(\sL/2- \wTh*cot(60) - \wTh)},-.15) -- (-5/16*\sL,-.15)
+      node[midway,below] {\pgfmathparse{10*(3/16*\sL - \wTh*cot(60)-\wTh)}%
         \pgfmathprintnumber{\pgfmathresult}\,mm};
     \draw[measure] (-5/16*\sL,-.15-.25) -- (-3/16*\sL,-.15-.25)
       node[midway, below] {\pgfmathparse{10/8*\sL}%
@@ -224,12 +229,12 @@
     \draw[measure] (3/16*\sL,-.15-.25) -- (5/16*\sL,-.15-.25)
         node [midway, below] {\pgfmathparse{10/8*\sL}%
         \pgfmathprintnumber{\pgfmathresult}\,mm};
-    \draw[measure] ({(\sL/2- \wTh*cot(60) )},-.15) -- (5/16*\sL,-.15)
-        node[midway,below] {\pgfmathparse{10*(3/16*\sL - \wTh*cot(60))}%
+    \draw[measure] ({(\sL/2- \wTh*cot(60) -\wTh)},-.15) -- (5/16*\sL,-.15)
+        node[midway,below] {\pgfmathparse{10*(3/16*\sL - \wTh*cot(60)-\wTh)}%
         \pgfmathprintnumber{\pgfmathresult}\,mm};
-    \draw[measure] ({- (\sL/2- \wTh*cot(60) )},-.8)
-        -- ({\sL/2- \wTh*cot(60)},-.8)
-        node[midway,below] {\pgfmathparse{10*(\sL - 2*\wTh*cot(60))}%
+    \draw[measure] ({- (\sL/2- \wTh*cot(60) - \wTh)},-.8)
+        -- ({\sL/2- \wTh*cot(60)-\wTh},-.8)
+        node[midway,below] {\pgfmathparse{10*(\sL - 2*\wTh*cot(60)-2*\wTh)}%
        \pgfmathprintnumber{\pgfmathresult}\,mm};
     \draw[measure] (-\sL/2,-1.45) -- (\sL/2,-1.45)
         node [midway, below] {\pgfmathparse{10*\sL}%
@@ -264,62 +269,56 @@
       \draw[base] (-\sL/2,0) -- (\sL/2,0);
       \draw[base] ({- (\sL/2- \wTh*cot(60)) },\wTh)--({\sL/2- \wTh*cot(60)},\wTh);
     \fi
-    \draw [magnets] (-\sL/4-\mTh/2,\mTh) rectangle (-\sL/4+\mTh/2,0);
-    \draw [magnets] (\sL/4-\mTh/2,\mTh) rectangle (\sL/4+\mTh/2,0);
+    \draw [magnets] (-\sL/4-\mTh/2,5*\mTh/4) rectangle (-\sL/4+\mTh/2,\mTh/4);
+    \draw [magnets] (\sL/4-\mTh/2,5*\mTh/4) rectangle (\sL/4+\mTh/2,\mTh/4);
     \ifshowLengths
-      \node (A2) at (-\sL/4,\mTh/2) {\large S};
-      \node (A1) at (\sL/4,\mTh/2) {\large N};
+      \node (A2) at (-\sL/4,3*\mTh/4) {\large S};
+      \node (A1) at (\sL/4,3*\mTh/4) {\large N};
     \fi
     \draw[main] ({- (\sL/2-\wTh*cot(60) - \wTh/sin(60) )}, \wTh)
       -- (-5/16*\sL,\wTh) -- (-5/16*\sL,0) -- (-3/16*\sL,0) -- (-3/16*\sL,\wTh)
       -- (-1/16*\sL,\wTh) -- (-1/16*\sL,0) -- (1/16*\sL,0) -- (1/16*\sL,\wTh)
       -- (3/16*\sL,\wTh) -- (3/16*\sL,0) -- (5/16*\sL,0) -- (5/16*\sL,\wTh) 
       -- ({\sL/2- \wTh*cot(60) - \wTh/sin(60)},\wTh);
-    % hole for plugs
-      \draw[main] (-.7,4-.4) rectangle (.7,4+.4);
-      \draw[base] (-.605,4-.35) rectangle (.605,4+.35);
-    \begin{scope}[shift={(-\sL/4,{2*sqrt(3)})},rotate=-120]
-    \ifshowLengths
-      \draw[base] (-\sL/2,0) -- (\sL/2,0);
-      \draw[base] ({- (\sL/2- \wTh*cot(60)) },\wTh)--({\sL/2- \wTh*cot(60)},\wTh);
-    \fi
-    \draw [magnets] (-\sL/4-\mTh/2,\mTh) rectangle (-\sL/4+\mTh/2,0);
-    \draw [magnets] (\sL/4-\mTh/2,\mTh) rectangle (\sL/4+\mTh/2,0);
-    \ifshowLengths
-      \node (A2) at (-\sL/4,\mTh/2) {\large S};
-      \node (A1) at (\sL/4,\mTh/2) {\large N};
-    \fi
-    \draw[main] ({- (\sL/2-\wTh*cot(60) - \wTh/sin(60) )}, \wTh)
-      -- (-5/16*\sL,\wTh) -- (-5/16*\sL,0) -- (-3/16*\sL,0) -- (-3/16*\sL,\wTh)
-      -- (-1/16*\sL,\wTh) -- (-1/16*\sL,0) -- (1/16*\sL,0) -- (1/16*\sL,\wTh)
-      -- (3/16*\sL,\wTh) -- (3/16*\sL,0) -- (5/16*\sL,0) -- (5/16*\sL,\wTh) 
-      -- ({\sL/2- \wTh*cot(60) - \wTh/sin(60)},\wTh);
-      \draw[main] (-.7,4-.4) rectangle (.7,4+.4);
-      \draw[base] (-.605,4-.35) rectangle (.605,4+.35);
+    \begin{scope}[shift={(-\sL/4,{2*sqrt(3)})},rotate=60]
+      \ifshowLengths
+        \draw[base] (-\sL/2,0) -- (\sL/2,0);
+        \draw[base] ({- (\sL/2-\wTh*cot(60) )},-\wTh)
+          -- ({4- \wTh*cot(60)},-\wTh);
+      \fi
+      \draw [magnets] (-\sL/4-\mTh/2,-5*\mTh/4) rectangle (-\sL/4+\mTh/2,-\mTh/4);
+      \draw [magnets] (\sL/4-\mTh/2,-5*\mTh/4) rectangle (\sL/4+\mTh/2,-\mTh/4);
+      \ifshowLengths
+        \node (A2) at (-\sL/4,-3*\mTh/4) {\large N};
+        \node (A1) at (\sL/4,-3*\mTh/4) {\large S};
+      \fi
+    \draw[main] ({- (\sL/2-\wTh*cot(60) - \wTh/sin(60) )}, -\wTh)
+    -- (-5/16*\sL,-\wTh) -- (-5/16*\sL,0) -- (-3/16*\sL,0) -- (-3/16*\sL,-\wTh)
+      -- (-1/16*\sL,-\wTh) -- (-1/16*\sL,0) -- (1/16*\sL,0) -- (1/16*\sL,-\wTh)
+      -- (3/16*\sL,-\wTh) -- (3/16*\sL,0) -- (5/16*\sL,0) -- (5/16*\sL,-\wTh) 
+      -- ({\sL/2- \wTh*cot(60) - \wTh/sin(60)},-\wTh);
     \end{scope}
-    \begin{scope}[shift={(\sL/4,{2*sqrt(3)})},rotate=120]
+    \begin{scope}[shift={(\sL/4,{2*sqrt(3)})},rotate=-60]
+      \ifshowLengths
+        \draw[base] (-\sL/2,0) -- (\sL/2,0);
+        \draw[base] ({- (\sL/2-\wTh*cot(60) )},-\wTh)
+          -- ({4- \wTh*cot(60)},-\wTh);
+      \fi
+    \draw [magnets] (-\sL/4-\mTh/2,-5*\mTh/4) rectangle (-\sL/4+\mTh/2,-\mTh/4);
+    \draw [magnets] (\sL/4-\mTh/2,-5*\mTh/4) rectangle (\sL/4+\mTh/2,-\mTh/4);
     \ifshowLengths
-      \draw[base] (-\sL/2,0) -- (\sL/2,0);
-      \draw[base] ({- (\sL/2- \wTh*cot(60)) },\wTh)--({\sL/2- \wTh*cot(60)},\wTh);
+      \node (A2) at (-\sL/4,-3*\mTh/4) {\large N};
+      \node (A1) at (\sL/4,-3*\mTh/4) {\large S};
     \fi
-    \draw [magnets] (-\sL/4-\mTh/2,\mTh) rectangle (-\sL/4+\mTh/2,0);
-    \draw [magnets] (\sL/4-\mTh/2,\mTh) rectangle (\sL/4+\mTh/2,0);
-    \ifshowLengths
-      \node (A2) at (-\sL/4,\mTh/2) {\large S};
-      \node (A1) at (\sL/4,\mTh/2) {\large N};
-    \fi
-    \draw[main] ({- (\sL/2-\wTh*cot(60) - \wTh/sin(60) )}, \wTh)
-      -- (-5/16*\sL,\wTh) -- (-5/16*\sL,0) -- (-3/16*\sL,0) -- (-3/16*\sL,\wTh)
-      -- (-1/16*\sL,\wTh) -- (-1/16*\sL,0) -- (1/16*\sL,0) -- (1/16*\sL,\wTh)
-      -- (3/16*\sL,\wTh) -- (3/16*\sL,0) -- (5/16*\sL,0) -- (5/16*\sL,\wTh) 
-      -- ({\sL/2- \wTh*cot(60) - \wTh/sin(60)},\wTh);
-      \draw[main] (-.7,4-.4) rectangle (.7,4+.4);
-      \draw[base] (-.605,4-.35) rectangle (.605,4+.35);
+    \draw[main] ({- (\sL/2-\wTh*cot(60) - \wTh/sin(60) )}, -\wTh)
+    -- (-5/16*\sL,-\wTh) -- (-5/16*\sL,0) -- (-3/16*\sL,0) -- (-3/16*\sL,-\wTh)
+      -- (-1/16*\sL,-\wTh) -- (-1/16*\sL,0) -- (1/16*\sL,0) -- (1/16*\sL,-\wTh)
+      -- (3/16*\sL,-\wTh) -- (3/16*\sL,0) -- (5/16*\sL,0) -- (5/16*\sL,-\wTh) 
+      -- ({\sL/2- \wTh*cot(60) - \wTh/sin(60)},-\wTh);
     \end{scope}
     \ifshowLengths
     % Neopixel in Scale
     \draw[neo] (0,{4/3*sqrt(3)}) circle (.5cm);
-    \draw[base] (0,{4/3*sqrt(3)}) circle (.5cm);
     % Masures
       \draw[measure] (-5/16*\sL,-.15) -- (-3/16*\sL,-.15)
         node[midway, below] {\pgfmathparse{10/8*\sL}%
