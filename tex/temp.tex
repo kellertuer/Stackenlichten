@@ -1,0 +1,112 @@
+\documentclass[border=0mm]{standalone}
+\usepackage[no-math]{fontspec}
+\usepackage{xunicode,xltxtra}
+\usepackage{tikz,pgfplots}
+\usetikzlibrary{calc,backgrounds,pgfplots.colormaps}
+% Font
+\defaultfontfeatures{Mapping=tex-text}
+\setromanfont[Ligatures={Common},ItalicFont={Vollkorn-Italic},BoldFont={Vollkorn-Bold}, BoldItalicFont={Vollkorn-BoldItalic}]{Vollkorn}
+%
+% Styles
+\tikzset{base/.style={gray,densely dotted,thin}}
+\tikzset{main/.style={thick}}
+\tikzset{minor/.style={dashed}}
+\tikzset{holes/.style={thick,fill=yellow!20}}
+\tikzset{magnets/.style={thick,fill=cyan!20}}
+\tikzset{measure/.style={thin,|-|}}
+\tikzset{emph/.style={fill=cyan!10!white,cyan!60!white}}
+\tikzset{neo/.style={fill=cyan!20!white,cyan!60!white}}
+\tikzset{every node/.style={font=\tiny}}
+%
+% Display lengths
+\newif\ifshowLengths
+\showLengthstrue
+%\showLengthsfalse
+%
+%
+% Sizes
+%
+% if unsure leave them as they're because that's the production standard for now
+\newcommand\wTh{0.4} %woodThickness in cm, short W in comments
+\newcommand\mTh{0.4} %MagnetThickness in cm, short M in comments
+\newcommand\pTh{0.2} %plexi frontplare Thickness
+\newcommand\sL{8.0} %length of a side of the Triangle
+\newcommand\h{8.0} % height of the side
+\begin{document}
+    \begin{tikzpicture}
+    \ifshowLengths
+      \draw[base] (-\sL/2,0) -- (\sL/2,0);
+      \draw[base] ({- (\sL/2- \wTh*cot(60)) },\wTh)--({\sL/2- \wTh*cot(60)},\wTh);
+    \fi
+    \draw [magnets] (-\sL/4-\mTh/2,\mTh) rectangle (-\sL/4+\mTh/2,0);
+    \draw [magnets] (\sL/4-\mTh/2,\mTh) rectangle (\sL/4+\mTh/2,0);
+    \ifshowLengths
+      \node (A2) at (-\sL/4,\mTh/2) {\large S};
+      \node (A1) at (\sL/4,\mTh/2) {\large N};
+    \fi
+    \draw[main] ({- (\sL/2-\wTh*cot(60) - \wTh/sin(60) )}, \wTh)
+      -- (-5/16*\sL,\wTh) -- (-5/16*\sL,0) -- (-3/16*\sL,0) -- (-3/16*\sL,\wTh)
+      -- (-1/16*\sL,\wTh) -- (-1/16*\sL,0) -- (1/16*\sL,0) -- (1/16*\sL,\wTh)
+      -- (3/16*\sL,\wTh) -- (3/16*\sL,0) -- (5/16*\sL,0) -- (5/16*\sL,\wTh) 
+      -- ({\sL/2- \wTh*cot(60) - \wTh/sin(60)},\wTh);
+    % hole for plugs
+    \draw[main,rounded corners=3mm]
+      (-.75,{4/3*sqrt(3)+.8-.6}) rectangle (.75,{4/3*sqrt(3)+.8+.6});
+    \draw[main, rounded corners=3mm]
+      (-.75,{4/3*sqrt(3)-.75-.5}) rectangle (.75,{4/3*sqrt(3)-.75+.5});
+    \begin{scope}[shift={(-\sL/4,{2*sqrt(3)})},rotate=-120]
+    \ifshowLengths
+      \draw[base] (-\sL/2,0) -- (\sL/2,0);
+      \draw[base] ({- (\sL/2- \wTh*cot(60)) },\wTh)--({\sL/2- \wTh*cot(60)},\wTh);
+    \fi
+    \draw [magnets] (-\sL/4-\mTh/2,\mTh) rectangle (-\sL/4+\mTh/2,0);
+    \draw [magnets] (\sL/4-\mTh/2,\mTh) rectangle (\sL/4+\mTh/2,0);
+    \ifshowLengths
+      \node (A2) at (-\sL/4,\mTh/2) {\large S};
+      \node (A1) at (\sL/4,\mTh/2) {\large N};
+    \fi
+    \draw[main] ({- (\sL/2-\wTh*cot(60) - \wTh/sin(60) )}, \wTh)
+      -- (-5/16*\sL,\wTh) -- (-5/16*\sL,0) -- (-3/16*\sL,0) -- (-3/16*\sL,\wTh)
+      -- (-1/16*\sL,\wTh) -- (-1/16*\sL,0) -- (1/16*\sL,0) -- (1/16*\sL,\wTh)
+      -- (3/16*\sL,\wTh) -- (3/16*\sL,0) -- (5/16*\sL,0) -- (5/16*\sL,\wTh) 
+      -- ({\sL/2- \wTh*cot(60) - \wTh/sin(60)},\wTh);
+    \end{scope}
+    \begin{scope}[shift={(\sL/4,{2*sqrt(3)})},rotate=120]
+    \ifshowLengths
+      \draw[base] (-\sL/2,0) -- (\sL/2,0);
+      \draw[base] ({- (\sL/2- \wTh*cot(60)) },\wTh)--({\sL/2- \wTh*cot(60)},\wTh);
+    \fi
+    \draw [magnets] (-\sL/4-\mTh/2,\mTh) rectangle (-\sL/4+\mTh/2,0);
+    \draw [magnets] (\sL/4-\mTh/2,\mTh) rectangle (\sL/4+\mTh/2,0);
+    \ifshowLengths
+      \node (A2) at (-\sL/4,\mTh/2) {\large S};
+      \node (A1) at (\sL/4,\mTh/2) {\large N};
+    \fi
+    \draw[main] ({- (\sL/2-\wTh*cot(60) - \wTh/sin(60) )}, \wTh)
+      -- (-5/16*\sL,\wTh) -- (-5/16*\sL,0) -- (-3/16*\sL,0) -- (-3/16*\sL,\wTh)
+      -- (-1/16*\sL,\wTh) -- (-1/16*\sL,0) -- (1/16*\sL,0) -- (1/16*\sL,\wTh)
+      -- (3/16*\sL,\wTh) -- (3/16*\sL,0) -- (5/16*\sL,0) -- (5/16*\sL,\wTh) 
+      -- ({\sL/2- \wTh*cot(60) - \wTh/sin(60)},\wTh);
+    \end{scope}
+    \ifshowLengths
+    % Neopixel in Scale
+    \draw[neo] (0,{4/3*sqrt(3)}) circle (.5cm);
+    \draw[base] (0,{4/3*sqrt(3)}) circle (.5cm);
+    % Masures
+      \draw[measure] (-5/16*\sL,-.15) -- (-3/16*\sL,-.15)
+        node[midway, below] {\pgfmathparse{10/8*\sL}%
+        \pgfmathprintnumber{\pgfmathresult}\,mm};
+      \draw[measure] (-1/16*\sL,-.15) -- (1/16*\sL,-.15)
+        node[midway, below] {\pgfmathparse{10/8*\sL}%
+        \pgfmathprintnumber{\pgfmathresult}\,mm};
+      \draw[measure] (3/16*\sL,-.15) -- (5/16*\sL,-.15)
+        node[midway, below] {\pgfmathparse{10/8*\sL}%
+        \pgfmathprintnumber{\pgfmathresult}\,mm};
+      \draw[measure] ({-(\sL/2-\wTh*cot(60)-\wTh/sin(60) )},-.8)
+        -- ({4- \wTh*cot(60)-\wTh/sin(60)},-.8)
+        node[midway,below]
+        {\pgfmathparse{10*(8-2*\wTh*cot(60) - 2*\wTh/sin(60) )}%
+        \pgfmathprintnumber{\pgfmathresult}\,mm};
+    \fi
+    \end{tikzpicture}
+\end{document}

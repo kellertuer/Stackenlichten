@@ -21,10 +21,9 @@ eW = 15; //larger ellipse width
 // don't change these values
 nC = 2*fC+2; //number of Divisions, due to 2fC+1 segments anC one segment that split in the corners
 nD = 2*fD;
-echo(sin(90));
 shortenSide = wW/tan(60)+wW;
 sH = 2*(wW/tan(60)+wW/sin(60)); //shorten inner
-Expl=-1; //-1: closed, the larger the further apart
+Expl=2; //-1: closed, the larger the further apart
 // concat with shfted rotated versions... bottom left right
 
 // Generate Top Part

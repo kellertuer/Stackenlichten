@@ -24,7 +24,7 @@ sH = 2*(wW/tan(60)+wW/sin(60)); //shorten inner
 // concat with shfted rotated versions... bottom left right
 
 bottomPlate();
-color([1,1,1]) translate([0,sL*sqrt(3)/6,wW/2]) cylinder(h=1.001*wW,r=5,$fn=360,center=true);
+//color([1,1,1]) translate([0,sL*sqrt(3)/6,wW/2]) cylinder(h=1.001*wW,r=5,$fn=360,center=true);
 
 module bottomPlate() { difference() {
     linear_extrude(height=wW, twist=0) polygon(points=concat(
