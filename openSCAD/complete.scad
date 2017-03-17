@@ -18,6 +18,7 @@ pW = 12; //width of plug inlet
 pD = 8; //depth of plug inlet
 pS = 40; //shift from baseline of plug inlet
 eW = 15; //larger ellipse width
+hR=3; //Rounded con
 // don't change these values
 nC = 2*fC+2; //number of Divisions, due to 2fC+1 segments anC one segment that split in the corners
 nD = 2*fD;
@@ -50,40 +51,54 @@ color([.3,.3,.3]) translate([0,sL*sqrt(3)/6,-3*bD/4]) cylinder(h=1.001*wW,r=5,$f
 /* 
  * generate one side
  */
-module SLside() { difference() {
+module SLside() {
+    linear_extrude(height=wW, twist=0)
+    difference() {
     midFC = (fC + 1)/2;
     SidePointLine = concat(genSide(0,[0,0], shortenSide,shortenSide+wW,fW),
     genDepth(0,[sL/2-shortenSide/2-wW,0],[0,0],wW),
     [[sL/2-shortenSide/2,-bD],[-sL/2+shortenSide/2+wW,-bD]],
     -genDepth(0,[sL/2-shortenSide/2-wW,bD],[0,0],wW)   );
   rotate(a=180,v=[1,0,0])
-    linear_extrude(height=wW, twist=0) polygon(points=SidePointLine);
+  polygon(points=SidePointLine);
   // minus...
-  translate([2*sL/nC,bD/2,-wW/2])
-    cube(size = [mW,mW,1.02*wW], center = true);
-  translate([-2*sL/nC,bD/2,-wW/2])
-    cube(size = [mW,mW,1.02*wW], center = true);
+  translate([2*sL/nC,bD/2])
+    square(size = [mW,mW], center = true);
+  translate([-2*sL/nC,bD/2])
+    square(size = [mW,mW], center = true);
   for (i = [1:fC]) {
-    translate([-sL/2+2*i*sL/nC,3*bD/4,-wW/2])
-      cube(size = [sL/nC,wW,1.02*wW], center = true);
+    translate([-sL/2+2*i*sL/nC,3*bD/4])
+      square([sL/nC,wW], center = true);
   };
-    translate([0,bD,-wW/2]) scale([2,1,1]) cylinder(h=1.001*wW,d=eW/2,$fn=360,center=true);
-    translate([0,bD-wW,-wW/2]) cube([wW,2*wW,wW],center=true);
+    translate([0,bD,0]) scale([eW,2*wW])circle(d=1,$fn=360,center=true);
+    translate([0,bD-wW]) square([wW,2*wW],center=true);
 }}
+
 /*
  * Generate bottom plate
  */
-module bottomPlate() { difference() {
-    linear_extrude(height=wW, twist=0) polygon(points=concat(
+module bottomPlate() {
+    linear_extrude(height=wW, twist=0)
+    difference() {
+    polygon(points=concat(
             genInnerSide(0,[0,0],sH,sH),
             genInnerSide(-120,[sL/4,sL*sqrt(3)/4],sH,sH),
-            genInnerSide(120,[-sL/4,sL*sqrt(3)/4],sH,sH) ));
-    translate([0,40-wW/2,wW/2]) cube([pW,pD,1.02*wW], center=true);
-    translate([-sL/4,sL*sqrt(3)/4,0]) rotate(a=-120,v=[0,0,1])
-        translate([0,40-wW/2,wW/2]) cube([pW,pD,1.02*wW], center=true);
-    translate([sL/4,sL*sqrt(3)/4,0]) rotate(a=120,v=[0,0,1])
-        translate([0,40-wW/2,wW/2]) cube([pW,pD,1.02*wW], center=true);
-}
+            genInnerSide(120,[-sL/4,sL*sqrt(3)/4],sH,sH)
+        ));
+    translate([0,sL*sqrt(3)/6+8]) hull() {
+        translate([-7.5+hR,-6+hR]) circle(r=hR,$fn=360);
+        translate([-7.5+hR, 6-hR]) circle(r=hR,$fn=360);
+        translate([ 7.5-hR,-6+hR]) circle(r=hR,$fn=360);
+        translate([ 7.5-hR, 6-hR]) circle(r=hR,$fn=360);
+       };
+    translate([0,sL*sqrt(3)/6-7.5]) hull() {
+        translate([-7.5+hR,-5+hR]) circle(r=hR,$fn=360);
+        translate([-7.5+hR, 5-hR]) circle(r=hR,$fn=360);
+        translate([ 7.5-hR,-5+hR]) circle(r=hR,$fn=360);
+        translate([ 7.5-hR, 5-hR]) circle(r=hR,$fn=360);
+    };
+};
+
 };
 /*
  * Helping Functions - Generate one side of the triangle recursion olé olé

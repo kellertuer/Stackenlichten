@@ -24,18 +24,31 @@ sH = 2*(wW/tan(60)+wW/sin(60)); //shorten inner
 // concat with shfted rotated versions... bottom left right
 
 bottomPlate();
-//color([1,1,1]) translate([0,sL*sqrt(3)/6,wW/2]) cylinder(h=1.001*wW,r=5,$fn=360,center=true);
-
-module bottomPlate() { difference() {
-    linear_extrude(height=wW, twist=0) polygon(points=concat(
+//color([.3,.3,.3]) translate([0,sL*sqrt(3)/6,]) circle(r=5,$fn=360,center=true);
+hR = 3;
+module bottomPlate() {
+    linear_extrude(height=wW, twist=0)
+    difference() {
+    polygon(points=concat(
             genInnerSide(0,[0,0],sH,sH),
             genInnerSide(-120,[sL/4,sL*sqrt(3)/4],sH,sH),
-            genInnerSide(120,[-sL/4,sL*sqrt(3)/4],sH,sH) ));
-    translate([0,40-wW/2,wW/2]) cube([pW,pD,1.02*wW], center=true);
-    translate([-sL/4,sL*sqrt(3)/4,0]) rotate(a=-120,v=[0,0,1])
-        translate([0,40-wW/2,wW/2]) cube([pW,pD,1.02*wW], center=true);
-    translate([sL/4,sL*sqrt(3)/4,0]) rotate(a=120,v=[0,0,1])
-        translate([0,40-wW/2,wW/2]) cube([pW,pD,1.02*wW], center=true); };};
+            genInnerSide(120,[-sL/4,sL*sqrt(3)/4],sH,sH)
+        ));
+    translate([0,sL*sqrt(3)/6+8]) hull() {
+        translate([-7.5+hR,-6+hR]) circle(r=hR,$fn=360);
+        translate([-7.5+hR, 6-hR]) circle(r=hR,$fn=360);
+        translate([ 7.5-hR,-6+hR]) circle(r=hR,$fn=360);
+        translate([ 7.5-hR, 6-hR]) circle(r=hR,$fn=360);
+       };
+    translate([0,sL*sqrt(3)/6-7.5]) hull() {
+        translate([-7.5+hR,-5+hR]) circle(r=hR,$fn=360);
+        translate([-7.5+hR, 5-hR]) circle(r=hR,$fn=360);
+        translate([ 7.5-hR,-5+hR]) circle(r=hR,$fn=360);
+        translate([ 7.5-hR, 5-hR]) circle(r=hR,$fn=360);
+    };
+};
+};
+
 /*
  * Helping Functions - Generate one side of the triangle recursion olé olé
  */

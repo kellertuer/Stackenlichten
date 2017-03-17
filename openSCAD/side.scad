@@ -26,25 +26,27 @@ shortenSide = wW/tan(60)+wW/sin(90);
 color([1,0,1]) translate([0,wW,0]) rotate(a=90,v=[1,0,0])
 SLside();
 
-module SLside() { difference() {
+module SLside() {
+    linear_extrude(height=wW, twist=0)
+    difference() {
     midFC = (fC + 1)/2;
     SidePointLine = concat(genSide(0,[0,0], shortenSide,shortenSide+wW,fW),
     genDepth(0,[sL/2-shortenSide/2-wW,0],[0,0],wW),
     [[sL/2-shortenSide/2,-bD],[-sL/2+shortenSide/2+wW,-bD]],
     -genDepth(0,[sL/2-shortenSide/2-wW,bD],[0,0],wW)   );
   rotate(a=180,v=[1,0,0])
-    linear_extrude(height=wW, twist=0) polygon(points=SidePointLine);
+  polygon(points=SidePointLine);
   // minus...
-  translate([2*sL/nC,bD/2,-wW/2])
-    cube(size = [mW,mW,1.02*wW], center = true);
-  translate([-2*sL/nC,bD/2,-wW/2])
-    cube(size = [mW,mW,1.02*wW], center = true);
+  translate([2*sL/nC,bD/2])
+    square(size = [mW,mW], center = true);
+  translate([-2*sL/nC,bD/2])
+    square(size = [mW,mW], center = true);
   for (i = [1:fC]) {
-    translate([-sL/2+2*i*sL/nC,3*bD/4,-wW/2])
-      cube(size = [sL/nC,wW,1.02*wW], center = true);
+    translate([-sL/2+2*i*sL/nC,3*bD/4])
+      square([sL/nC,wW], center = true);
   };
-    translate([0,bD,-wW/2]) scale([2,1,1]) cylinder(h=1.001*wW,d=eW/2,$fn=360,center=true);
-    translate([0,bD-wW,-wW/2]) cube([wW,2*wW,wW],center=true);
+    translate([0,bD,0]) scale([eW,2*wW])circle(d=1,$fn=360,center=true);
+    translate([0,bD-wW]) square([wW,2*wW],center=true);
 }}
 
 
