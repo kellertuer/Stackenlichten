@@ -27,7 +27,7 @@ bottomPlate();
 //color([.3,.3,.3]) translate([0,sL*sqrt(3)/6,]) circle(r=5,$fn=360,center=true);
 hR = 3;
 module bottomPlate() {
-    linear_extrude(height=wW, twist=0)
+    //linear_extrude(height=wW, twist=0)
     difference() {
     polygon(points=concat(
             genInnerSide(0,[0,0],sH,sH),
