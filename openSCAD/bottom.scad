@@ -27,20 +27,20 @@ bottomPlate();
 //color([.3,.3,.3]) translate([0,sL*sqrt(3)/6,]) circle(r=5,$fn=360,center=true);
 hR = 3;
 module bottomPlate() {
-    //linear_extrude(height=wW, twist=0)
+    linear_extrude(height=wW, twist=0)
     difference() {
     polygon(points=concat(
             genInnerSide(0,[0,0],sH,sH),
             genInnerSide(-120,[sL/4,sL*sqrt(3)/4],sH,sH),
             genInnerSide(120,[-sL/4,sL*sqrt(3)/4],sH,sH)
         ));
-    translate([0,sL*sqrt(3)/6+8]) hull() {
-        translate([-7.5+hR,-6+hR]) circle(r=hR,$fn=360);
-        translate([-7.5+hR, 6-hR]) circle(r=hR,$fn=360);
-        translate([ 7.5-hR,-6+hR]) circle(r=hR,$fn=360);
-        translate([ 7.5-hR, 6-hR]) circle(r=hR,$fn=360);
+    translate([0,sL*sqrt(3)/6+7]) hull() {
+        translate([-7.5+hR,-5+hR]) circle(r=hR,$fn=360);
+        translate([-7.5+hR, 5-hR]) circle(r=hR,$fn=360);
+        translate([ 7.5-hR,-5+hR]) circle(r=hR,$fn=360);
+        translate([ 7.5-hR, 5-hR]) circle(r=hR,$fn=360);
        };
-    translate([0,sL*sqrt(3)/6-7.5]) hull() {
+    translate([0,sL*sqrt(3)/6-7]) hull() {
         translate([-7.5+hR,-5+hR]) circle(r=hR,$fn=360);
         translate([-7.5+hR, 5-hR]) circle(r=hR,$fn=360);
         translate([ 7.5-hR,-5+hR]) circle(r=hR,$fn=360);

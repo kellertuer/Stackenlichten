@@ -23,7 +23,7 @@ shortenSide = wW/tan(60)+wW/sin(90);
 
 //Generate one side
 
-color([1,0,1]) translate([0,wW,0]) rotate(a=0,v=[1,0,0])
+color([1,0,1]) translate([0,wW]) rotate(a=0,v=[1,0,0])
 SLside();
 
 module SLside() {
