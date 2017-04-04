@@ -10,10 +10,11 @@ stack different forms of Lichten.
 
 ## Material
 For bulding one of the pixels the following is required
-* 6 [Neodyn magnets](http://www.magnetportal.de/wuerfel/neodym-magnet-wuerfel-n45-4mm-1-3kg/a-64/) of size `4x4x4 mm` (0,10 € ab 200 Stk.)
-* 1 [Cables for 3 pin](https://www.adafruit.com/products/1663)
-* 1 [NeoPixel](https://www.adafruit.com/products/1559) (1,75 €) or any other WS2812 LED having the classical 4 ports +,-,in,out
+* 6 [Neodyn magnets](http://www.magnetportal.de/wuerfel/neodym-magnet-wuerfel-n45-4mm-1-3kg/a-64/) of size `4x4x4 mm` (0,10 € from 200 pieces on)
+* 1 [Cables for 3 pin](https://www.adafruit.com/products/1663) (1,50 € each) or [the not black cable version](https://www.amazon.com/HKBAYI-50Pair-50sets-Connector-WS2812B/dp/B00NBSH4CA/ref=sr_1_4?s=electronics&ie=UTF8&qid=1491030077&sr=1-4&keywords=JST+SM+3+pin) (0,24 € each)
+* 1 [NeoPixel](https://www.adafruit.com/products/1559) (1,75 €) or any other WS2812 LED having the classical 4 ports +,-,in,out, e.g. [these](https://www.adafruit.com/products/1461) (0,41 € each)
 * 4mm thick wood
+* 2mm smoke gray acryl glass (todo)
 * a laser cutter
 
 ## Sketches
@@ -25,6 +26,7 @@ the edges don't overlap the triangular shape.
 The top plate made of plexi glas obtains a shape, that looks quite fance but is
 basically just the triangular shape with the fingers of `0.4x1 cm` cut out.
 <div align="center"><img src="png/side.png" width="50%"></div>
+<span class="color:red;"> Attention: Measurements here are wrong, please use the up to date openSCAD file. I will update the TikZ graphics soon(ish)</span><br>
 Each side plate is made with equal fingers for the sides, but for each pixel
 two sides sould consists of the same pole pointing outward ([S]outh in the sketch)
 and one having the other. This yields South dominated or North dominated pixels,
@@ -44,6 +46,4 @@ the data line is just passed through and hence both pixels are provided with pow
 * [Stackenblochen](https://www.youtube.com/watch?v=QEN5-_93gQg)
 
 ## TODO
-The sketches have to be transformed into laser cutting plans and a layout of
-the jacks has to be made for a usual bottom plate (placement of the connector,
-  length of the cable to the jack (10cm?).
+The front plate has a design but we haven't found a source yet.
