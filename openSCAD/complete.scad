@@ -1,5 +1,5 @@
 /* 
- * Stackenlichten-Files I: The top plate
+ * Stackenlichten-Files I: Collect all parts.
  *
  * kellertuer, 2017-02-19
  */
@@ -24,28 +24,35 @@ nC = 2*fC+2; //number of Divisions, due to 2fC+1 segments anC one segment that s
 nD = 2*fD;
 shortenSide = wW/tan(60)+wW;
 sH = 2*(wW/tan(60)+wW/sin(60)); //shorten inner
-Expl=2; //-1: closed, the larger the further apart
+Expl=0; //-1: closed, the larger the further apart
 // concat with shfted rotated versions... bottom left right
 
-// Generate Top Part
-TopPointLine = concat(genSide(),genSide(-120,[sL/4,sL*sqrt(3)/4],0),genSide(120,[-sL/4,sL*sqrt(3)/4],0));
-color([.1,.5,.7,.25]) translate([0,0,(Expl+1)/2*wW]) linear_extrude(height=fW, twist=0) polygon(points=TopPointLine);
+color([.6,.6,1,.75]) translate([0,0,-3*bD/4-wW/2]) bottomPlate();
+
+color([1,1,1,.8])
+/* A pointy hat */
+translate([0,sL*sqrt(3)/6,-3*bD/4-wW/2]) rotate(a=90,v=[0,0,1])
+difference() {
+    cylinder(10, 6, 3, $fn=360);
+    translate([-0.05,0,1.9]) cube([4.2,12,4.1],center=true);
+}
 
 //Generate one side
 
-color([0,.7,.7]) translate([0,-Expl*wW,0]) rotate(a=-90,v=[1,0,0])
+color([0,.7,.7,.8]) translate([0,-Expl*wW,0]) rotate(a=-90,v=[1,0,0])
     SLside();
 
-color([.7,0,.7]) translate([-sL/4,sL*sqrt(3)/4,0]) rotate(a=-120,v=[0,0,1])
+color([.7,0,.7,.8]) translate([-sL/4,sL*sqrt(3)/4,0]) rotate(a=-120,v=[0,0,1])
     translate([0,-Expl*wW,0]) rotate(a=-90,v=[1,0,0])
         SLside();
 
-color([.7,.7,0]) translate([sL/4,sL*sqrt(3)/4,0]) rotate(a=120,v=[0,0,1])
+color([.7,.7,0,.8]) translate([sL/4,sL*sqrt(3)/4,0]) rotate(a=120,v=[0,0,1])
     translate([0,-Expl*wW,0]) rotate(a=-90,v=[1,0,0])
         SLside();
 
-color([0,0,1]) translate([0,0,-3*bD/4-wW/2]) bottomPlate();
-color([.3,.3,.3]) translate([0,sL*sqrt(3)/6,-3*bD/4]) cylinder(h=1.001*wW,r=5,$fn=360,center=true);
+// Generate Top Part
+TopPointLine = concat(genSide(),genSide(-120,[sL/4,sL*sqrt(3)/4],0),genSide(120,[-sL/4,sL*sqrt(3)/4],0));
+color([.4,.4,.4,.75]) translate([0,0,(Expl)/2*wW]) linear_extrude(height=fW, twist=0) polygon(points=TopPointLine);
 
 
 /* 
