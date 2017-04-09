@@ -40,6 +40,18 @@ class Pixel:
         'set color to a value and reset brightness'
         this.color = color
         this.brightness = brightness
-
     def getColor(this):
         return [i*this.brightness for i in this.color]
+    
+    def getDirectionDistance(this,direction):
+        "get the Distance a pixel is at in given direction"
+        for i in range(len(this.neighbor))
+            if direction == this.neighborDirection[i]:
+                return this.neighborDistance[i]
+        return -1
+    
+    def getDirectionNeighborID(this,direction):
+        "get the Distance a pixel is at in given direction"
+        for i in range(len(this.neighbor))
+            if direction == this.neighborDirection[i]:
+                return this.neighbor[i]

@@ -49,6 +49,9 @@ class Graph:
                         NDists.append(1)
                 this.nodes.append(Pixel(newID,NIDs,NDirs,NDists))
 
+    def getPixel(this,ID):
+        return this.nodes[ID];
+    
     def __repr__(this):
         Descr = "A Graph with nodes\n"
         for n in this.nodes:

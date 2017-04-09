@@ -1,5 +1,6 @@
 import includes.opc as opc
 import numpy as np
+from graph import Graph
 
 def abstractmethod(method):
     def default_abstract_method(*args, **kwargs):
