@@ -12,42 +12,50 @@ class Graph:
                  'square', this.genSquareImage}
         return types[type](size)
     
-    def __init__(this,filename):
-        "Graph(filename): Read graph from file."
-        this.nodes = []
-        with open(filename) as f:
-            for line in f:
-                NIDs = []
-                NDirs = []
-                NDists = []
-                split1 = line.rstrip('\n').split(":");
-                if len(split1) != 2:
-                    raise ValueError("expected an ID followed by a colon and its neighbors per line.")
-                try:
-                    newID = int(split1[0]);
-                except ValueError:
-                    raise ValueError("Not a valid ID given"+split1[0]+".")
-                split1[1] = split1[1].strip().rstrip()
-                for neighborblock in split1[1].split(" "):
-                    values = neighborblock.strip().rstrip().split("|")
-                    # [0] ID
-                    try:
-                        NIDs.append(int(values[0]))
-                    except ValueError:
-                        raise ValueError("Not a valid ID for next neighbor"+values[0]+".")
-                    #[1] Winkel
-                    try:
-                        NDirs.append(float(values[1]))
-                    except ValueError:
-                        raise ValueError("No valid angle given for next neighbor #"+nextNID+".")
-                    if len(values)>2:
+    def __init__(this,graph):
+        this.nodes = graph.nodes;
+    
+    def __init__(this,filename="",graph=None):
+        "construct a graph from file or graph!"
+        if graph is not None:
+            this.nodes = graph.nodes;
+        elif len(filename) > 0:
+            this.nodes = []
+            with open(filename) as f:
+                for line in f:
+                    NIDs = []
+                    NDirs = []
+                    NDists = []
+                    split1 = line.rstrip('\n').split(":");
+                    if len(split1) != 2:
+                        raise ValueError("expected an ID followed by a colon and its neighbors per line.")
                         try:
-                            NDists.append(float(values[2]))
+                            newID = int(split1[0]);
                         except ValueError:
-                            raise ValueError("No valid distance for next neighbor #"+nextNID+".")
-                    else:
-                        NDists.append(1)
-                this.nodes.append(Pixel(newID,NIDs,NDirs,NDists))
+                            raise ValueError("Not a valid ID given"+split1[0]+".")
+                        split1[1] = split1[1].strip().rstrip()
+                        for neighborblock in split1[1].split(" "):
+                            values = neighborblock.strip().rstrip().split("|")
+                            # [0] ID
+                            try:
+                                NIDs.append(int(values[0]))
+                            except ValueError:
+                                raise ValueError("Not a valid ID for next neighbor"+values[0]+".")
+                            #[1] Winkel
+                            try:
+                                NDirs.append(float(values[1]))
+                            except ValueError:
+                                raise ValueError("No valid angle given for next neighbor #"+nextNID+".")
+                            if len(values)>2:
+                                try:
+                                    NDists.append(float(values[2]))
+                                except ValueError:
+                                    raise ValueError("No valid distance for next neighbor #"+nextNID+".")
+                            else:
+                                NDists.append(1)
+                            this.nodes.append(Pixel(newID,NIDs,NDirs,NDists))
+        else:
+            raise ValueError("Neither Graph nor Filebname given");
 
     def getPixel(this,ID):
         return this.nodes[ID];

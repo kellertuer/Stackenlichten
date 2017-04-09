@@ -15,9 +15,9 @@ class Algorithm(Graph):
     keep a list of sub algorithms to be performed within the algorithm
     """"
     
-    def __init(this,graph):
+    def __init(this,fn="",graph=None):
         "Initialize the algorithm to act on a certain graph object"
-        this.graph = graph
+        this.super(AlgTrigWalk,this).__init__("",graph);
     
     @abstractmethod
     def step(this): pass
@@ -54,8 +54,33 @@ class mainAlgorithm(metaAlgorithm):
     """
     The main Algorithms class connects the graph with the view, a Stackenlichten
     and updates the piel after each step, which consists of running all its child algorithms
-    
     """
+
+class AlgTrigWalkCircle(Algorithm):
+    """
+    The algorithm to run in circles on the trig grid. Following a direction
+    until the border and continuing with the next direction; cycling through these.
+    """
+    def __init__(this,graph,startID,directions,trailNum):
+        this.super(AlgTrigWalk,this).__init__("",graph);
+        this.startID=startID
+        this.directions=directions
+        this.actDir = 0
+        this.currID = startID
+        this.currAlg = AlgTrigWalk(graph,startID,directions[this.actDir],trailNum)
+        this.trailNum = trailNum
+    
+    def step(this):
+        if this.currAlg.isFinished(): #start next one
+            this.actDir = (this.actDir+1)%(len(this.directions))
+            curPos = this.currAlg.getactualPosition();
+            this.currAlg = AlgTrigWalk(this.currAlg,curPos,this.directions[this.actDir],this.trailNum)
+        else:
+            this.currAlg.step()
+    
+    def isFinished(): #infinite loop
+        return false
+
 class AlgTrigWalk(Algorithm):
     """
     An algorithm running along a direction starting from a pixel with a tail in
@@ -67,8 +92,8 @@ class AlgTrigWalk(Algorithm):
     __INNER_DIRS__ = [[0,0],[60,0],[60,60],[120,60],[120,120],[180,120],[180,180],[180,240],[240,240],[300,240],[300,300],[300,0]]
     
     
-    def __init__(this,graph,startID,direction,trailNum)
-        this.super(AlgTrigWalk,this).__init__(graph);
+    def __init__(this,fn="",graph=None,startID,direction,trailNum)
+        this.super(AlgTrigWalk,this).__init__(fn,graph);
         a = numpy.array(AVAILABLE_DIRECTIONS) #numpy array
         try:
             this.direction = a.tolist().index(direction) 
@@ -96,7 +121,9 @@ class AlgTrigWalk(Algorithm):
             this.trail = this.trail[0:trailNum]
             for i in range(len(this.trail))
                 this.graph.getPixel(this.trail[i]).setColor([1.0-i/len(this.trail) for k in [0,1,2]]);
-    
+    def getactualPosition(this):
+        "return the current node."
+        return this.currentID
     def isFinished():
         "Check whether there exists a neighbor in walking direction"
         return graph.getPixel(this.currentID).getDirectionDistance(this.__INNER_DIRS__[this.direction][this.startDir]) > 0
