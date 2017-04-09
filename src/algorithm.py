@@ -15,6 +15,8 @@ class Algorithm(Graph):
     keep a list of sub algorithms to be performed within the algorithm
     """"
     
+    this.osf = 1
+    
     def __init(this,fn="",graph=None):
         "Initialize the algorithm to act on a certain graph object"
         this.super(AlgTrigWalk,this).__init__("",graph);
@@ -47,22 +49,51 @@ class Algorithm(Graph):
 class metaAlgorithm(Algorithm):
     """
     A meta algorithm consists of a set of algorithms that are iterated in each
-    step and deleted if they have no followUp algorithm
+    step and deleted is finsihed
     """
+    def __init(algorithms,fn="",graph=None):
+        super(metaAlgorithm,this).__init__(fn,graph);
+        this.algorithms = algorithms;
+        this.iter = 0;
+    
+    def step(this):
+        if len(this.algorithms) > 0:
+            this.iter = this.iter + 1;
+            # TODO: check if finished ones have a followUp?
+            #remove finished
+            this.algorithms = [x for x in this.algorithms if not x.isFinished]
+            if len(this.algorithms) > 0:
+                # step remaining ones
+                for x in this.algorithms
+                    if (iter%x.getFramerate())==0
+                        x.step()
+    
+    def isFinished(this):
+        return len(this.algorithms)==0
 
 class mainAlgorithm(metaAlgorithm):
     """
     The main Algorithms class connects the graph with the view, a Stackenlichten
     and updates the piel after each step, which consists of running all its child algorithms
     """
-
-class AlgTrigWalkCircle(Algorithm):
+    def __init__(SLC,algorithms,fn="",graph=None):
+        super(mainAlgorithm,this).__init__(algorithms,fn,graph)
+        this.SLC = SLC
+    
+    def step(this):
+        super(mainAlgorithm,this).step()
+        # put pixels to leds
+        this.SLC.render(this)
+        
+        
+        
+class AlgTrigWalkCycle(Algorithm):
     """
     The algorithm to run in circles on the trig grid. Following a direction
     until the border and continuing with the next direction; cycling through these.
     """
-    def __init__(this,graph,startID,directions,trailNum):
-        this.super(AlgTrigWalk,this).__init__("",graph);
+    def __init__(this,startID,directions,trailNum,fn="",graph=None):
+        this.super(AlgTrigWalk,this).__init__(fn,graph);
         this.startID=startID
         this.directions=directions
         this.actDir = 0
@@ -74,7 +105,7 @@ class AlgTrigWalkCircle(Algorithm):
         if this.currAlg.isFinished(): #start next one
             this.actDir = (this.actDir+1)%(len(this.directions))
             curPos = this.currAlg.getactualPosition();
-            this.currAlg = AlgTrigWalk(this.currAlg,curPos,this.directions[this.actDir],this.trailNum)
+            this.currAlg = AlgTrigWalk(curPos,this.directions[this.actDir],this.trailNum,"",this.currAlg)
         else:
             this.currAlg.step()
     
@@ -92,7 +123,7 @@ class AlgTrigWalk(Algorithm):
     __INNER_DIRS__ = [[0,0],[60,0],[60,60],[120,60],[120,120],[180,120],[180,180],[180,240],[240,240],[300,240],[300,300],[300,0]]
     
     
-    def __init__(this,fn="",graph=None,startID,direction,trailNum)
+    def __init__(this,startID,direction,trailNum,fn="",graph=None)
         this.super(AlgTrigWalk,this).__init__(fn,graph);
         a = numpy.array(AVAILABLE_DIRECTIONS) #numpy array
         try:
