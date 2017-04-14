@@ -9,3 +9,4 @@ tex/*.log
 *.md5
 *.auxlock
 doku
+*.pyc
