@@ -4,31 +4,32 @@ class Pixel:
     'A pixel class including its neighbors'
     ID = 0
     color = [0,0,0]
-    neighbor = []
     neighborDirection = []
     nbeighborDistance = []
     brightness = 1.0
     
-    def __init__(this, ID, neighbor = [], neighborDirection = [], neighborDistance = [], color = [0,0,0]):
+    def __init__(this, ID, neighborDirection = {}, neighborDistance = {}, color = [0,0,0]):
         'initialize pixel with a color and its neighbors'
         this.ID = ID
         this.color = color
-        this.neighbor = neighbor
-        if len(neighborDirection) == 0:
-            num = len(neighbors)
-            step = math.floor(360/num)
-            this.neighborDirection = [(i+step)%360 for i in  range(0,360,step)]
-        else:
-            this.neighborDirection = neighborDirection
-        if len(neighborDistance) == 0:
-            this.neighborDistance = len(this.neighbor)*[1]
-        else:
-            this.neighborDistance = neighborDistance
+        if len(neighborDistance) == 0 and len(neighborDistance) == 0:
+            raise ValueError("At least one of the dictionaries of Directions or Distances has to be provied")
+        this.neighborDirection = neighborDirection
+        if len(this.neighborDirection) == 0:
+            dir = 0;
+            dirStep = 360/len(neighborDistance)
+            for k in neighborDistance.keys():
+                this.neighborDirection[k] = dir
+                dir += dirStep
+        this.neighborDistance = neighborDistance
+        if len(this.neighborDistance) == 0:
+            for k in this.neighborDirection.keys():
+                this.neighborDistance[k] = 1
 
     def __repr__(this):
         neighborStrings = ''
-        for idS, dirS, distS in zip(this.neighbor, this.neighborDirection, this.neighborDistance):
-            neighborStrings += '(#'+str(idS)+' '+str(dirS)+':'+str(distS)+') '
+        for  k in this.neighborDirection.keys():
+            neighborStrings += '(#'+str(k)+' '+str(this.neighborDirection[k])+':'+str(this.neighborDistance[k])+') '
         neighborStrings = neighborStrings[:-1] #remove last string
         return '#'+str(this.ID)+' with neighbors '+neighborStrings
         
@@ -45,13 +46,14 @@ class Pixel:
     
     def getDirectionDistance(this,direction):
         "get the Distance a pixel is at in given direction"
-        for i in range(len(this.neighbor))
-            if direction == this.neighborDirection[i]:
-                return this.neighborDistance[i]
+        for k in this.neighborDirection.keys():
+            if this.neighborDirection[k]  == direction:
+                return this.neighborDistance[k]
         return -1
     
     def getDirectionNeighborID(this,direction):
         "get the Distance a pixel is at in given direction"
-        for i in range(len(this.neighbor))
-            if direction == this.neighborDirection[i]:
-                return this.neighbor[i]
+        for k in this.neighborDirection.keys():
+            if this.neighborDirection[k]  == direction:
+                return k
+        return None

@@ -16,25 +16,29 @@ class SLC:
     MAX_BRIGHTNESS = 255
     
     @abstractmethod
-    def render(self, graph,scale=1): pass
+    def render(this, graph,scale=1):
         "render(graph) – renders a graph onto the Stackenlichten and activates the LEDs."
+        pass
         
 class FadecandySLC(SLC):
     client = None
 
-    def __init__(url='localhost:7890'):
-    """
-    FadecandySLC() initializes the Open Pixel Control (OPC) to connect to
+    def __init__(this,url='localhost:7890'):
+        """
+        FadecandySLC() initializes the Open Pixel Control (OPC) to connect to
         the usual localhost fadecandy server.
-    """
-    print('~~ Stackenlichten ~~\n\nLet\'s blink in lichten. But with German stacken and blochen.~~\n\nMoin.')
-    this.client opc.Client(url)
-        
+        """
+        print("""                              ~~~ Stackenlichten ~~~                            
+           Let\'s blink in lichten. But with German stacken and blochen.         
+                                                                     @kellertuer
+Moin.""")
+        this.client = opc.Client(url)
+
     def render(this, graph,scale=1):
         data = [ (0,0,0) ] * 512
-        for p in graph.nodes
-            v = [i*scale*this.MAX_BRIGHTNESS for i in p.getColor()]
-            if p.ID > 512
-                 raise ValueError("The graph node id " + str(p.ID) * " is too large for the fadecandy board (max 512 LEDs).\nPlease reorder or reduce the number")
-            data[p.ID-1] = tuple( np.round(v)) )
-        client.put_pixels(data)
+        for k in graph.nodes.keys():
+            v = [i*scale*this.MAX_BRIGHTNESS for i in graph.nodes[k].getColor()]
+            if k > 512:
+                 raise ValueError("The graph node id " + str(k) * " is too large for the fadecandy board (max 512 LEDs).\nPlease reorder or reduce the number")
+            data[k-1] = tuple( np.round(v) )
+        this.client.put_pixels(data)
