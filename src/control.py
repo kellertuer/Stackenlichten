@@ -12,7 +12,7 @@ def abstractmethod(method):
 
 class Control:
     # standard parameters
-    PARAMETERS = {'framerate': 10}
+    PARAMETERS = {'framerate': 25}
     
     def __init__(this,algorithm,parameters=None):
         this.algorithm = algorithm
@@ -31,7 +31,12 @@ class SimpleControl(Control):
         super(SimpleControl,this).__init__(algorithm,parameters)
     
     def start(this):
-        while not this.algorithm.isFinished():
-           this.algorithm.step()
-           time.sleep(1/this.parameters["framerate"])
-           print('.', end='', flush=True)
+        try: #Check for Keypresses
+            while not this.algorithm.isFinished():
+                this.algorithm.step()
+                time.sleep(1/this.parameters["framerate"])
+                print('.', end='', flush=True)
+        except KeyboardInterrupt:
+            #set back hard to black
+            this.algorithm.setBlack()
+            print("\n\nKthxbye.")

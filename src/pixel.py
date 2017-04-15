@@ -4,8 +4,8 @@ class Pixel:
     'A pixel class including its neighbors'
     ID = 0
     color = [0,0,0]
-    neighborDirection = []
-    nbeighborDistance = []
+    neighborDirection = {}
+    nbeighborDistance = {}
     brightness = 1.0
     
     def __init__(this, ID, neighborDirection = {}, neighborDistance = {}, color = [0,0,0]):
@@ -57,3 +57,8 @@ class Pixel:
             if this.neighborDirection[k]  == direction:
                 return k
         return None
+
+    def clone(this):
+        p = Pixel(this.ID,this.neighborDirection,this.neighborDistance,color)
+        p.brightness = this.brightness
+        return

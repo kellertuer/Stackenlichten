@@ -71,3 +71,10 @@ class Graph:
         for k,n in this.nodes.items():
             Descr += str(n)+"\n"
         return Descr
+
+    def clone(this):
+        g = Graph("",this)
+        g.nodes = {}
+        for k in this.nodes.keys():
+            g.nodes[k] = this.nodes[k].clone()
+        

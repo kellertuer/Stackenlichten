@@ -87,15 +87,60 @@ class mainAlgorithm(metaAlgorithm):
     def __init__(this,SLC,algorithms,fn="",graph=None):
         super(mainAlgorithm,this).__init__(algorithms,fn,graph)
         this.SLC = SLC
-    
+        
     def step(this):
         super(mainAlgorithm,this).step()
         # put pixels to leds
         this.SLC.render(this)
- 
+    
+    def setBlack(this):
+        super(mainAlgorithm,this).setBlack()
+        this.SLC.render(this)
+
+class AlgRunningLight(Algorithm):
+    """The algorithm performs a simple running light ordered by id"""
+    def __init__(this,randomColor=True,restart=True,sort=False,fn="",graph=None):
+        """Initialize the Runninglight.
+        Variables:
+        * randomColor – random color (if set true)
+        * repeatSequence - repeat or not"""
+        super(AlgRunningLight,this).__init__(fn,graph)
+        this.sort = sort
+        if sort:
+            this._iterator = iter(sorted(this.nodes.keys()))
+        else:
+            this._iterator = iter(this.nodes.keys())
+        this.restart = restart
+        this.currentID = None
+        this.start = True
+
+    def step(this):
+        this.start=False
+        if this.currentID is not None:
+            #remove last
+            this.getPixel(this.currentID).setColor([0, 0,0])
+        try:
+            this.currentID = this._iterator.__next__()
+        except StopIteration:
+            this.currentID = None
+        if this.currentID is not None:
+            this.getPixel(this.currentID).setColor([1.0, 1.0,1.0]);
+        elif this.restart:
+            if this.sort:
+                this._iterator = iter(sorted(this.nodes.keys()))
+            else:
+                this._iterator = iter(this.nodes.keys())
+            this.start = True
+
+    def isFinished(this):
+        return this.currentID is None and this.start == False
+
+    def getactualPosition(this):
+        "return the current node."
+        return this.currentID
+
 class AlgTrigWalkCycle(Algorithm):
-    """
-    The algorithm to run in circles on the trig grid. Following a direction
+    """The algorithm to run in circles on the trig grid. Following a direction
     until the border and continuing with the next direction; cycling through these.
     """
     def __init__(this,startID,directions,trailNum,fn="",graph=None):
@@ -128,7 +173,7 @@ class AlgTrigWalk(Algorithm):
     
     
     def __init__(this,startID,direction,trail,fn="",graph=None):
-        super(AlgTrigWalk,this).__init__(fn,graph);
+        super(AlgTrigWalk,this).__init__(fn,graph)
         if direction not in AlgTrigWalk.DIRECTION_MAPS:
             raise ValueError("This direction is not availale for walking athe moment");
         this.Direction = direction
@@ -156,7 +201,7 @@ class AlgTrigWalk(Algorithm):
             this.trail = this.trail[0:this.trailNum]
             n = len(this.trail)
             for i in range(n):
-                this.getPixel(this.trail[i]).setColor([1.0, 0.3,0.9]);
+                this.getPixel(this.trail[i]).setColor([1.0, 1.0,1.0]);
             # switch step
             this.startDir = (this.startDir+1)%2
 
