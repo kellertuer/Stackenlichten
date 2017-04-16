@@ -55,9 +55,9 @@ class Algorithm(Graph):
         pass
 
 class metaAlgorithm(Algorithm):
-    """
-    A meta algorithm consists of a set of algorithms that are iterated in each
-    step and deleted is finsihed
+    """ Meta Algorithm
+        the meta algorithm just encapsulates a set of algorithms and assumes
+        they all work on the same graph, i.e. the last set pixel wins
     """
     def __init__(this,algorithms,fn="",graph=None):
         super(metaAlgorithm,this).__init__(fn,graph)
@@ -80,7 +80,7 @@ class metaAlgorithm(Algorithm):
         return len(this.algorithms)==0
 
 class mainAlgorithm(metaAlgorithm):
-    """
+    """Main Algorithm
     The main Algorithms class connects the graph with the view, a Stackenlichten
     and updates the piel after each step, which consists of running all its child algorithms
     """
@@ -96,6 +96,22 @@ class mainAlgorithm(metaAlgorithm):
     def setBlack(this):
         super(mainAlgorithm,this).setBlack()
         this.SLC.render(this)
+
+class AlgBackground(Algorithm):
+    """ Background Algorithm
+    The background algorithm just sets a constant color as background.
+    In the meta Algorithm it should hence be set as first algorithm.
+    """
+    def __init__(this,color=[0,0,0],fn="", graph=None):
+        super(Algorithm,this).__init__(fn,graph)
+        this.color= color
+        
+    def step(this):
+        for k,n in this.nodes.items():
+            n.setColor(this.color)
+
+    def isFinished(this):
+        return False
 
 class AlgRunningLight(Algorithm):
     """The algorithm performs a simple running light ordered by id"""

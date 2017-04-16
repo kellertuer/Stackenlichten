@@ -13,7 +13,7 @@ def abstractmethod(method):
 class SLC:
     "StackenLichtenControl - the connector to the USB board"
 
-    MAX_BRIGHTNESS = 255
+    MAX_BRIGHTNESS = 128
     
     @abstractmethod
     def render(this, graph,scale=1):
