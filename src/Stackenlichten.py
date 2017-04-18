@@ -13,7 +13,7 @@ def abstractmethod(method):
 class SLC:
     "StackenLichtenControl - the connector to the USB board"
 
-    MAX_BRIGHTNESS = 128
+    MAX_BRIGHTNESS = 255
     
     @abstractmethod
     def render(this, graph,scale=1):
@@ -37,7 +37,7 @@ Moin.""")
     def render(this, graph,scale=1):
         data = [ (0,0,0) ] * 512
         for k in graph.nodes.keys():
-            v = [i*scale*this.MAX_BRIGHTNESS for i in graph.nodes[k].getColor()]
+            v = [i*scale*this.MAX_BRIGHTNESS*graph.nodes[k].brightness for i in graph.nodes[k].getColor()]
             if k > 512:
                  raise ValueError("The graph node id " + str(k) * " is too large for the fadecandy board (max 512 LEDs).\nPlease reorder or reduce the number")
             data[k-1] = tuple( np.round(v) )

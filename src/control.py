@@ -12,14 +12,13 @@ def abstractmethod(method):
 
 class Control:
     # standard parameters
-    PARAMETERS = {'framerate': 12}
+    PARAMETERS = {'framerate': 30}
     
     def __init__(this,algorithm,parameters=None):
         this.algorithm = algorithm
+        this.parameters = Control.PARAMETERS
         if parameters is not None:
-            this.parameters = parameters
-        else:
-            this.parameters = Control.PARAMETERS
+            this.parameters.updatethis.PARAMETERS.update(parameters)
     
     @abstractmethod
     def start(this):
@@ -37,6 +36,10 @@ class SimpleControl(Control):
                 time.sleep(1/this.parameters["framerate"])
                 print('.', end='', flush=True)
         except KeyboardInterrupt:
-            #set back hard to black
-            this.algorithm.setBlack()
+            this.algorithm = mainAlgorithm(this.algorithm.SLC,AlgFadeOut(2*this.PARAMETERS['framerate'],this.algorithm))
+            print('o', end='', flush=True)
+            while not this.algorithm.isFinished():
+                this.algorithm.step()
+                time.sleep(1/this.parameters["framerate"])
+                print('.', end='', flush=True)
             print("\n\nKthxbye.")

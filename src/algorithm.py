@@ -17,9 +17,10 @@ class Algorithm(Graph):
     
     osf = 1
     
-    def __init(this,fn="",graph=None):
+    def __init__(this,graph=None):
         "Initialize the algorithm to act on a certain graph object"
-        super(Algorithm,this).__init__(fn,graph);
+        super(Algorithm,this).__init__(graph)
+        
     
     @abstractmethod
     def step(this):
@@ -54,13 +55,35 @@ class Algorithm(Graph):
         "if the algorithm is finished it may provide a followUpAlgorithm or set of Algorithms"
         pass
 
+class mainAlgorithm(Algorithm):
+    """Main Algorithm
+    The main Algorithms class connects the graph with the view, a Stackenlichten
+    and updates the piel after each step, which consists of running all its child algorithms
+    """
+    def __init__(this,SLC,algorithm):
+        super(mainAlgorithm,this).__init__(algorithm)
+        this.alg = algorithm;
+        this.SLC = SLC
+        
+    def step(this):
+        this.alg.step()
+        # put pixels to leds
+        this.SLC.render(this.alg)
+    
+    def setBlack(this):
+        this.alg.setBlack();
+        this.SLC.render(this)
+    
+    def isFinished(this):
+        return this.alg.isFinished()
+
 class metaAlgorithm(Algorithm):
     """ Meta Algorithm
         the meta algorithm just encapsulates a set of algorithms and assumes
         they all work on the same graph, i.e. the last set pixel wins
     """
-    def __init__(this,algorithms,fn="",graph=None):
-        super(metaAlgorithm,this).__init__(fn,graph)
+    def __init__(this,algorithms,graph=None):
+        super(metaAlgorithm,this).__init__(graph)
         this.algorithms = algorithms;
         this.iter = 0;
     
@@ -75,35 +98,47 @@ class metaAlgorithm(Algorithm):
                 for x in this.algorithms:
                     if (this.iter%x.getFramerate()) == 0:
                         x.step()
+    def append(algorithm):
+        this.algorithms.append(algorithm)
     
     def isFinished(this):
         return len(this.algorithms)==0
 
-class mainAlgorithm(metaAlgorithm):
-    """Main Algorithm
-    The main Algorithms class connects the graph with the view, a Stackenlichten
-    and updates the piel after each step, which consists of running all its child algorithms
-    """
-    def __init__(this,SLC,algorithms,fn="",graph=None):
-        super(mainAlgorithm,this).__init__(algorithms,fn,graph)
-        this.SLC = SLC
+class addAlgorithm(metaAlgorithm):
+    def __init__(this,algorithms,graph=None):
+        super(addAlgorithm,this).__init__(algorithms,graph)
+    
+    def step(this):
+        super(addAlgorithm,this).step()
+        if len(this.algorithms) > 0:
+            # step remaining ones
+            for k in this.nodes.keys():
+                this.nodes[k].setColor([0.0,0.0,0.0]);
+            for x in this.algorithms:
+                for k in this.nodes.keys():
+                    this.nodes[k] += x.nodes[k]
+
+class multAlgorithm(metaAlgorithm):
+    def __init__(this,algorithms,graph=None):
+        super(multAlgorithm,this).__init__(algorithms,graph)
         
     def step(this):
-        super(mainAlgorithm,this).step()
-        # put pixels to leds
-        this.SLC.render(this)
-    
-    def setBlack(this):
-        super(mainAlgorithm,this).setBlack()
-        this.SLC.render(this)
+        super(multAlgorithm,this).step()
+        if len(this.algorithms) > 0:
+            # start with 1 and multiply them
+            for k in this.nodes.keys():
+                this.nodes[k].setColor([1.0,1.0,1.0]);
+            for x in this.algorithms:
+                for k in this.nodes.keys():
+                    this.nodes[k] *= x.nodes[k]
 
 class AlgBackground(Algorithm):
     """ Background Algorithm
     The background algorithm just sets a constant color as background.
     In the meta Algorithm it should hence be set as first algorithm.
     """
-    def __init__(this,color=[0,0,0],fn="", graph=None):
-        super(Algorithm,this).__init__(fn,graph)
+    def __init__(this,color=[0,0,0],graph=None):
+        super(AlgBackground,this).__init__(graph)
         this.color= color
         
     def step(this):
@@ -113,14 +148,75 @@ class AlgBackground(Algorithm):
     def isFinished(this):
         return False
 
+class AlgFadeOut(Algorithm):
+    def __init__(this,frames=30,graph=None):
+        super(AlgFadeOut,this).__init__(graph)
+        this.actFrame=0
+        this.frames = frames
+
+    def step(this):
+        this.actFrame +=1
+        for k,n in this.nodes.items():
+            n.brightness = float(this.frames-this.actFrame)/float(this.frames)
+
+    def isFinished(this):
+        return this.actFrame==this.frames
+
+class AlgSampleFunction(Algorithm):
+    """Algorithm to Sample a Function
+        A function f(x,y,p) is sampled on (x,y)-plane with respect to the
+        directions and distances of the nodes. This function is enhances by
+        parameters and accompanied by a stepParameters function."""
+    def __init__(this,fct,stepParamFct,initParameters,graph=None):
+        super(AlgSampleFunction,this).__init__(graph)
+        this.function = fct
+        this.stepFct = stepParamFct
+        this.FctValues = initParameters
+
+    def step(this):
+        finished = False
+        sampledList = dict()
+        for k in this.nodes.keys():
+            sampledList[k] = False
+        Start = True
+        samplePoint = [0,0];
+        while not finished:
+            for k,n in this.nodes.items():
+                if not sampledList[k]:
+                    if Start:
+                        nextID = k
+                        dir = 0
+                        dist = 0
+                        Start = False
+                        break
+                    else:
+                        if this.nodes[this.currentID].isNeighbor(n):
+                            nextID = k
+                            dir = this.nodes[this.currentID].getNeighborDirection(n)
+                            dist = this.nodes[this.currentID].getNeighborDistance(n)
+                            break
+            # updirection is 0 degree, hence we invert sin and cos
+            samplePoint = [samplePoint[0] + np.sin(dir)*dist,samplePoint[1] + np.cos(dir)*dist]
+            this.nodes[nextID].setColor(this.function(samplePoint,this.FctValues))
+            this.currentID = nextID
+            sampledList[this.currentID] = True
+            finished = True
+            for k in sampledList.keys():
+                finished = finished & sampledList[k]
+        this.FctValues = this.stepFct(this.FctValues)
+
+
+    def isFinished(this):
+        this.FctValues.get('finished',False)
+        
 class AlgRunningLight(Algorithm):
     """The algorithm performs a simple running light ordered by id"""
-    def __init__(this,randomColor=True,restart=True,sort=False,fn="",graph=None):
+    def __init__(this,randomColor=True,restart=True,sort=False,graph=None):
         """Initialize the Runninglight.
         Variables:
         * randomColor – random color (if set true)
         * repeatSequence - repeat or not"""
-        super(AlgRunningLight,this).__init__(fn,graph)
+        super(AlgRunningLight,this).__init__(graph)
         this.sort = sort
         if sort:
             this._iterator = iter(sorted(this.nodes.keys()))
@@ -159,21 +255,21 @@ class AlgTrigWalkCycle(Algorithm):
     """The algorithm to run in circles on the trig grid. Following a direction
     until the border and continuing with the next direction; cycling through these.
     """
-    def __init__(this,startID,directions,trailNum,fn="",graph=None):
-        super(AlgTrigWalkCycle,this).__init__(fn,graph);
+    def __init__(this,startID,directions,trailNum,graph=None):
+        super(AlgTrigWalkCycle,this).__init__(graph);
         this.startID=startID
         this.directions=directions
         this.actDir = 0
         this.currID = startID
-        this.currAlg = AlgTrigWalk(startID,directions[this.actDir],trailNum,fn,graph)
+        this.currAlg = AlgTrigWalk(startID,directions[this.actDir],trailNum,graph)
         this.trailNum = trailNum
     
     def step(this):
-        this.currAlg.step()
         if this.currAlg.isFinished(): #start next one
             this.actDir = (this.actDir+1)%(len(this.directions))
             curPos = this.currAlg.getactualPosition();
-            this.currAlg = AlgTrigWalk(curPos,this.directions[this.actDir],this.currAlg.trail,"",this.currAlg)
+            this.currAlg = AlgTrigWalk(curPos,this.directions[this.actDir],this.currAlg.trail,this.currAlg)
+        this.currAlg.step()
         
     def isFinished(this): #infinite loop
         return False
@@ -188,8 +284,8 @@ class AlgTrigWalk(Algorithm):
     DIRECTION_MAPS = {0:[0,0], 30:[60,0], 60:[60,60], 90:[60,120], 120:[120,120], 150:[180,120], 180:[180,180], 210:[180,240], 240:[240,240], 270:[300,240], 300:[300,300], 330:[300,0]}
     
     
-    def __init__(this,startID,direction,trail,fn="",graph=None):
-        super(AlgTrigWalk,this).__init__(fn,graph)
+    def __init__(this,startID,direction,trail,graph=None):
+        super(AlgTrigWalk,this).__init__(graph)
         if direction not in AlgTrigWalk.DIRECTION_MAPS:
             raise ValueError("This direction is not availale for walking athe moment");
         this.Direction = direction
@@ -205,7 +301,7 @@ class AlgTrigWalk(Algorithm):
         this.trailNum = len(trail)
 
     def step(this):
-        if ~this.isFinished():
+        if not this.isFinished():
             thisDir = this.DIRECTION_MAPS[this.Direction][this.startDir]
             thisP = this.getPixel(this.currentID);
             this.currentID = thisP.getDirectionNeighborID(thisDir)

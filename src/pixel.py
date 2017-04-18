@@ -31,7 +31,7 @@ class Pixel:
         for  k in this.neighborDirection.keys():
             neighborStrings += '(#'+str(k)+' '+str(this.neighborDirection[k])+':'+str(this.neighborDistance[k])+') '
         neighborStrings = neighborStrings[:-1] #remove last string
-        return '#'+str(this.ID)+' with neighbors '+neighborStrings
+        return '#'+str(this.ID)+' ['+str(this.color[0])+','+str(this.color[1])+','+str(this.color[2])+'] with neighbors '+neighborStrings
         
     def dimm(this,brightness):
         'Dim this pixel down to brightness, which is a value between 1 (full brightness) and 0 (off) '
@@ -44,12 +44,27 @@ class Pixel:
     def getColor(this):
         return [i*this.brightness for i in this.color]
     
+    def isNeighbor(this,pixel):
+        return pixel.ID in this.neighborDirection.keys()
+
+    def getNeighborDirection(this,pixel):
+        if pixel.ID in this.neighborDirection.keys():
+            return this.neighborDirection[pixel.ID]
+        else:
+            None
+
+    def getNeighborDistance(this,pixel):
+        if pixel.ID in this.neighborDistance.keys():
+            return this.neighborDistance[pixel.ID]
+        else:
+            None
+    
     def getDirectionDistance(this,direction):
         "get the Distance a pixel is at in given direction"
         for k in this.neighborDirection.keys():
             if this.neighborDirection[k]  == direction:
                 return this.neighborDistance[k]
-        return -1
+        return None
     
     def getDirectionNeighborID(this,direction):
         "get the Distance a pixel is at in given direction"
@@ -59,6 +74,28 @@ class Pixel:
         return None
 
     def clone(this):
-        p = Pixel(this.ID,this.neighborDirection,this.neighborDistance,color)
+        p = Pixel(this.ID,this.neighborDirection,this.neighborDistance,this.color)
         p.brightness = this.brightness
-        return
+        return p
+    def __add__(this,pixel):
+        color = [min(this.color[i]+pixel.color[i],1.0) for i in range(3)]
+        brightness = min(this.brightness+pixel.brightness,1.0)
+        p = Pixel(this.ID,this.neighborDirection,this.neighborDistance,color)
+        p.brightness = brightness;
+        return p
+    def __iadd__(this,pixel):
+        this.color = [min(this.color[i]+pixel.color[i],1.0) for i in range(3)]
+        this.brightness = min(this.brightness+pixel.brightness,1.0)
+        return this
+    def __radd__(this,pixel):
+        return this+pixel
+    def __mul__(this,pixel):
+        color = [min(this.color[i]*pixel.color[i],1.0) for i in range(3)]
+        brightness = min(this.brightness*pixel.brightness,1.0)
+        p = Pixel(this.ID,this.neighborDirection,this.neighborDistance,color)
+        p.brightness = brightness;
+        return p
+    def __imul__(this,pixel):
+        this.color = [min(this.color[i]*pixel.color[i],1.0) for i in range(3)]
+        this.brightness = min(this.brightness*pixel.brightness,1.0)
+        return this
