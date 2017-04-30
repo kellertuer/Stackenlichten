@@ -32,7 +32,7 @@ def run(argv):
     vars = {'alpha':0,'scale':.5}
     sample = AlgSampleFunction(f,stepVars,vars,graph.clone())
     walk = AlgTrigWalkCycle(1,[90,330,90,210],[1,1,1,1,1,1,1,1],graph.clone())
-    walk.setFramerate(2)
+    walk.setFramerate(1)
     add1 = addAlgorithm([
         AlgBackground([0,0,0],graph.clone()),
         walk],graph.clone())

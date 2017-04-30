@@ -1,5 +1,7 @@
 from graph import Graph
+from pixel import Pixel
 import numpy as np
+import random
 
 def abstractmethod(method):
     def default_abstract_method(*args, **kwargs):
@@ -104,6 +106,34 @@ class metaAlgorithm(Algorithm):
     def isFinished(this):
         return len(this.algorithms)==0
 
+class iterAlgorithm(Algorithm):
+    """ Iter Algorithm
+        the meta algorithm just encapsulates a set of algorithms and assumes
+        they all work on the same graph, i.e. the last set pixel wins
+    """
+    def __init__(this,algorithms,graph=None):
+        super(iterAlgorithm,this).__init__(graph)
+        this.algorithms = algorithms;
+        this.numAlg = 0
+        this.actAlg = this.algorithms[0]
+        this.iter = 0
+    
+    def step(this):
+        if len(this.algorithms) > 0:
+            this.iter = this.iter + 1;
+            if this.actAlg.isFinished():
+                this.numAlg += 1
+                if this.numAlg < len(this.algorithms):
+                    this.actAlg = this.algorithms[this.numAlg]
+            if (this.iter%this.actAlg.getFramerate()) == 0:
+                this.actAlg.step()
+            
+    def append(algorithm):
+        this.algorithms.append(algorithm)
+    
+    def isFinished(this):
+        return this.numAlg == (len(this.algorithms)-1) and len(this.algorithms)==0
+
 class addAlgorithm(metaAlgorithm):
     def __init__(this,algorithms,graph=None):
         super(addAlgorithm,this).__init__(algorithms,graph)
@@ -147,6 +177,83 @@ class AlgBackground(Algorithm):
 
     def isFinished(this):
         return False
+
+class AlgDiffusion(Algorithm):
+    """Algorithm to perform Diffusion on the colors
+    """
+    def __init__(this,stepSize=0.05,graph=None):
+        super(AlgDiffusion,this).__init__(graph)
+        this.stepSize = stepSize
+        this.algInit = False
+
+    def step(this):
+        gCopy = this.clone()
+        for k in this.nodes.keys():
+            csub = [0,0,0]
+            numN = 0.5 #len(this.nodes[k].getNeighborIDs())
+            for l in this.nodes[k].getNeighborIDs():
+                c = gCopy.nodes[k].getColor()
+                c2 = gCopy.nodes[l].getColor()
+                step = [i - j for i, j in zip(c, c2)]
+                csub = [csub[i] - step[i]*this.stepSize/numN for i in range(3)]
+                this.nodes[l].addToColor([step[i]*this.stepSize for i in range(3)])
+            this.nodes[k].addToColor(csub)
+        this.algInit = True
+        
+    def isFinished(this):
+        if not this.algInit:
+            return False
+        init = False
+        finished = True
+        for k in this.nodes.keys():
+            if not init:
+                c = this.nodes[k].getColor()
+                init = True
+            else:
+                c2 = this.nodes[k].getColor()
+                for i in range(3):
+                    if not c2[i] == c[i]:
+                        finished=False
+        return finished
+
+class AlgRandomPoints(Algorithm):
+    """AlgRandomPoints – generate (and destruct) 
+    """
+    def __init__(this,destruct=0,maxNum=10,createEvery=1,graph=None):
+        super(AlgRandomPoints,this).__init__(graph)
+        this.destruct = destruct
+        this.maxNum = maxNum;
+        this.iter = 0
+        this.num = 0
+        this.createEvery = createEvery
+        if destruct > 0:
+            this.alive = dict()
+            for k in this.nodes.keys():
+                this.alive[k]=0
+
+    def step(this):
+        if this.destruct > 0:
+            for k in this.alive.keys():
+                if this.alive[k]>0:
+                    this.alive[k] -= 1
+                    if this.alive[k] == 0:
+                        this.nodes[k].setColor([0,0,0])
+        if (this.iter%this.createEvery) == 0 and (this.maxNum==0 or this.num < this.maxNum):
+            this.num += 1
+            k = random.choice(list(this.nodes.keys()))
+            c = [random.random() for i in range(3)]
+            this.nodes[k].setColor(c)
+            if this.destruct > 0:
+                this.alive[k] = random.randint(1,this.destruct)
+        this.iter +=1
+
+    def isFinished(this):
+        finished = (this.num==this.maxNum) and this.maxNum>0
+        if this.destruct > 0:
+            for k in this.alive.keys():
+                if this.alive[k] > 0:
+                    finished = False
+        return finished
 
 class AlgFadeOut(Algorithm):
     def __init__(this,frames=30,graph=None):

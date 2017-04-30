@@ -43,7 +43,9 @@ class Pixel:
         this.brightness = brightness
     def getColor(this):
         return [i*this.brightness for i in this.color]
-    
+    def addToColor(this,color):
+        this.color = [max(min(this.color[i]+color[i],1.0),0) for i in range(3)]
+
     def isNeighbor(this,pixel):
         return pixel.ID in this.neighborDirection.keys()
 
@@ -58,6 +60,9 @@ class Pixel:
             return this.neighborDistance[pixel.ID]
         else:
             None
+    
+    def getNeighborIDs(this):
+        return this.neighborDistance.keys()
     
     def getDirectionDistance(this,direction):
         "get the Distance a pixel is at in given direction"

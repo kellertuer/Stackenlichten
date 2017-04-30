@@ -22,13 +22,13 @@ def f(pts,vars):
 
 def stepVars(vars):
     v = dict(vars)
-    v['alpha'] = np.mod(v['alpha'] + np.pi/180*1.5,2*np.pi)
+    v['alpha'] = np.mod(v['alpha'] + np.pi/180*v['alphaInc'],2*np.pi)
     return v
 
 def run(argv):
     slc = FadecandySLC();
     graph = Graph.load("graphs/graph21.txt")
-    vars = {'alpha':0,'scale':.5}
+    vars = {'alpha':0,'alphaInc':2,'scale':.75}
     sample = AlgSampleFunction(f,stepVars,vars,graph.clone())
     alg = mainAlgorithm(slc,sample)
     c = SimpleControl(alg);
