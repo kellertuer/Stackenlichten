@@ -26,6 +26,7 @@ sH = 2*(wW/tan(60)+wW/sin(60)); //shorten inner
 bottomPlate();
 //color([.3,.3,.3]) translate([0,sL*sqrt(3)/6,]) circle(r=5,$fn=360,center=true);
 hR = 3;
+
 module bottomPlate() {
     linear_extrude(height=wW, twist=0)
     difference() {
