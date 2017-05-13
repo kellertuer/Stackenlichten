@@ -9,7 +9,7 @@
  */
 wW      = 4;  // Thickness/Width of wood
 mW    = 4;   //                 of a Magnet-Cube
-fW     = 2; // Thickness of the front plastic plate
+fW     = 3; // Thickness of the front plastic plate
 sL = 80;    // sidelength of a triangle
 bD = 80;   // Depth of a box (depth w.r.t. frontview)
 fC = 3; // number of fingers
