@@ -18,8 +18,9 @@ class Control:
         this.algorithm = algorithm
         this.parameters = Control.PARAMETERS
         if parameters is not None:
-            this.parameters.updatethis.PARAMETERS.update(parameters)
-    
+            this.parameters = Control.PARAMETERS.copy()
+            this.parameters.update(parameters)
+
     @abstractmethod
     def start(this):
         "start the algorithm as long as its running."

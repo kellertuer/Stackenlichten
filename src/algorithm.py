@@ -303,7 +303,7 @@ class AlgSampleFunction(Algorithm):
                             dist = this.nodes[this.currentID].getNeighborDistance(n)
                             break
             # updirection is 0 degree, hence we invert sin and cos
-            samplePoint = [samplePoint[0] + np.sin(dir)*dist,samplePoint[1] + np.cos(dir)*dist]
+            samplePoint = [samplePoint[0] + np.sin(dir/180.0*np.pi)*dist,samplePoint[1] + np.cos(dir/180.0*np.pi)*dist]
             this.nodes[nextID].setColor(this.function(samplePoint,this.FctValues))
             this.currentID = nextID
             sampledList[this.currentID] = True
