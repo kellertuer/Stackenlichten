@@ -19,7 +19,7 @@ def run(argv):
         ],graph.clone())
     aAlg = addAlgorithm([AlgBackground([0,0,0],graph.clone()),malg,malg2],graph)
     alg = mainAlgorithm(slc,aAlg)
-    c = SimpleControl(alg,{'frameratre':30});
+    c = SimpleControl(alg,{'frameratre':10});
     c.start()
     
 if __name__ == "__main__":

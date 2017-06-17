@@ -18,6 +18,9 @@
 \definecolor{hl}{HTML}{FF7260} % left reddish
 \definecolor{hl2}{HTML}{FFF5C3} % right yellowish
 \definecolor{hl3}{HTML}{98D7D5} % top blueish
+%\definecolor{hl}{HTML}{777777} % left reddish
+%\definecolor{hl2}{HTML}{777777} % right yellowish
+%\definecolor{hl3}{HTML}{777777} % top blueish
 \tikzset{base/.style={hl}}
 \tikzset{main/.style={fill=bg,draw=fg,thick}}
 \tikzset{mydots/.style={line width=3pt, line cap=round, dash pattern=on 0pt off 1.5\pgflinewidth}}
@@ -119,25 +122,18 @@
 %   (C14)
     ;
     }
-    \draw[bg,thick] (A1) -- (A14) -- (B14) -- cycle;
-    \draw[fill=bg,draw=fg] (A2) -- (A3) -- (A4) -- (A5);
-    \draw[fill=bg,draw=fg] (A6) -- (A7) -- (A8) -- (A9);
-    \draw[fill=bg,draw=fg] (A10) -- (A11) -- (A12) -- (A13);
-    \foreach \x[count=\xnext from 2] in {1,...,13}{
-      \draw[main] (A\x) -- (A\xnext);
-    }
-    \draw[fill=bg,draw=fg] (B2) -- (B3) -- (B4) -- (B5);
-    \draw[fill=bg,draw=fg] (B6) -- (B7) -- (B8) -- (B9);
-    \draw[fill=bg,draw=fg] (B10) -- (B11) -- (B12) -- (B13);
-    \foreach \x[count=\xnext from 2] in {1,...,13}{
-      \draw[main] (B\x) -- (B\xnext);
-    }
-    \draw[fill=bg,draw=fg] (C2) -- (C3) -- (C4) -- (C5);
-    \draw[fill=bg,draw=fg] (C6) -- (C7) -- (C8) -- (C9);
-    \draw[fill=bg,draw=fg] (C10) -- (C11) -- (C12) -- (C13);
-    \foreach \x[count=\xnext from 2] in {1,...,13}{
-      \draw[main] (C\x) -- (C\xnext);
-    }
+    % frame
+    \draw[bg] (A1) -- (A14) -- (B14) -- cycle;
+    \draw[bg] ($(A1)+(210:.05pt)$) -- ($(A14)+(330:.05pt)$) -- ($(B14)+(90:.05pt)$) -- cycle;
+    \draw[fill=bg,draw=none] (A2) -- (A3) -- (A4) -- (A5);
+    \draw[fill=bg,draw=none] (A6) -- (A7) -- (A8) -- (A9);
+    \draw[fill=bg,draw=none] (A10) -- (A11) -- (A12) -- (A13);
+    \draw[fill=bg,draw=none] (B2) -- (B3) -- (B4) -- (B5);
+    \draw[fill=bg,draw=none] (B6) -- (B7) -- (B8) -- (B9);
+    \draw[fill=bg,draw=none] (B10) -- (B11) -- (B12) -- (B13);
+    \draw[fill=bg,draw=none] (C2) -- (C3) -- (C4) -- (C5);
+    \draw[fill=bg,draw=none] (C6) -- (C7) -- (C8) -- (C9);
+    \draw[fill=bg,draw=none] (C10) -- (C11) -- (C12) -- (C13);
     %
     \node (A) at (0,-.66) {\Huge\color{fg} Stackenlichten};
   \end{tikzpicture}

@@ -12,7 +12,7 @@ def abstractmethod(method):
 
 class Control:
     # standard parameters
-    PARAMETERS = {'framerate': 30}
+    PARAMETERS = {'framerate': 20}
     
     def __init__(this,algorithm,parameters=None):
         this.algorithm = algorithm

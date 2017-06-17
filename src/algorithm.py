@@ -283,35 +283,42 @@ class AlgSampleFunction(Algorithm):
     def step(this):
         finished = False
         sampledList = dict()
+        positions = dict()
         for k in this.nodes.keys():
             sampledList[k] = False
         Start = True
         samplePoint = [0,0];
         while not finished:
-            for k,n in this.nodes.items():
+            for k,n in this.nodes.items(): #k neighbor id, n its index
                 if not sampledList[k]:
                     if Start:
                         nextID = k
                         dir = 0
                         dist = 0
                         Start = False
+                        positions[k] = samplePoint
                         break
                     else:
-                        if this.nodes[this.currentID].isNeighbor(n):
-                            nextID = k
-                            dir = this.nodes[this.currentID].getNeighborDirection(n)
-                            dist = this.nodes[this.currentID].getNeighborDistance(n)
+                        found=False
+                        for k2 in sampledList.keys():
+                            if sampledList[k2]:
+                                if this.nodes[k2].isNeighbor(n):
+                                    nextID = k
+                                    dir = this.nodes[k2].getNeighborDirection(n)
+                                    dist = this.nodes[k2].getNeighborDistance(n)
+                                    samplePoint = positions[k2]
+                                    positions[k] = [samplePoint[0] + np.sin(dir/180.0*np.pi)*dist,samplePoint[1] + np.cos(dir/180.0*np.pi)*dist]
+                                    found=True
+                                    break
+                        if found:
                             break
             # updirection is 0 degree, hence we invert sin and cos
-            samplePoint = [samplePoint[0] + np.sin(dir/180.0*np.pi)*dist,samplePoint[1] + np.cos(dir/180.0*np.pi)*dist]
-            this.nodes[nextID].setColor(this.function(samplePoint,this.FctValues))
-            this.currentID = nextID
-            sampledList[this.currentID] = True
+            this.nodes[nextID].setColor(this.function(positions[nextID],this.FctValues))
+            sampledList[nextID] = True
             finished = True
             for k in sampledList.keys():
                 finished = finished & sampledList[k]
         this.FctValues = this.stepFct(this.FctValues)
-
 
     def isFinished(this):
         this.FctValues.get('finished',False)

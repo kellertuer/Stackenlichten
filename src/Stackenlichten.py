@@ -1,7 +1,9 @@
 import includes.opc as opc
+import sys
 import numpy as np
 from graph import Graph
-import turtle as t
+import matplotlib.pyplot as plt
+import matplotlib.collections as mpc
 
 def abstractmethod(method):
     def default_abstract_method(*args, **kwargs):
@@ -59,7 +61,7 @@ Moin.""")
         t.mode("logo")
         t.speed(0)
         t.ht()
-    
+        
     def triangleAt(this,pos=(0.0,0.0),dir=90,length=15,fill=(1.0,1.0,1.0),clockwise=True):
         t.color( (0,0,0), fill)
         height = np.sqrt(3)/6*length
@@ -93,6 +95,7 @@ Moin.""")
     def render(this,graph):
         t.tracer(0, 0)
         t.reset()
+        t.ht()
         finished = False
         drawnList = dict()
         upward = dict()
@@ -120,10 +123,102 @@ Moin.""")
             upward[nextID] = (graph.nodes[nextID].getDirectionDistance(60)==1) or (graph.nodes[nextID].getDirectionDistance(180)==1) or (graph.nodes[nextID].getDirectionDistance(300)==1)
             # updirection is 0 degree, hence we invert sin and cos
             samplePoint = [samplePoint[0] + np.sqrt(3)/3*this.length*np.sin(dir/180.0*np.pi)*dist,samplePoint[1] + np.sqrt(3)/3*this.length*np.cos(dir/180.0*np.pi)*dist]
-            this.triangleAt(pos=(samplePoint[0],samplePoint[1]),dir=90,length=this.length,fill=graph.nodes[nextID].getColor(),clockwise = (not upward[nextID]))
+            b = graph.nodes[nextID].getColor();
+            this.triangleAt(pos=(samplePoint[0],samplePoint[1]),dir=90,length=this.length,fill=(np.asscalar(b[0]),np.asscalar(b[1]),np.asscalar(b[2])),clockwise = (not upward[nextID]))
             this.currentID = nextID
             drawnList[this.currentID] = True
             finished = True
             for k in drawnList.keys():
                 finished = finished & drawnList[k]
         t.update()
+
+class PyMatplotSLC():
+    
+    def __init__(this,length=30,limits=[-300,300,-300,300]):
+        """
+        PyMatplotSLC() initialize the vizualization using the python matplot lib
+        """
+        print("""                              ~~~ Stackenlichten ~~~                            
+           Let\'s blink in lichten. But with German stacken and blochen AND matplot!         
+                                                                    @kellertuer
+Moin.""")
+        this.length=length;
+        this.fig = plt.figure()
+        this.ax = this.fig.gca()
+        this.fig.canvas.mpl_connect("close_event",lambda:sys.exit())
+        this.ax.set_xlim([limits[0], limits[1]])
+        this.ax.set_ylim([limits[2], limits[3]])
+        this.ax.xaxis.set_visible(False)
+        this.ax.yaxis.set_visible(False)
+        plt.ioff()
+        this.patches = []
+
+    def has_been_closed(this):
+        fig = this.ax.figure.canvas.manager
+        active_fig_managers = plt._pylab_helpers.Gcf.figs.values()
+        return fig not in active_fig_managers
+    
+    def triangleAt(this,pos=(0.0,0.0),dir=90,length=15,fill=(1.0,1.0,1.0)):
+        height = np.sqrt(3)/6*length
+        base = [pos[0] + np.sin(dir/180.0*np.pi+np.pi/2.0)*height, pos[1] + np.cos(dir/180.0*np.pi + np.pi/2.0)*height]
+        firstP = [base[0] + np.sin(dir/180.0*np.pi)*this.length/2, base[1] + np.cos(dir/180.0*np.pi)*this.length/2]
+        secondP = [base[0] - np.sin(dir/180.0*np.pi+np.pi/2)*3.0*height, base[1] - np.cos(dir/180.0*np.pi+np.pi/2)*3.0*height]
+        thirdP = [base[0] - np.sin(dir/180.0*np.pi)*this.length/2, base[1] - np.cos(dir/180.0*np.pi)*this.length/2]
+        this.patches.append( plt.Polygon([firstP,thirdP,secondP],fill=True,color=fill) )
+
+    def render(this,graph):
+        this.ax.cla();
+        this.patches = []
+        finished = False
+        drawnList = dict()
+        positions = dict()
+        upward = dict()
+        for k in graph.nodes.keys():
+            drawnList[k] = False
+        Start = True
+        startPoint = [0.0,0.0]
+        while not finished:
+            # look for next index
+            for k,n in graph.nodes.items(): #k neighbor id, n its index
+                if not drawnList[k]:
+                    if Start:
+                        nextID = k
+                        dir = 90
+                        dist = 0
+                        break
+                    else:
+                        found=False
+                        for k2 in drawnList.keys():
+                            if drawnList[k2]:
+                                if graph.nodes[k2].isNeighbor(n):
+                                    nextID = k
+                                    dir = graph.nodes[k2].getNeighborDirection(n)
+                                    dist = graph.nodes[k2].getNeighborDistance(n)
+                                    samplePoint = positions[k2]
+                                    found=True
+                                    break
+                        if found:
+                            break
+            # do we have an upward triangle?
+            upward[nextID] = (graph.nodes[nextID].getDirectionDistance(60)==1) or (graph.nodes[nextID].getDirectionDistance(180)==1) or (graph.nodes[nextID].getDirectionDistance(300)==1)
+            if Start:
+                Start = False
+                positions[nextID] = startPoint
+            else:
+                # updirection is 0 degree, hence we invert sin and cos
+                positions[nextID] = [samplePoint[0] + np.sqrt(3)/3*this.length*np.sin(dir/180.0*np.pi)*dist,samplePoint[1] + np.sqrt(3)/3*this.length*np.cos(dir/180.0*np.pi)*dist]
+            b = graph.nodes[nextID].getColor();
+            thisP = positions[nextID]
+            if upward[nextID]:
+                this.triangleAt(pos=(thisP[0],thisP[1]),dir=90,length=this.length,fill=(np.asscalar(b[0]),np.asscalar(b[1]),np.asscalar(b[2])))
+            else:
+                this.triangleAt(pos=(thisP[0],thisP[1]),dir=270,length=this.length,fill=(np.asscalar(b[0]),np.asscalar(b[1]),np.asscalar(b[2])))
+            drawnList[nextID] = True
+            finished = True
+            for k in drawnList.keys():
+                finished = finished & drawnList[k]
+        if this.has_been_closed():
+            sys.exit()
+        this.ax.add_collection(mpc.PatchCollection(this.patches,match_original=True))
+        plt.draw()
+        plt.pause(0.0000005)
