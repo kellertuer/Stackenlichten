@@ -210,9 +210,9 @@ Moin.""")
             b = graph.nodes[nextID].getColor();
             thisP = positions[nextID]
             if upward[nextID]:
-                this.triangleAt(pos=(thisP[0],thisP[1]),dir=90,length=this.length,fill=(np.asscalar(b[0]),np.asscalar(b[1]),np.asscalar(b[2])))
+                this.triangleAt(pos=(thisP[0],thisP[1]),dir=90,length=this.length,fill=(b[0],b[1],b[2]))
             else:
-                this.triangleAt(pos=(thisP[0],thisP[1]),dir=270,length=this.length,fill=(np.asscalar(b[0]),np.asscalar(b[1]),np.asscalar(b[2])))
+                this.triangleAt(pos=(thisP[0],thisP[1]),dir=270,length=this.length,fill=(b[0],b[1],b[2]))
             drawnList[nextID] = True
             finished = True
             for k in drawnList.keys():

@@ -2,6 +2,7 @@ from graph import Graph
 from pixel import Pixel
 import numpy as np
 import random
+import math
 
 def abstractmethod(method):
     def default_abstract_method(*args, **kwargs):
@@ -162,6 +163,26 @@ class multAlgorithm(metaAlgorithm):
                 for k in this.nodes.keys():
                     this.nodes[k] *= x.nodes[k]
 
+class overlayAlgorithm(metaAlgorithm):
+    def __init__(this,algorithms,transparentcolors,graph=None):
+        super(overlayAlgorithm,this).__init__(algorithms,graph)
+        this.tColors = transparentcolors
+        
+    def step(this):
+        super(overlayAlgorithm,this).step()
+        if len(this.algorithms) > 0:
+            # start with 1 and multiply them
+            for k in this.nodes.keys():
+                this.nodes[k].setColor(this.tColors[0]);
+            c=1
+            for x in this.algorithms:
+                trColor = this.tColors[c]
+                for k in this.nodes.keys():
+                    thisC = x.nodes[k].getColor()
+                    if thisC!=trColor:
+                        this.nodes[k].setColor(thisC)
+                c = c+1
+
 class AlgBackground(Algorithm):
     """ Background Algorithm
     The background algorithm just sets a constant color as background.
@@ -308,6 +329,10 @@ class AlgSampleFunction(Algorithm):
                                     dist = this.nodes[k2].getNeighborDistance(n)
                                     samplePoint = positions[k2]
                                     positions[k] = [samplePoint[0] + np.sin(dir/180.0*np.pi)*dist,samplePoint[1] + np.cos(dir/180.0*np.pi)*dist]
+                                    #print(k2)
+                                    #print(k)
+                                    #print(dist)
+                                    #print(dir)
                                     found=True
                                     break
                         if found:
@@ -369,20 +394,24 @@ class AlgTrigWalkCycle(Algorithm):
     """The algorithm to run in circles on the trig grid. Following a direction
     until the border and continuing with the next direction; cycling through these.
     """
-    def __init__(this,startID,directions,trailNum,graph=None):
+    def __init__(this,startID,directions,trailNum,lookaheads=None,graph=None):
         super(AlgTrigWalkCycle,this).__init__(graph);
         this.startID=startID
         this.directions=directions
+        if lookaheads is None:
+            this.lookaheads = [0]*len(directions)
+        else:
+            this.lookaheads = lookaheads
         this.actDir = 0
         this.currID = startID
-        this.currAlg = AlgTrigWalk(startID,directions[this.actDir],trailNum,graph)
+        this.currAlg = AlgTrigWalk(startID,directions[this.actDir],trailNum,this.lookaheads[this.actDir],graph)
         this.trailNum = trailNum
     
     def step(this):
         if this.currAlg.isFinished(): #start next one
             this.actDir = (this.actDir+1)%(len(this.directions))
             curPos = this.currAlg.getactualPosition();
-            this.currAlg = AlgTrigWalk(curPos,this.directions[this.actDir],this.currAlg.trail,this.currAlg)
+            this.currAlg = AlgTrigWalk(curPos,this.directions[this.actDir],this.currAlg.trail,this.lookaheads[this.actDir],this.currAlg)
         this.currAlg.step()
         
     def isFinished(this): #infinite loop
@@ -398,7 +427,7 @@ class AlgTrigWalk(Algorithm):
     DIRECTION_MAPS = {0:[0,0], 30:[60,0], 60:[60,60], 90:[60,120], 120:[120,120], 150:[180,120], 180:[180,180], 210:[180,240], 240:[240,240], 270:[300,240], 300:[300,300], 330:[300,0]}
     
     
-    def __init__(this,startID,direction,trail,graph=None):
+    def __init__(this,startID,direction,trail,lookahead=1,graph=None):
         super(AlgTrigWalk,this).__init__(graph)
         if direction not in AlgTrigWalk.DIRECTION_MAPS:
             raise ValueError("This direction is not availale for walking athe moment");
@@ -413,6 +442,7 @@ class AlgTrigWalk(Algorithm):
         # else issue a warining?
         this.trail = trail
         this.trailNum = len(trail)
+        this.lookahead=lookahead
 
     def step(this):
         if not this.isFinished():
@@ -437,4 +467,63 @@ class AlgTrigWalk(Algorithm):
 
     def isFinished(this):
         "Check whether there exists a neighbor in walking direction"
-        return this.getPixel(this.currentID).getDirectionNeighborID(this.DIRECTION_MAPS[this.Direction][this.startDir]) is None
+        cnt = 0
+        checkID = this.currentID
+        while cnt < this.lookahead:
+            checkID = this.getPixel(checkID).getDirectionNeighborID(this.DIRECTION_MAPS[this.Direction][(this.startDir+cnt)%2])
+            cnt = cnt+1
+            if checkID is None:
+                return True
+        return False
+
+class AlgRandomBlink(Algorithm):
+    """
+    An algorithm producing random blinks within the graph of given or random
+    or random duration abd pause 
+    """
+    def __init__(this,meanBlinkIntervall,BlinkRandom,meanBlinkLength,BlinkLengthVariance,graph=None):
+        super(AlgRandomBlink,this).__init__(graph)
+        this.blinkP=meanBlinkIntervall
+        this.blinkR = BlinkRandom
+        this.blinkL = meanBlinkLength
+        this.blinkLVar = BlinkLengthVariance
+        this.activeNodes = []
+        this.activeFramesLeft = []
+        if this.blinkR:
+            this.nextTime = int(math.floor(-this.blinkP*math.log(random.uniform(0, 1))))
+        else:
+            this.nextTime = meanBlinkIntervall
+        this.cnt = 0;
+    
+    def isFinished(this):
+        return False
+    
+    def step(this):
+        # draw random number to determine whether a new pixel is lit
+        this.cnt = this.cnt+1;
+        if (this.cnt==this.nextTime):
+            # time to activate next one
+            nextNode = random.randint(1,len(this.nodes))
+            nextDuration = random.randint(this.blinkL-this.blinkLVar,this.blinkL+this.blinkLVar);
+            this.activeNodes.append(nextNode)
+            this.activeFramesLeft.append(nextDuration)
+            #set Black activate
+            if this.blinkR:
+                this.nextTime = this.cnt+int(math.floor(-this.blinkP*math.log(random.uniform(0, 1))))
+            else:
+                this.nextTime = this.cnt+meanBlinkIntervall
+            if (this.nextTime==this.cnt):
+                this.nextTime = this.nextTime+1
+        this.setBlack()
+        for i in this.activeNodes:
+            this.getPixel(i).setColor([1.0, 1.0,1.0]);
+        newN = []
+        newD = []
+        # which ones not to activcate next time?
+        for index, item in enumerate(this.activeFramesLeft):
+            if item!=0:
+                newN.append(this.activeNodes[index])
+                newD.append(item-1)
+        this.activeFramesLeft = newD
+        this.activeNodes = newN
+        

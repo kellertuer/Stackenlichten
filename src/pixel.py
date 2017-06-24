@@ -48,6 +48,15 @@ class Pixel:
 
     def isNeighbor(this,pixel):
         return pixel.ID in this.neighborDirection.keys()
+        
+    def addNeighbor(this,pixel,direction,distance):
+        this.neighborDirection[pixel.ID] = direction
+        this.neighborDistance[pixel.ID] = distance
+
+    def removeNeighbor(this,pixel):
+        if this.isNeighbor(pixel):
+            this.neighborDirection.pop(pixel.ID)
+            this.neighborDistance.pop(pixel.ID)
 
     def getNeighborDirection(this,pixel):
         if pixel.ID in this.neighborDirection.keys():
