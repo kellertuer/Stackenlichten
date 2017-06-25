@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from algorithm import *
 import time
+import curses
 
 def abstractmethod(method):
     def default_abstract_method(*args, **kwargs):
@@ -44,3 +45,38 @@ class SimpleControl(Control):
                 time.sleep(1/this.parameters["framerate"])
                 print('.', end='', flush=True)
             print("\n\nKthxbye.")
+            
+class DirectionControl(Control):
+    def __init__(this,algorithm,parameters=None):
+        super(DirectionControl,this).__init__(algorithm,parameters)
+        this.stdscr = curses.initscr()
+        curses.cbreak()
+        this.stdscr.keypad(1)
+        this.stdscr.nodelay(1)
+        
+    
+    def start(this):
+        key = ''
+        while not this.algorithm.isFinished():
+            key = this.stdscr.getch()
+            if key == ord('f'):
+                print("90",end='',flush=True)
+            elif key==ord('r'):
+                print("30",end='',flush=True)
+            elif key==ord('e'):
+                print("330",end='',flush=True)
+            elif key==ord('d'):
+                print("270",end='',flush=True)
+            elif key==ord('x'):
+                print("210",end='',flush=True)
+            elif key==ord('c'):
+                print("150",end='',flush=True)
+            elif key == ord('q'):
+                break;
+            # step
+            this.algorithm.step()
+            time.sleep(1/this.parameters["framerate"])
+            print('.', end='', flush=True)
+        curses.endwin()
+        print("\n\nKthxbye.")
+        
