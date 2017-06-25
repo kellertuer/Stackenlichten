@@ -23,7 +23,7 @@ def f(pts,vars):
 def f2(pts,vars):
     x = pts[0]*vars['scale']
     y = pts[1]*vars['scale']
-    a = -2*vars['alpha']
+    a = -vars['alpha']
     value = (np.sin(np.cos(a)*x-np.sin(a)*y)
         + np.cos(np.sin(a)*x+np.cos(a)*y)
         + np.sin(np.cos(2*a)*x+np.sin(a)*y)
@@ -33,7 +33,7 @@ def f2(pts,vars):
 
 def stepVars(vars):
     v = dict(vars)
-    v['alpha'] = np.mod(v['alpha'] + np.pi/180*1,2*np.pi)
+    v['alpha'] = np.mod(v['alpha'] + np.pi/180/5,2*np.pi)
     return v
 
 
@@ -45,18 +45,15 @@ def run(argv):
     graph = Graph.load("graphs/triangle77.txt")
     #vars = {'alpha':0,'scale':.5}
     #sample = AlgSampleFunction(f,stepVars,vars,graph.clone())
-    running = AlgTrigWalkCycle(28,[90,330,210,90,330,210,90,330,210,90,330,210,90,330,210,240],[28]*5,[1,1,3,3,3,5,5,5,7,7,7,9,9,9,9,1],graph.clone())
-    sample = AlgSampleFunction(f,stepVars,vars,graph.clone())
-    mAlg = multAlgorithm([running,sample],graph.clone())
+    snake = AlgSnake(28,90,5,graph.clone())
+    #sample = AlgSampleFunction(f,stepVars,vars,graph.clone())
+    #mAlg = multAlgorithm([running,sample],graph.clone())
     sample2 = AlgSampleFunction(f2,stepVars,vars,graph.clone())
-    mG = graph.clone()
-    randomAlg = AlgRandomBlink(3,True,15,4,graph.clone())
-    myBT = AlgBackground([0.33,0.33,0.33],graph.clone())
-    background = overlayAlgorithm([myBT,randomAlg],[[0.0,0.0,0.0]]*3,graph.clone())
-    mAlg2 = multAlgorithm([background, sample2],graph.clone())
-    metaAlg = overlayAlgorithm([mAlg2,mAlg],[[0.0,0.0,0.0]]*3,graph.clone())
-    alg = mainAlgorithm(slc,metaAlg)
-    #alg = mainAlgorithm(slc,mAlg2)
+    #mG = graph.clone()
+    myBT = AlgBackground([0.75,0.75,0.75],graph.clone())
+    mAlg = multAlgorithm([myBT, sample2],graph.clone())
+    mainAlg = overlayAlgorithm([mAlg,snake],[[0.0,0.0,0.0]]*3,graph.clone())
+    alg = mainAlgorithm(slc,mainAlg)
     c = DirectionControl(alg);
     c.start()
     

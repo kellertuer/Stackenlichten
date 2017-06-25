@@ -13,7 +13,7 @@ def abstractmethod(method):
 
 class Control:
     # standard parameters
-    PARAMETERS = {'framerate': 20}
+    PARAMETERS = {'framerate': 40}
     
     def __init__(this,algorithm,parameters=None):
         this.algorithm = algorithm
@@ -58,21 +58,37 @@ class DirectionControl(Control):
     def start(this):
         key = ''
         while not this.algorithm.isFinished():
+#            print(this.algorithm.getParameter("Alive"))
             key = this.stdscr.getch()
+            dir = None
             if key == ord('f'):
-                print("90",end='',flush=True)
+                #print("90",end='',flush=True)
+                dir=90
             elif key==ord('r'):
-                print("30",end='',flush=True)
+                #print("30",end='',flush=True)
+                dir=30
             elif key==ord('e'):
-                print("330",end='',flush=True)
+                #print("330",end='',flush=True)
+                dir=330
             elif key==ord('d'):
-                print("270",end='',flush=True)
+                #print("270",end='',flush=True)
+                dir=270
             elif key==ord('x'):
-                print("210",end='',flush=True)
+                #print("210",end='',flush=True)
+                dir=210
             elif key==ord('c'):
-                print("150",end='',flush=True)
+                #print("150",end='',flush=True)
+                dir=150
             elif key == ord('q'):
+                this.algorithm = mainAlgorithm(this.algorithm.SLC,AlgFadeOut(3*this.PARAMETERS['framerate'],this.algorithm))
+                print('o', end='', flush=True)
+                while not this.algorithm.isFinished():
+                    this.algorithm.step()
+                    time.sleep(1/this.parameters["framerate"])
+                    print('.', end='', flush=True)
                 break;
+            if dir is not None:
+                this.algorithm.setParameter("Direction",dir)
             # step
             this.algorithm.step()
             time.sleep(1/this.parameters["framerate"])

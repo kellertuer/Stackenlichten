@@ -18,12 +18,15 @@ class Algorithm(Graph):
     keep a list of sub algorithms to be performed within the algorithm
     """
     
-    osf = 1
+    PARAMS = {"OSF" : 1}
     
-    def __init__(this,graph=None):
+    def __init__(this,graph=None,parameters={}):
         "Initialize the algorithm to act on a certain graph object"
         super(Algorithm,this).__init__(graph)
-        
+        this.parameters = parameters
+        for key,value in this.PARAMS.items():
+            if not key in parameters:
+                this.parameters[key] = value
     
     @abstractmethod
     def step(this):
@@ -32,12 +35,22 @@ class Algorithm(Graph):
 
     def getFramerate(this):
         "perform a step only each kth step of the parent algorithm or framerate if this is a main algorithm"
-        return this.osf;
+        return this.parameters.get("OSF",1);
 
     def setFramerate(this,osf):
         "perform a step only each kth step of the parent algorithm"
-        this.osf=osf;
+        this.parameters["OSF"]=osf;
+    
+    def setParameters(this,parameters):
+        for key,value in parameters:
+            this.parameters[key] = value
+    
+    def setParameter(this,key,value):
+        this.parameters[key] = value
         
+    def getParameter(this,key):
+        return this.parameters.get(key)
+
     @abstractmethod
     def isFinished(this):
         "returns whether this algorithm has finished running"
@@ -79,6 +92,15 @@ class mainAlgorithm(Algorithm):
     
     def isFinished(this):
         return this.alg.isFinished()
+    
+    def setParameters(this,parameters):
+        this.alg.setParameters(parameters)
+    
+    def setParameter(this,key,value):
+        this.alg.setParameter(key,value)
+    
+    def getParameter(this,key):
+        this.alg.getParameter(key)
 
 class metaAlgorithm(Algorithm):
     """ Meta Algorithm
@@ -106,6 +128,18 @@ class metaAlgorithm(Algorithm):
     
     def isFinished(this):
         return len(this.algorithms)==0
+    
+    def setParameters(this,parameters):
+        for a in this.algorithms:
+            a.setParameters(parameters)
+
+    def setParameter(this,key,value):
+        print("A")
+        for a in this.algorithms:
+            a.setParameter(key,value)
+
+    def getParameter(this,key):
+        return [a.getParameter(key) for a in this.algorithms]
 
 class iterAlgorithm(Algorithm):
     """ Iter Algorithm
@@ -134,6 +168,17 @@ class iterAlgorithm(Algorithm):
     
     def isFinished(this):
         return this.numAlg == (len(this.algorithms)-1) and len(this.algorithms)==0
+    
+    def setParameters(parameters):
+        for a in this.algorithms:
+            a.setParameters(parameters)
+
+    def setParameter(key,value):
+        for a in this.algorithms:
+            a.setParameter(key,value)
+
+    def getParameter(key):
+        return [a.getParaneter(key) for a in this.algorithms]
 
 class addAlgorithm(metaAlgorithm):
     def __init__(this,algorithms,graph=None):
@@ -527,3 +572,108 @@ class AlgRandomBlink(Algorithm):
         this.activeFramesLeft = newD
         this.activeNodes = newN
         
+class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
+            """
+            An algorithm running along a direction starting from a pixel with a tail#
+            
+            """
+            # we have to alternate, these are for /\ triangles, for \/ start with the
+            # second term each entry
+            DIRECTION_MAPS = {30:[60,0], 90:[60,120], 150:[180,120], 210:[180,240], 270:[300,240], 330:[300,0]}
+    
+    
+            def __init__(this,startID,StartDirection,InitLength,graph=None,parameters={}):
+                super(AlgSnake,this).__init__(graph,parameters)
+                if StartDirection not in AlgSnake.DIRECTION_MAPS:
+                    raise ValueError("This direction is not available for walking.");
+                parameters = {"Direction" : StartDirection, "CurrentHead":startID, "Alive":True, "StepInt":10}
+                for k,v in parameters.items():
+                    if k not in this.parameters:
+                        this.parameters[k] = v
+                #StepInt = 1/Speed
+                p = this.getPixel(startID)
+                this.headID = startID
+                # is the triangle pointing upward?
+                if (p.getDirectionDistance(60)==1) or (p.getDirectionDistance(180)==1) or (p.getDirectionDistance(300)==1):
+                    this.startDir=0
+                elif (p.getDirectionDistance(0)==1) or (p.getDirectionDistance(120)==1) or (p.getDirectionDistance(240)==1):
+                    this.startDir=1
+                this.trail = [startID]*InitLength
+                this.trailNum = InitLength
+                this.cnt = 0
+                this.warning=False
+                this.nomnom = startID
+                while this.nomnom in this.trail:
+                    this.nomnom = random.choice([this.nodes[k].ID for k in this.nodes.keys()])
+                this.nomnomcount = 0
+
+            def step(this):
+                if this.cnt==0:
+                    if this.hasNextNeighbor():
+                        thisDir = this.DIRECTION_MAPS[this.parameters["Direction"]][this.startDir]
+                        thisP = this.getPixel(this.headID);
+                        #self collision tests
+                        newHead = thisP.getDirectionNeighborID(thisDir)
+                        if (newHead in this.trail) and (newHead != this.trail[1]):
+                            # and not second, in order to not get stuck in corners
+                            if this.warning:
+                                this.parameters["Alive"] = False
+                                print("dead after eating ",this.nomnomcount," trixel")
+                            else:
+                                this.warning = True
+                        this.headID = thisP.getDirectionNeighborID(thisDir)
+                        this.startDir = (this.startDir+1)%2
+                        # off old trail
+                        for i in range(len(this.trail)):
+                            this.getPixel(this.trail[i]).setColor([0.0,0.0,0.0]);
+                        # update trail
+                        this.trail.insert(0,this.headID)
+                        this.trail = this.trail[0:this.trailNum]
+                        n = len(this.trail)
+                        for i in range(n):
+                            this.getPixel(this.trail[i]).setColor([1.0, 1.0,1.0]);
+                        if this.nomnom==this.headID:
+                            this.nomnomcount = this.nomnomcount + 1
+                            while this.nomnom in this.trail:
+                                this.nomnom = random.choice([this.nodes[k].ID for k in this.nodes.keys()])
+                            this.trailNum = this.trailNum+1 # longer
+                            if this.parameters["StepInt"] > 1:
+                                this.parameters["StepInt"] = this.parameters["StepInt"]-1 #faster
+                        this.getPixel(this.nomnom).setColor([0.0,0.0,1.0])
+                        
+                    else: # wallcollision?
+                        if this.warning:
+                            this.parameters["Alive"] = False
+                            print("dead after eating",this.nomnomcount,"trixel.")
+                        else:
+                            this.warning = True
+                # switch step
+                this.cnt = (this.cnt+1)%(this.parameters["StepInt"])
+
+            def setParameters(this,parameters):
+                super(AlgSnake,this).setParameters(parameters)
+                if parameters.get("Direction"):
+                    this.warning=False
+
+            def setParameter(this,key,value):
+                super(AlgSnake,this).setParameter(key,value)
+                print(this.parameters["Direction"])
+                if key=="Direction":
+                    this.warning=False
+
+            def getactualPosition(this):
+                "return the current node."
+                return this.headID
+
+            def getEatenPieces():
+                return this.nomnomcount
+            
+            
+            def hasNextNeighbor(this):
+                "Check whether there exists a neighbor in walking direction"
+                checkID = this.headID
+                checkID = this.getPixel(checkID).getDirectionNeighborID(this.DIRECTION_MAPS[this.parameters["Direction"]][this.startDir])
+                return not (this.isFinished() or (checkID is None))
+            
+            def isFinished(this):
+                return not this.parameters["Alive"]
