@@ -13,7 +13,7 @@ def abstractmethod(method):
 
 class Control:
     # standard parameters
-    PARAMETERS = {'framerate': 40}
+    PARAMETERS = {'framerate': 50}
     
     def __init__(this,algorithm,parameters=None):
         this.algorithm = algorithm
@@ -61,6 +61,7 @@ class DirectionControl(Control):
 #            print(this.algorithm.getParameter("Alive"))
             key = this.stdscr.getch()
             dir = None
+            rot = None
             if key == ord('f'):
                 #print("90",end='',flush=True)
                 dir=90
@@ -79,6 +80,10 @@ class DirectionControl(Control):
             elif key==ord('c'):
                 #print("150",end='',flush=True)
                 dir=150
+            elif key==ord('k'):
+                rot=-60
+            elif key==ord('l'):
+                rot=60
             elif key == ord('q'):
                 this.algorithm = mainAlgorithm(this.algorithm.SLC,AlgFadeOut(3*this.PARAMETERS['framerate'],this.algorithm))
                 print('o', end='', flush=True)
@@ -89,6 +94,8 @@ class DirectionControl(Control):
                 break;
             if dir is not None:
                 this.algorithm.setParameter("Direction",dir)
+            if rot is not None:
+                this.algorithm.setParameter("Rotate",rot)
             # step
             this.algorithm.step()
             time.sleep(1/this.parameters["framerate"])

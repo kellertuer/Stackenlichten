@@ -19,6 +19,7 @@ class Algorithm(Graph):
     """
     
     PARAMS = {"OSF" : 1}
+    DIRECTION_MAPS = {0:[0,0], 30:[60,0], 60:[60,60], 90:[60,120], 120:[120,120], 150:[180,120], 180:[180,180], 210:[180,240], 240:[240,240], 270:[300,240], 300:[300,300], 330:[300,0]}
     
     def __init__(this,graph=None,parameters={}):
         "Initialize the algorithm to act on a certain graph object"
@@ -134,7 +135,6 @@ class metaAlgorithm(Algorithm):
             a.setParameters(parameters)
 
     def setParameter(this,key,value):
-        print("A")
         for a in this.algorithms:
             a.setParameter(key,value)
 
@@ -228,6 +228,62 @@ class overlayAlgorithm(metaAlgorithm):
                         this.nodes[k].setColor(thisC)
                 c = c+1
 
+class sequentialAlgorithm(metaAlgorithm):
+    """An Algorithm to perform sequential execution of an array of algorithms
+    """
+    def __init__(this,algorithms,repeat=False,graph=None):
+        super(sequentialAlgorithm,this).__init__(algorithms,graph)
+        this.repeat = repeat
+        this.actAlgorithm = 0
+    
+    def step(this):
+        if this.algorithms[this.actAlgorithm].isFinished():
+            if this.actAlgorithm < len(this.algorithms)-1:
+                this.actAlgorithm = this.actAlgorithm + 1
+        this.algorithms[this.actAlgorithm].step()
+        this.setBlack()
+        for k in this.algorithms[this.actAlgorithm].nodes.keys():
+            this.nodes[k] += this.algorithms[this.actAlgorithm].nodes[k]
+        
+    def isFinished(this):
+        # no repeats, last algorithm was active and has finished
+        return (not this.repeat) and (this.actAlgorithm == len(this.algorithms)-1) and (this.algorithms[-1].isFinished()) 
+#
+#
+#
+# Specific algorithms
+#-------------------------------------------------------------------------------
+class AlgPause(Algorithm):
+    """A simple short pause algorithm to pause between sequential algorithms
+       can also be used to have an indefinite pause by using AlgPause(0)
+    """
+    def __init__(this,duration,graph=None):
+        super(AlgPause,this).__init__(graph)
+        this.parameters["PauseDuration"] = duration
+        this.cnt = 0
+    
+    def step(this):
+        # cnt=0,pause=0 means infinite pause...
+        if this.parameters["PauseDuration"]>0:
+            this.cnt = this.cnt + 1
+    
+    def isFinished(this):
+         return this.cnt > this.parameters["PauseDuration"]
+    
+    def setParameters(this,parameters):
+        super(AlgPause,this).setParameters(parameters)
+        this.__updateState()
+    
+    def setParameter(this,key,value):
+        super(AlgPause).setParameter(key,value)
+        this.__updateState()
+    
+    def __updateState(this):
+        if this.parameters.get("EndPause",False):
+            this.cnt = this.parameters["PauseDuration"]+1
+        if this.parameters.get("StartPause",False):
+            this.cnt = 0
+        
 class AlgBackground(Algorithm):
     """ Background Algorithm
     The background algorithm just sets a constant color as background.
@@ -243,6 +299,87 @@ class AlgBackground(Algorithm):
 
     def isFinished(this):
         return False
+
+class AlgDisplayDigit(Algorithm):
+    """An hardcoded algorithm to display italic numbers
+    (keep dirRight to 90, dirDown to 210 if you'Re unsure)
+    the posTopLeft should be an uowards pointing triangle
+    """
+    # HARDCODED!
+    DIGITS = [
+        #0
+        [[1,1,1,1,1,0],[1,1,0,0,1,1],[1,1,0,0,1,1],[1,1,0,0,1,1],[0,1,1,1,1,1]],
+        #1
+        [[0,1,1,1,0,0],[0,0,1,1,0,0],[0,0,1,1,0,0],[0,0,1,1,0,0],[0,1,1,1,1,0]],
+        #2
+        [[1,1,1,1,1,0],[0,0,0,0,1,1],[1,1,1,1,1,1],[1,1,0,0,0,0],[1,1,1,1,1,0]],
+        #3
+        [[0,1,1,1,1,0],[0,0,0,0,1,1],[0,0,0,1,1,1],[0,0,0,0,1,1],[0,1,1,1,1,1]],
+        #4
+        [[1,1,0,0,1,1],[1,1,0,0,1,1],[0,1,1,1,1,1],[0,0,0,0,1,1],[0,0,0,0,1,1]],
+        #5
+        [[1,1,1,1,1,0],[1,1,0,0,0,0],[1,1,1,1,1,0],[0,0,0,0,1,1],[0,1,1,1,1,1,]],
+        #6
+        [[1,1,1,1,0,0],[1,1,0,0,0,0],[1,1,1,1,1,0],[1,1,0,0,1,1],[0,1,1,1,1,1]],
+        #7
+        [[0,1,1,1,1,1],[0,0,0,0,1,1],[0,0,0,0,1,1],[0,0,0,0,1,1],[0,0,0,0,1,1]],
+        #8
+        [[1,1,1,1,1,0],[1,1,0,0,1,1],[1,1,1,1,1,1],[1,1,0,0,1,1],[0,1,1,1,1,1]],
+        #9
+        [[1,1,1,1,1,0],[1,1,0,0,1,1],[0,1,1,1,1,1],[0,0,0,0,1,1],[0,0,1,1,1,1]]]
+    def __init__(this,digit,posTopLeft,duration,dirRight=90,dirDown=210,graph=None):
+        super(AlgDisplayDigit,this).__init__(graph)
+        this.parameters["DisplayDigitDuration"] = duration
+        this.digit=digit
+        this.TLID = posTopLeft
+        this.dirRight = dirRight
+        this.dirDown = dirDown
+        this.cnt = 0
+        #hardcoded here
+    
+    def step(this):
+        # cnt=0,pause=0 means infinite pause...
+        #put digit on the graph
+        thisDigit = this.DIGITS[this.digit]
+        firstInLineID = this.TLID
+        for i,row in enumerate(thisDigit):
+            thisID = firstInLineID
+            for j,entry in enumerate(row):
+                p = this.getPixel(thisID)
+                p.setColor([float(entry)]*3)
+                # is the triangle pointing upward?
+                if (p.getDirectionDistance(60)==1) or (p.getDirectionDistance(180)==1) or (p.getDirectionDistance(300)==1):
+                    this.startDir=0 #
+                elif (p.getDirectionDistance(0)==1) or (p.getDirectionDistance(120)==1) or (p.getDirectionDistance(240)==1):
+                    this.startDir=1
+                nextDir = thisDir = this.DIRECTION_MAPS[this.dirRight][this.startDir]
+                thisID = p.getDirectionNeighborID(nextDir)
+                if thisID is None:
+                    break# end this line
+            # switch to next line
+            p = this.getPixel(firstInLineID)
+            firstInLineID = p.getDirectionNeighborID(this.dirDown)
+            if firstInLineID is None:
+                break #if no next line available -> break setting
+        if this.parameters.get("DisplayDigitDuration",0)>0:
+            this.cnt = this.cnt + 1
+    
+    def isFinished(this):
+        return this.cnt > this.parameters.get("DisplayDigitDuration",0)
+    
+    def setParameters(this,parameters):
+        super(AlgDisplayDigit,this).setParameters(parameters)
+        this.__updateState()
+    
+    def setParameter(this,key,value):
+        super(AlgDisplayDigit,this).setParameter(key,value)
+        this.__updateState()
+    
+    def __updateState(this):
+        if this.parameters.get("EndDisplayDigit",False):
+            this.cnt = this.parameters["EndDisplayDigit"]+1
+        if this.parameters.get("StartPause",False):
+            this.cnt = 0
 
 class AlgDiffusion(Algorithm):
     """Algorithm to perform Diffusion on the colors
@@ -469,8 +606,6 @@ class AlgTrigWalk(Algorithm):
     """
     # we have to alternate, these are for /\ triangles, for \/ start with the
     # second term each entry
-    DIRECTION_MAPS = {0:[0,0], 30:[60,0], 60:[60,60], 90:[60,120], 120:[120,120], 150:[180,120], 180:[180,180], 210:[180,240], 240:[240,240], 270:[300,240], 300:[300,300], 330:[300,0]}
-    
     
     def __init__(this,startID,direction,trail,lookahead=1,graph=None):
         super(AlgTrigWalk,this).__init__(graph)
@@ -586,7 +721,7 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
                 super(AlgSnake,this).__init__(graph,parameters)
                 if StartDirection not in AlgSnake.DIRECTION_MAPS:
                     raise ValueError("This direction is not available for walking.");
-                parameters = {"Direction" : StartDirection, "CurrentHead":startID, "Alive":True, "StepInt":10}
+                parameters = {"Direction" : StartDirection, "CurrentHead":startID, "Alive":True, "StepInt":15}
                 for k,v in parameters.items():
                     if k not in this.parameters:
                         this.parameters[k] = v
@@ -652,20 +787,22 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
 
             def setParameters(this,parameters):
                 super(AlgSnake,this).setParameters(parameters)
-                if parameters.get("Direction"):
+                if parameters.get("Direction") or parameters.get("Rotate"):
                     this.warning=False
+                this.parameters["Direction"] = (this.parameters["Direction"] + this.parameters.get("Rotate",0))%360
 
             def setParameter(this,key,value):
                 super(AlgSnake,this).setParameter(key,value)
-                print(this.parameters["Direction"])
-                if key=="Direction":
+                if key=="Direction" or key=="Rotate":
                     this.warning=False
+                if key=="Rotate":
+                    this.parameters["Direction"]=(this.parameters["Direction"]+value)%360
 
             def getactualPosition(this):
                 "return the current node."
                 return this.headID
 
-            def getEatenPieces():
+            def getEatenPieces(this):
                 return this.nomnomcount
             
             
