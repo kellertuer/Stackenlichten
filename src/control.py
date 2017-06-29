@@ -84,6 +84,8 @@ class DirectionControl(Control):
                 rot=-60
             elif key==ord('l'):
                 rot=60
+            elif key == ord(' '):
+                this.algorithm.setParameter("EndDisplayDigit",True)
             elif key == ord('q'):
                 this.algorithm = mainAlgorithm(this.algorithm.SLC,AlgFadeOut(3*this.PARAMETERS['framerate'],this.algorithm))
                 print('o', end='', flush=True)

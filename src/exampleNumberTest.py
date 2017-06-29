@@ -49,22 +49,22 @@ def run(argv):
     sample2 = AlgSampleFunction(f2,stepVars,vars,graph.clone())
     mAlg = multAlgorithm([myBT, sample2],graph.clone())
     snake = AlgSnake(28,90,5,graph.clone())
-    mainAlg = overlayAlgorithm([mAlg,snake],[[0.0,0.0,0.0]]*3,graph.clone())
     seq = sequentialAlgorithm([
-      addAlgorithm([AlgDisplayDigit(1,68,15,90,210,graph.clone()),AlgDisplayDigit(0,59,15,90,210,graph.clone())],graph.clone()),
-      AlgDisplayDigit(9,59,15,90,210,graph.clone()),
-      AlgDisplayDigit(8,59,15,90,210,graph.clone()),
-      AlgDisplayDigit(7,59,15,90,210,graph.clone()),
-      AlgDisplayDigit(6,59,15,90,210,graph.clone()),
-      AlgDisplayDigit(5,59,15,90,210,graph.clone()),
-      AlgDisplayDigit(4,59,15,90,210,graph.clone()),
-      AlgDisplayDigit(3,59,15,90,210,graph.clone()),
-      AlgDisplayDigit(2,59,15,90,210,graph.clone()),
-      AlgDisplayDigit(1,59,15,90,210,graph.clone()),
-      AlgDisplayDigit(0,59,15,90,210,graph.clone()),
-      mainAlg
-    ],False,graph.clone())
-    alg = mainAlgorithm(slc,seq)
+      AlgDisplayDigit(9,55,15,90,210,graph.clone()),
+      AlgDisplayDigit(8,55,15,90,210,graph.clone()),
+      AlgDisplayDigit(7,55,15,90,210,graph.clone()),
+      AlgDisplayDigit(6,55,15,90,210,graph.clone()),
+      AlgDisplayDigit(5,55,15,90,210,graph.clone()),
+      AlgDisplayDigit(4,55,15,90,210,graph.clone()),
+      AlgDisplayDigit(3,55,15,90,210,graph.clone()),
+      AlgDisplayDigit(2,55,15,90,210,graph.clone()),
+      AlgDisplayDigit(1,55,15,90,210,graph.clone()),
+      AlgDisplayDigit(0,55,15,90,210,graph.clone()),
+      snake,
+      addAlgorithm([AlgDisplayDigit(4,68,0,90,210,graph.clone()),AlgDisplayDigit(2,59,0,90,210,graph.clone())],graph.clone())
+    ],True,graph.clone(),{"PassValue":[ {"From":10,"FromKey":"GameScore","To":[[11,0],[11,1]],"ToKey":"Digit","Type":"SplitDigits"} ]})
+    mainAlg = overlayAlgorithm([mAlg,seq],[[0.0]*3]*3,graph.clone())
+    alg = mainAlgorithm(slc,mainAlg)
     c = DirectionControl(alg);
     c.start()
     

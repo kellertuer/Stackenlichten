@@ -21,13 +21,18 @@ class Algorithm(Graph):
     PARAMS = {"OSF" : 1}
     DIRECTION_MAPS = {0:[0,0], 30:[60,0], 60:[60,60], 90:[60,120], 120:[120,120], 150:[180,120], 180:[180,180], 210:[180,240], 240:[240,240], 270:[300,240], 300:[300,300], 330:[300,0]}
     
-    def __init__(this,graph=None,parameters={}):
+    def __init__(this,graph=None,parameters=None):
         "Initialize the algorithm to act on a certain graph object"
         super(Algorithm,this).__init__(graph)
-        this.parameters = parameters
-        for key,value in this.PARAMS.items():
-            if not key in parameters:
+        if parameters is None:
+            this.parameters = {} # instanciate a new one!
+            for key,value in this.PARAMS.items():
                 this.parameters[key] = value
+        else:
+            this.parameters = parameters
+            for key,value in this.PARAMS.items():
+                if not key in parameters:
+                    this.parameters[key] = value
     
     @abstractmethod
     def step(this):
@@ -45,12 +50,19 @@ class Algorithm(Graph):
     def setParameters(this,parameters):
         for key,value in parameters:
             this.parameters[key] = value
+    def setParametersOf(this,Indices,parameters):
+        this.setParameters(parameters) # end / fallback
+        
     
     def setParameter(this,key,value):
         this.parameters[key] = value
+    def setParameterOf(this,Indices,key,value):
+        this.setParameter(key,value) # end / fallback
         
     def getParameter(this,key):
         return this.parameters.get(key)
+    def getParameterOf(this,Indices,key):
+        return this.getParameter(key) # end / fallback
 
     @abstractmethod
     def isFinished(this):
@@ -71,6 +83,8 @@ class Algorithm(Graph):
     def getFollowUp(this):
         "if the algorithm is finished it may provide a followUpAlgorithm or set of Algorithms"
         pass
+    def reset(this):
+        this.setBlack()
 
 class mainAlgorithm(Algorithm):
     """Main Algorithm
@@ -108,16 +122,14 @@ class metaAlgorithm(Algorithm):
         the meta algorithm just encapsulates a set of algorithms and assumes
         they all work on the same graph, i.e. the last set pixel wins
     """
-    def __init__(this,algorithms,graph=None):
-        super(metaAlgorithm,this).__init__(graph)
-        this.algorithms = algorithms;
+    def __init__(this,algorithms,graph=None,parameters=None):
+        super(metaAlgorithm,this).__init__(graph,parameters)
+        this.algorithms = algorithms
         this.iter = 0;
     
     def step(this):
         if len(this.algorithms) > 0:
             this.iter = this.iter + 1;
-            # TODO: check if finished ones have a followUp?
-            #remove finished
             this.algorithms = [x for x in this.algorithms if not x.isFinished() ]
             if len(this.algorithms) > 0:
                 # step remaining ones
@@ -127,19 +139,54 @@ class metaAlgorithm(Algorithm):
     def append(algorithm):
         this.algorithms.append(algorithm)
     
+    def reset(this):
+        for x in this.algorithms:
+            x.reset()
+            
     def isFinished(this):
-        return len(this.algorithms)==0
+        T = [x for x in this.algorithms if not x.isFinished() ]
+        return len(T)==0
     
     def setParameters(this,parameters):
         for a in this.algorithms:
             a.setParameters(parameters)
-
+    
     def setParameter(this,key,value):
         for a in this.algorithms:
             a.setParameter(key,value)
 
+    def setParametersOf(this,Indices,parameters):
+            if isinstance(Indices,list):
+                ind = Indices.pop(0)
+                if len(Indices)>0:
+                    this.algorithms[ind].setParametersOf(Indices,parameters)
+                else:
+                    this.algorithms[ind].setParameters(parameters)
+            else:
+                    this.algorithms[Indices].setParameters(parameters)
+
+    def setParameterOf(this,Indices,key,value):
+            if isinstance(Indices,list):
+                ind = Indices.pop(0)
+                if len(Indices)>0:
+                    this.algorithms[ind].setParameterOf(Indices,key,value)
+                else:
+                    this.algorithms[ind].setParameter(key,value)
+            else:
+                    this.algorithms[Indices].setParameter(key,value)
+
     def getParameter(this,key):
-        return [a.getParameter(key) for a in this.algorithms]
+        return [this.parameters.get(key), [a.getParameter(key) for a in this.algorithms]]
+
+    def getParameterOf(this,Indices,key):
+        if isinstance(Indices,list):
+            ind = Indices.pop(0)
+            if len(Indices)>0:
+                return this.algorithms[ind].getParameterOf(Indices,key,value)
+            else:
+                return this.algorithms[ind].getParameter(key)
+        else:
+            return this.algorithms[ind].getParameter(key)
 
 class iterAlgorithm(Algorithm):
     """ Iter Algorithm
@@ -231,15 +278,44 @@ class overlayAlgorithm(metaAlgorithm):
 class sequentialAlgorithm(metaAlgorithm):
     """An Algorithm to perform sequential execution of an array of algorithms
     """
-    def __init__(this,algorithms,repeat=False,graph=None):
-        super(sequentialAlgorithm,this).__init__(algorithms,graph)
+    def __init__(this,algorithms,repeat=False,graph=None,parameters=None):
+        super(sequentialAlgorithm,this).__init__(algorithms,graph,parameters)
         this.repeat = repeat
         this.actAlgorithm = 0
     
     def step(this):
         if this.algorithms[this.actAlgorithm].isFinished():
             if this.actAlgorithm < len(this.algorithms)-1:
+                # handle {"PassValue":[ {"From":10,"FromKey","To":[[11,0],[11,1]],"Type":"SplitDigits"} ]}
+                if this.getParameter("PassValue") is not None:
+                    passValues = this.getParameter("PassValue")[0]
+                    for passValueDict in passValues:
+                        if passValueDict.get("From",-1) == this.actAlgorithm:
+                            FromValue = this.algorithms[this.actAlgorithm].getParameter(passValueDict.get("FromKey"))
+                            if passValueDict.get("Type","") == "SplitDigits":
+                                FromValue = [int(i) for i in str(FromValue)]
+                            ToValue = passValueDict.get("To")
+                            ToKey = passValueDict.get("ToKey")
+                            if isinstance(ToValue, list): #we have a list to proomote to
+                                i=0
+                                for toV in ToValue:
+                                    if isinstance(toV, list): # subAlgs
+                                        if isinstance(FromValue,list):
+                                            if (len(FromValue)-len(toV)+i)<0:
+                                                this.setParameterOf(toV.copy(),ToKey,-1)
+                                            else:
+                                                this.setParameterOf(toV.copy(),ToKey,FromValue[len(FromValue)-len(toV)+i])
+                                            i=i+1
+                                        else:
+                                            this.setParameterOf(toV.copy(),ToKey,FromValue)
+                                            
                 this.actAlgorithm = this.actAlgorithm + 1
+                this.algorithms[this.actAlgorithm].reset()
+                # and for the last fnished?
+            elif this.repeat:
+                this.actAlgorithm=0
+                this.algorithms[this.actAlgorithm].reset()
+        #step.
         this.algorithms[this.actAlgorithm].step()
         this.setBlack()
         for k in this.algorithms[this.actAlgorithm].nodes.keys():
@@ -330,41 +406,46 @@ class AlgDisplayDigit(Algorithm):
     def __init__(this,digit,posTopLeft,duration,dirRight=90,dirDown=210,graph=None):
         super(AlgDisplayDigit,this).__init__(graph)
         this.parameters["DisplayDigitDuration"] = duration
-        this.digit=digit
+        this.parameters["Digit"] = digit
         this.TLID = posTopLeft
         this.dirRight = dirRight
         this.dirDown = dirDown
+        this.reset()
+        
+    def reset(this):
+        super(AlgDisplayDigit,this).reset()
+        this.parameters["EndDisplayDigit"] = False
         this.cnt = 0
-        #hardcoded here
-    
+        
     def step(this):
         # cnt=0,pause=0 means infinite pause...
-        #put digit on the graph
-        thisDigit = this.DIGITS[this.digit]
-        firstInLineID = this.TLID
-        for i,row in enumerate(thisDigit):
-            thisID = firstInLineID
-            for j,entry in enumerate(row):
-                p = this.getPixel(thisID)
-                p.setColor([float(entry)]*3)
-                # is the triangle pointing upward?
-                if (p.getDirectionDistance(60)==1) or (p.getDirectionDistance(180)==1) or (p.getDirectionDistance(300)==1):
-                    this.startDir=0 #
-                elif (p.getDirectionDistance(0)==1) or (p.getDirectionDistance(120)==1) or (p.getDirectionDistance(240)==1):
-                    this.startDir=1
-                nextDir = thisDir = this.DIRECTION_MAPS[this.dirRight][this.startDir]
-                thisID = p.getDirectionNeighborID(nextDir)
-                if thisID is None:
-                    break# end this line
-            # switch to next line
-            p = this.getPixel(firstInLineID)
-            firstInLineID = p.getDirectionNeighborID(this.dirDown)
-            if firstInLineID is None:
-                break #if no next line available -> break setting
-        if this.parameters.get("DisplayDigitDuration",0)>0:
-            this.cnt = this.cnt + 1
-    
-    def isFinished(this):
+        # put digit on the graph if valid number
+        if this.getParameter("Digit")>=0 and this.getParameter("Digit")<=9:
+            thisDigit = this.DIGITS[this.getParameter("Digit")]
+            firstInLineID = this.TLID
+            for i,row in enumerate(thisDigit):
+                thisID = firstInLineID
+                for j,entry in enumerate(row):
+                    p = this.getPixel(thisID)
+                    p.setColor([float(entry)]*3)
+                    # is the triangle pointing upward?
+                    if (p.getDirectionDistance(60)==1) or (p.getDirectionDistance(180)==1) or (p.getDirectionDistance(300)==1):
+                        this.startDir=0 #
+                    elif (p.getDirectionDistance(0)==1) or (p.getDirectionDistance(120)==1) or (p.getDirectionDistance(240)==1):
+                        this.startDir=1
+                    nextDir = thisDir = this.DIRECTION_MAPS[this.dirRight][this.startDir]
+                    thisID = p.getDirectionNeighborID(nextDir)
+                    if thisID is None:
+                        break# end this line
+                # switch to next line
+                p = this.getPixel(firstInLineID)
+                firstInLineID = p.getDirectionNeighborID(this.dirDown)
+                if firstInLineID is None:
+                    break #if no next line available -> break setting
+            if this.parameters.get("DisplayDigitDuration",0)>0:
+                this.cnt = this.cnt + 1
+
+    def isFinished(this): # finishes exactely once
         return this.cnt > this.parameters.get("DisplayDigitDuration",0)
     
     def setParameters(this,parameters):
@@ -377,7 +458,7 @@ class AlgDisplayDigit(Algorithm):
     
     def __updateState(this):
         if this.parameters.get("EndDisplayDigit",False):
-            this.cnt = this.parameters["EndDisplayDigit"]+1
+            this.cnt = this.parameters["DisplayDigitDuration"]+1
         if this.parameters.get("StartPause",False):
             this.cnt = 0
 
@@ -717,31 +798,40 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
             DIRECTION_MAPS = {30:[60,0], 90:[60,120], 150:[180,120], 210:[180,240], 270:[300,240], 330:[300,0]}
     
     
-            def __init__(this,startID,StartDirection,InitLength,graph=None,parameters={}):
+            def __init__(this,startID,StartDirection,InitLength,graph=None,parameters=None):
                 super(AlgSnake,this).__init__(graph,parameters)
                 if StartDirection not in AlgSnake.DIRECTION_MAPS:
                     raise ValueError("This direction is not available for walking.");
-                parameters = {"Direction" : StartDirection, "CurrentHead":startID, "Alive":True, "StepInt":15}
+                parameters = {"StartDirection":StartDirection,"StartID":startID,"StepInt":15,"StartLength":InitLength}
                 for k,v in parameters.items():
                     if k not in this.parameters:
                         this.parameters[k] = v
                 #StepInt = 1/Speed
-                p = this.getPixel(startID)
-                this.headID = startID
+                this.reset()
+            
+            def reset(this):
+                super(AlgSnake,this).reset()
+                this.parameters["Direction"] = this.parameters["StartDirection"]
+                this.parameters["CurrentHead"] = this.parameters["StartID"]
+                this.parameters["GameScore"] = 0
+                this.parameters["Alive"] = True
+                this.parameters["StepInt"] = 15
+                this.headID = this.parameters["StartID"]
+                p = this.getPixel(this.headID)
                 # is the triangle pointing upward?
                 if (p.getDirectionDistance(60)==1) or (p.getDirectionDistance(180)==1) or (p.getDirectionDistance(300)==1):
                     this.startDir=0
                 elif (p.getDirectionDistance(0)==1) or (p.getDirectionDistance(120)==1) or (p.getDirectionDistance(240)==1):
                     this.startDir=1
-                this.trail = [startID]*InitLength
-                this.trailNum = InitLength
+                this.trail = [this.parameters["StartID"]]*this.parameters["StartLength"]
+                this.trailNum = this.parameters["StartLength"]
                 this.cnt = 0
                 this.warning=False
-                this.nomnom = startID
-                while this.nomnom in this.trail:
-                    this.nomnom = random.choice([this.nodes[k].ID for k in this.nodes.keys()])
-                this.nomnomcount = 0
-
+                this.fruitID = this.headID
+                while this.fruitID in this.trail:
+                    this.fruitID = random.choice([this.nodes[k].ID for k in this.nodes.keys()])
+                
+                
             def step(this):
                 if this.cnt==0:
                     if this.hasNextNeighbor():
@@ -753,7 +843,6 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
                             # and not second, in order to not get stuck in corners
                             if this.warning:
                                 this.parameters["Alive"] = False
-                                print("dead after eating ",this.nomnomcount," trixel")
                             else:
                                 this.warning = True
                         this.headID = thisP.getDirectionNeighborID(thisDir)
@@ -767,19 +856,18 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
                         n = len(this.trail)
                         for i in range(n):
                             this.getPixel(this.trail[i]).setColor([1.0, 1.0,1.0]);
-                        if this.nomnom==this.headID:
-                            this.nomnomcount = this.nomnomcount + 1
-                            while this.nomnom in this.trail:
-                                this.nomnom = random.choice([this.nodes[k].ID for k in this.nodes.keys()])
+                        if this.fruitID==this.headID:
+                            this.setParameter("GameScore", this.getParameter("GameScore")+1)
+                            while this.fruitID in this.trail:
+                                this.fruitID = random.choice([this.nodes[k].ID for k in this.nodes.keys()])
                             this.trailNum = this.trailNum+1 # longer
                             if this.parameters["StepInt"] > 1:
                                 this.parameters["StepInt"] = this.parameters["StepInt"]-1 #faster
-                        this.getPixel(this.nomnom).setColor([0.0,0.0,1.0])
+                        this.getPixel(this.fruitID).setColor([0.0,0.0,1.0])
                         
                     else: # wallcollision?
                         if this.warning:
                             this.parameters["Alive"] = False
-                            print("dead after eating",this.nomnomcount,"trixel.")
                         else:
                             this.warning = True
                 # switch step
@@ -802,10 +890,6 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
                 "return the current node."
                 return this.headID
 
-            def getEatenPieces(this):
-                return this.nomnomcount
-            
-            
             def hasNextNeighbor(this):
                 "Check whether there exists a neighbor in walking direction"
                 checkID = this.headID
