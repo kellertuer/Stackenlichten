@@ -8,13 +8,13 @@ def abstractmethod(method):
         raise NotImplementedError('call to abstract method ' + repr(method))
 
     default_abstract_method.__name__ = method.__name__
-    
+
     return default_abstract_method
 
 class Control:
     # standard parameters
     PARAMETERS = {'framerate': 50}
-    
+
     def __init__(this,algorithm,parameters=None):
         this.algorithm = algorithm
         this.parameters = Control.PARAMETERS
@@ -26,11 +26,11 @@ class Control:
     def start(this):
         "start the algorithm as long as its running."
         pass
-    
+
 class SimpleControl(Control):
     def __init__(this,algorithm,parameters=None):
         super(SimpleControl,this).__init__(algorithm,parameters)
-    
+
     def start(this):
         try: #Check for Keypresses
             while not this.algorithm.isFinished():
@@ -45,7 +45,7 @@ class SimpleControl(Control):
                 time.sleep(1/this.parameters["framerate"])
                 print('.', end='', flush=True)
             print("\n\nKthxbye.")
-            
+
 class DirectionControl(Control):
     def __init__(this,algorithm,parameters=None):
         super(DirectionControl,this).__init__(algorithm,parameters)
@@ -53,11 +53,13 @@ class DirectionControl(Control):
         curses.cbreak()
         this.stdscr.keypad(1)
         this.stdscr.nodelay(1)
-        
-    
+
+
     def start(this):
         key = ''
+        cnt=0
         while not this.algorithm.isFinished():
+            cnt=cnt+1
 #            print(this.algorithm.getParameter("Alive"))
             key = this.stdscr.getch()
             dir = None
@@ -102,6 +104,8 @@ class DirectionControl(Control):
             this.algorithm.step()
             time.sleep(1/this.parameters["framerate"])
             print('.', end='', flush=True)
+            if cnt%this.parameters["framerate"]==0:
+                this.stdscr.clear()
+                this.stdscr.refresh()
         curses.endwin()
         print("\n\nKthxbye.")
-        

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import sys 
+import sys
 from graph import Graph
 from pixel import Pixel
 from Stackenlichten import *
@@ -67,6 +67,6 @@ def run(argv):
     alg = mainAlgorithm(slc,mainAlg)
     c = DirectionControl(alg);
     c.start()
-    
+
 if __name__ == "__main__":
         run(sys.argv[1:])
