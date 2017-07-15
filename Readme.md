@@ -1,6 +1,6 @@
 # Stackenlichten
-<div align="right">by [@kellertuer](https://twitter.com/kellertuer), [@k4sp4r](https://twitter.com/k4sp4r)</div>
-<div align="center"><img src="png/logo-w.png" width="300"></div>
+<div align="right">by <a href="https://twitter.com/kellertuer">@kellertuer</a>, <a href="https://twitter.com/k4sp4r">@k4spar</a>.</div>
+<div align="center"><img src="logo-w.png" width="500"></div>
 
 ## Motivation
 The idea of this project is to provide a blueprint for single pixels, that
