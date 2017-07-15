@@ -70,28 +70,30 @@ module SLside() {
     // magnet fixer
     translate([0,2*bD/4,wW])
         cube([sL/2-2*wW,1.05,1],center=true);
-    translate([0,0,-2*wW/4])
+    translate([0,0,-1*wW/4])
     linear_extrude(height=wW, twist=0)
     translate([0,sL/4])
     rotate(v=[0,1,0], a=180)
     rotate(v=[0,0,1], a=180)
-    text("Stackenlichten", font="Futura:style=Black", valign="center", halign="center",size=6);
+//    text("Stackenlichten", font="Futura:style=Black", valign="center", halign="center",size=6);
+    text("Stackenlichten", font="Pump Triline", valign="center", halign="center",size=7.5);
     //Triangle
     translate([0,0,-2*wW/4])
     linear_extrude(height=wW, twist=0)
-    translate([0,sL/2+sL*sqrt(3)/16+5,0])
+    translate([0,sL/2+sL*sqrt(3)/16+6.5,0])
             rotate([0,0,1],a=180)
-            scale(0.4)
+            scale(0.45)
             difference() {
                 polygon(points=PointLine);
                 offset(delta=-2.5) polygon(points=PointLine);
             }
-    translate([0,0,-2*wW/4])
-    linear_extrude(height=wW, twist=0)
-    translate([0,sL/2+sL*sqrt(3)/128+3.5])
+    translate([0,0,-0*wW/4])
+    linear_extrude(height=1.1*wW, twist=0)
+    translate([0,sL/2+sL*sqrt(3)/128+5.5])
     rotate(v=[0,1,0], a=180)
     rotate(v=[0,0,1], a=180)
-    text(str(number), font="Futura:style=Black", valign="center", halign="center",size=5);
+    //text(str(number), font="Futura:style=Black", valign="center", halign="center",size=5);
+    text(str(number), font="Pump Triline", valign="center", halign="center",size=6.5);
     }
 }
 

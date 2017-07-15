@@ -21,7 +21,6 @@ nD = 2*fC+2; //number of Divisions, due to 2fC+1 segments and one segment that s
 // Generate triangle
 PointLine = concat(genSide(),genSide(-120,[sL/4,sL*sqrt(3)/4]),genSide(120,[-sL/4,sL*sqrt(3)/4]));
 
-color([1,0,1])
 linear_extrude(height=fW, twist=0) polygon(points=PointLine);
 
 /*

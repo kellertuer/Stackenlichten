@@ -47,6 +47,11 @@ translate([0,0,3/4*wW]) hull() {
             cube(size = [1.1*mW,1.1*mW,wW], center = true);
             translate([-2*sL/nC,0,wW/2+1])
             cube(size = [1.1*mW,1.1*mW,wW], center = true);
+    translate([0,-7.5])
+    scale([2,.75,1])
+    linear_extrude(2*wW)
+    circle(8,$fn=180);
 }
+
     translate([0,0,wW-1.5])
         cube([sL/2-2*wW,.9,1],center=true);

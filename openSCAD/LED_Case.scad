@@ -20,11 +20,11 @@ height=3;
 hSp = 0.5;
 //inner Helper
 //outer helpers
-translate([0,0,10])
+/*translate([0,0,10])
       difference () {
         cylinder(d1=5.8,d2=5.8,h=height-0.75,$fn=360);
         translate([0,0,-.31]) cylinder(d1=5.4,d2=5.4,h=height-0.75,$fn=360);
-};
+};*/
 // Base
 difference() {
     cylinder(10, 6, 3, $fn=360);

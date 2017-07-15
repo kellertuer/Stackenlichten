@@ -23,11 +23,11 @@ shortenSide = wW/tan(60)+wW/sin(90);
 
 //Generate one side
 
-color([1,0,1]) translate([0,wW]) rotate(a=0,v=[1,0,0])
+translate([0,wW]) rotate(a=0,v=[1,0,0])
 SLside();
 
 module SLside() {
-    //linear_extrude(height=wW, twist=0)
+    linear_extrude(height=wW, twist=0)
     difference() {
     midFC = (fC + 1)/2;
     SidePointLine = concat(genSide(0,[0,0], shortenSide,shortenSide+wW,fW),
