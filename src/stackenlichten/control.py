@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from algorithm import *
+from .algorithm import Algorithm, mainAlgorithm, AlgFadeOut
 import time
 import curses
 

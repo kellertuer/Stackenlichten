@@ -1,7 +1,7 @@
-import includes.opc as opc
 import sys
 import numpy as np
-from graph import Graph
+from .Graph import Graph
+from .opc import Client
 import matplotlib.pyplot as plt
 import matplotlib.collections as mpc
 
@@ -10,20 +10,20 @@ def abstractmethod(method):
         raise NotImplementedError('call to abstract method ' + repr(method))
 
     default_abstract_method.__name__ = method.__name__
-    
+
     return default_abstract_method
 
-class SLC:
-    "StackenLichtenControl - the connector to the USB board"
+class SLV:
+    "StackenLichtenVisualization - the connector to the USB board"
 
     MAX_BRIGHTNESS = 255
-    
+
     @abstractmethod
     def render(this, graph,scale=1):
         "render(graph) – renders a graph onto the Stackenlichten and activates the LEDs."
         pass
-        
-class FadecandySLC(SLC):
+
+class FadecandySLV(SLV):
     client = None
 
     def __init__(this,url='localhost:7890'):
@@ -31,11 +31,11 @@ class FadecandySLC(SLC):
         FadecandySLC() initializes the Open Pixel Control (OPC) to connect to
         the usual localhost fadecandy server.
         """
-        print("""                              ~~~ Stackenlichten ~~~                            
-           Let\'s blink in lichten. But with German stacken and blochen.         
+        print("""                              ~~~ Stackenlichten ~~~
+           Let\'s blink in lichten. But with German stacken and blochen.
                                                                      @kellertuer
-Moin.""")
-        this.client = opc.Client(url)
+        Moin.""")
+        this.client = Client(url)
 
     def render(this, graph,scale=1):
         data = [ (0,0,0) ] * 512
@@ -46,22 +46,22 @@ Moin.""")
             data[k-1] = tuple( np.round(v) )
         this.client.put_pixels(data)
 
-class PyTurtleSLC():
-    
+class PyTurtleSLV():
+
     def __init__(this,length=30):
         """
         PyTurtleSLC() initialize the vizualization using the python turtle module
         """
-        print("""                              ~~~ Stackenlichten ~~~                            
-           Let\'s blink in lichten. But with German stacken and blochen AND Turtles!         
+        print("""                              ~~~ Stackenlichten ~~~
+           Let\'s blink in lichten. But with German stacken and blochen AND Turtles!
                                                                     @kellertuer
-Moin.""")
+        Moin.""")
         this.length=length;
         t.home()
         t.mode("logo")
         t.speed(0)
         t.ht()
-        
+
     def triangleAt(this,pos=(0.0,0.0),dir=90,length=15,fill=(1.0,1.0,1.0),clockwise=True):
         t.color( (0,0,0), fill)
         height = np.sqrt(3)/6*length
@@ -132,16 +132,16 @@ Moin.""")
                 finished = finished & drawnList[k]
         t.update()
 
-class PyMatplotSLC():
-    
+class PyMatplotSLV():
+
     def __init__(this,length=30,limits=[-300,300,-300,300]):
         """
         PyMatplotSLC() initialize the vizualization using the python matplot lib
         """
-        print("""                              ~~~ Stackenlichten ~~~                            
-           Let\'s blink in lichten. But with German stacken and blochen AND matplot!         
+        print("""                              ~~~ Stackenlichten ~~~
+           Let\'s blink in lichten. But with German stacken and blochen AND matplot!
                                                                     @kellertuer
-Moin.""")
+        Moin.""")
         this.length=length;
         this.fig = plt.figure()
         this.ax = this.fig.gca()
@@ -157,7 +157,7 @@ Moin.""")
         fig = this.ax.figure.canvas.manager
         active_fig_managers = plt._pylab_helpers.Gcf.figs.values()
         return fig not in active_fig_managers
-    
+
     def triangleAt(this,pos=(0.0,0.0),dir=90,length=15,fill=(1.0,1.0,1.0)):
         height = np.sqrt(3)/6*length
         base = [pos[0] + np.sin(dir/180.0*np.pi+np.pi/2.0)*height, pos[1] + np.cos(dir/180.0*np.pi + np.pi/2.0)*height]

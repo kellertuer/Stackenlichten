@@ -1,5 +1,5 @@
-from graph import Graph
-from pixel import Pixel
+from .Graph import Graph
+from .Pixel import Pixel
 import numpy as np
 import random
 import math
@@ -9,7 +9,7 @@ def abstractmethod(method):
         raise NotImplementedError('call to abstract method ' + repr(method))
 
     default_abstract_method.__name__ = method.__name__
-    
+
     return default_abstract_method
 
 class Algorithm(Graph):
@@ -17,10 +17,10 @@ class Algorithm(Graph):
     All algorithm serves as decorator for a graph, such that any algorthm may
     keep a list of sub algorithms to be performed within the algorithm
     """
-    
+
     PARAMS = {"OSF" : 1}
     DIRECTION_MAPS = {0:[0,0], 30:[60,0], 60:[60,60], 90:[60,120], 120:[120,120], 150:[180,120], 180:[180,180], 210:[180,240], 240:[240,240], 270:[300,240], 300:[300,300], 330:[300,0]}
-    
+
     def __init__(this,graph=None,parameters=None):
         "Initialize the algorithm to act on a certain graph object"
         super(Algorithm,this).__init__(graph)
@@ -33,7 +33,7 @@ class Algorithm(Graph):
             for key,value in this.PARAMS.items():
                 if not key in parameters:
                     this.parameters[key] = value
-    
+
     @abstractmethod
     def step(this):
         "perform a step/frame of the algorithm"
@@ -46,19 +46,19 @@ class Algorithm(Graph):
     def setFramerate(this,osf):
         "perform a step only each kth step of the parent algorithm"
         this.parameters["OSF"]=osf;
-    
+
     def setParameters(this,parameters):
         for key,value in parameters:
             this.parameters[key] = value
     def setParametersOf(this,Indices,parameters):
         this.setParameters(parameters) # end / fallback
-        
-    
+
+
     def setParameter(this,key,value):
         this.parameters[key] = value
     def setParameterOf(this,Indices,key,value):
         this.setParameter(key,value) # end / fallback
-        
+
     def getParameter(this,key):
         return this.parameters.get(key)
     def getParameterOf(this,Indices,key):
@@ -95,25 +95,25 @@ class mainAlgorithm(Algorithm):
         super(mainAlgorithm,this).__init__(algorithm)
         this.alg = algorithm;
         this.SLC = SLC
-        
+
     def step(this):
         this.alg.step()
         # put pixels to leds
         this.SLC.render(this.alg)
-    
+
     def setBlack(this):
         this.alg.setBlack();
         this.SLC.render(this)
-    
+
     def isFinished(this):
         return this.alg.isFinished()
-    
+
     def setParameters(this,parameters):
         this.alg.setParameters(parameters)
-    
+
     def setParameter(this,key,value):
         this.alg.setParameter(key,value)
-    
+
     def getParameter(this,key):
         this.alg.getParameter(key)
 
@@ -126,7 +126,7 @@ class metaAlgorithm(Algorithm):
         super(metaAlgorithm,this).__init__(graph,parameters)
         this.algorithms = algorithms
         this.iter = 0;
-    
+
     def step(this):
         if len(this.algorithms) > 0:
             this.iter = this.iter + 1;
@@ -138,19 +138,19 @@ class metaAlgorithm(Algorithm):
                         x.step()
     def append(algorithm):
         this.algorithms.append(algorithm)
-    
+
     def reset(this):
         for x in this.algorithms:
             x.reset()
-            
+
     def isFinished(this):
         T = [x for x in this.algorithms if not x.isFinished() ]
         return len(T)==0
-    
+
     def setParameters(this,parameters):
         for a in this.algorithms:
             a.setParameters(parameters)
-    
+
     def setParameter(this,key,value):
         for a in this.algorithms:
             a.setParameter(key,value)
@@ -199,7 +199,7 @@ class iterAlgorithm(Algorithm):
         this.numAlg = 0
         this.actAlg = this.algorithms[0]
         this.iter = 0
-    
+
     def step(this):
         if len(this.algorithms) > 0:
             this.iter = this.iter + 1;
@@ -209,13 +209,13 @@ class iterAlgorithm(Algorithm):
                     this.actAlg = this.algorithms[this.numAlg]
             if (this.iter%this.actAlg.getFramerate()) == 0:
                 this.actAlg.step()
-            
+
     def append(algorithm):
         this.algorithms.append(algorithm)
-    
+
     def isFinished(this):
         return this.numAlg == (len(this.algorithms)-1) and len(this.algorithms)==0
-    
+
     def setParameters(parameters):
         for a in this.algorithms:
             a.setParameters(parameters)
@@ -230,7 +230,7 @@ class iterAlgorithm(Algorithm):
 class addAlgorithm(metaAlgorithm):
     def __init__(this,algorithms,graph=None):
         super(addAlgorithm,this).__init__(algorithms,graph)
-    
+
     def step(this):
         super(addAlgorithm,this).step()
         if len(this.algorithms) > 0:
@@ -244,7 +244,7 @@ class addAlgorithm(metaAlgorithm):
 class multAlgorithm(metaAlgorithm):
     def __init__(this,algorithms,graph=None):
         super(multAlgorithm,this).__init__(algorithms,graph)
-        
+
     def step(this):
         super(multAlgorithm,this).step()
         if len(this.algorithms) > 0:
@@ -259,7 +259,7 @@ class overlayAlgorithm(metaAlgorithm):
     def __init__(this,algorithms,transparentcolors,graph=None):
         super(overlayAlgorithm,this).__init__(algorithms,graph)
         this.tColors = transparentcolors
-        
+
     def step(this):
         super(overlayAlgorithm,this).step()
         if len(this.algorithms) > 0:
@@ -282,7 +282,7 @@ class sequentialAlgorithm(metaAlgorithm):
         super(sequentialAlgorithm,this).__init__(algorithms,graph,parameters)
         this.repeat = repeat
         this.actAlgorithm = 0
-    
+
     def step(this):
         if this.algorithms[this.actAlgorithm].isFinished():
             if this.actAlgorithm < len(this.algorithms)-1:
@@ -308,7 +308,7 @@ class sequentialAlgorithm(metaAlgorithm):
                                             i=i+1
                                         else:
                                             this.setParameterOf(toV.copy(),ToKey,FromValue)
-                                            
+
                 this.actAlgorithm = this.actAlgorithm + 1
                 this.algorithms[this.actAlgorithm].reset()
                 # and for the last fnished?
@@ -320,10 +320,10 @@ class sequentialAlgorithm(metaAlgorithm):
         this.setBlack()
         for k in this.algorithms[this.actAlgorithm].nodes.keys():
             this.nodes[k] += this.algorithms[this.actAlgorithm].nodes[k]
-        
+
     def isFinished(this):
         # no repeats, last algorithm was active and has finished
-        return (not this.repeat) and (this.actAlgorithm == len(this.algorithms)-1) and (this.algorithms[-1].isFinished()) 
+        return (not this.repeat) and (this.actAlgorithm == len(this.algorithms)-1) and (this.algorithms[-1].isFinished())
 #
 #
 #
@@ -337,29 +337,29 @@ class AlgPause(Algorithm):
         super(AlgPause,this).__init__(graph)
         this.parameters["PauseDuration"] = duration
         this.cnt = 0
-    
+
     def step(this):
         # cnt=0,pause=0 means infinite pause...
         if this.parameters["PauseDuration"]>0:
             this.cnt = this.cnt + 1
-    
+
     def isFinished(this):
          return this.cnt > this.parameters["PauseDuration"]
-    
+
     def setParameters(this,parameters):
         super(AlgPause,this).setParameters(parameters)
         this.__updateState()
-    
+
     def setParameter(this,key,value):
         super(AlgPause).setParameter(key,value)
         this.__updateState()
-    
+
     def __updateState(this):
         if this.parameters.get("EndPause",False):
             this.cnt = this.parameters["PauseDuration"]+1
         if this.parameters.get("StartPause",False):
             this.cnt = 0
-        
+
 class AlgBackground(Algorithm):
     """ Background Algorithm
     The background algorithm just sets a constant color as background.
@@ -368,7 +368,7 @@ class AlgBackground(Algorithm):
     def __init__(this,color=[0,0,0],graph=None):
         super(AlgBackground,this).__init__(graph)
         this.color= color
-        
+
     def step(this):
         for k,n in this.nodes.items():
             n.setColor(this.color)
@@ -411,12 +411,12 @@ class AlgDisplayDigit(Algorithm):
         this.dirRight = dirRight
         this.dirDown = dirDown
         this.reset()
-        
+
     def reset(this):
         super(AlgDisplayDigit,this).reset()
         this.parameters["EndDisplayDigit"] = False
         this.cnt = 0
-        
+
     def step(this):
         # cnt=0,pause=0 means infinite pause...
         # put digit on the graph if valid number
@@ -447,15 +447,15 @@ class AlgDisplayDigit(Algorithm):
 
     def isFinished(this): # finishes exactely once
         return this.cnt > this.parameters.get("DisplayDigitDuration",0)
-    
+
     def setParameters(this,parameters):
         super(AlgDisplayDigit,this).setParameters(parameters)
         this.__updateState()
-    
+
     def setParameter(this,key,value):
         super(AlgDisplayDigit,this).setParameter(key,value)
         this.__updateState()
-    
+
     def __updateState(this):
         if this.parameters.get("EndDisplayDigit",False):
             this.cnt = this.parameters["DisplayDigitDuration"]+1
@@ -483,7 +483,7 @@ class AlgDiffusion(Algorithm):
                 this.nodes[l].addToColor([step[i]*this.stepSize for i in range(3)])
             this.nodes[k].addToColor(csub)
         this.algInit = True
-        
+
     def isFinished(this):
         if not this.algInit:
             return False
@@ -501,7 +501,7 @@ class AlgDiffusion(Algorithm):
         return finished
 
 class AlgRandomPoints(Algorithm):
-    """AlgRandomPoints – generate (and destruct) 
+    """AlgRandomPoints – generate (and destruct)
     """
     def __init__(this,destruct=0,maxNum=10,createEvery=1,graph=None):
         super(AlgRandomPoints,this).__init__(graph)
@@ -610,7 +610,7 @@ class AlgSampleFunction(Algorithm):
 
     def isFinished(this):
         this.FctValues.get('finished',False)
-        
+
 class AlgRunningLight(Algorithm):
     """The algorithm performs a simple running light ordered by id"""
     def __init__(this,randomColor=True,restart=True,sort=False,graph=None):
@@ -669,14 +669,14 @@ class AlgTrigWalkCycle(Algorithm):
         this.currID = startID
         this.currAlg = AlgTrigWalk(startID,directions[this.actDir],trailNum,this.lookaheads[this.actDir],graph)
         this.trailNum = trailNum
-    
+
     def step(this):
         if this.currAlg.isFinished(): #start next one
             this.actDir = (this.actDir+1)%(len(this.directions))
             curPos = this.currAlg.getactualPosition();
             this.currAlg = AlgTrigWalk(curPos,this.directions[this.actDir],this.currAlg.trail,this.lookaheads[this.actDir],this.currAlg)
         this.currAlg.step()
-        
+
     def isFinished(this): #infinite loop
         return False
 
@@ -687,7 +687,7 @@ class AlgTrigWalk(Algorithm):
     """
     # we have to alternate, these are for /\ triangles, for \/ start with the
     # second term each entry
-    
+
     def __init__(this,startID,direction,trail,lookahead=1,graph=None):
         super(AlgTrigWalk,this).__init__(graph)
         if direction not in AlgTrigWalk.DIRECTION_MAPS:
@@ -740,7 +740,7 @@ class AlgTrigWalk(Algorithm):
 class AlgRandomBlink(Algorithm):
     """
     An algorithm producing random blinks within the graph of given or random
-    or random duration abd pause 
+    or random duration abd pause
     """
     def __init__(this,meanBlinkIntervall,BlinkRandom,meanBlinkLength,BlinkLengthVariance,graph=None):
         super(AlgRandomBlink,this).__init__(graph)
@@ -755,10 +755,10 @@ class AlgRandomBlink(Algorithm):
         else:
             this.nextTime = meanBlinkIntervall
         this.cnt = 0;
-    
+
     def isFinished(this):
         return False
-    
+
     def step(this):
         # draw random number to determine whether a new pixel is lit
         this.cnt = this.cnt+1;
@@ -787,17 +787,17 @@ class AlgRandomBlink(Algorithm):
                 newD.append(item-1)
         this.activeFramesLeft = newD
         this.activeNodes = newN
-        
+
 class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
             """
             An algorithm running along a direction starting from a pixel with a tail#
-            
+
             """
             # we have to alternate, these are for /\ triangles, for \/ start with the
             # second term each entry
             DIRECTION_MAPS = {30:[60,0], 90:[60,120], 150:[180,120], 210:[180,240], 270:[300,240], 330:[300,0]}
-    
-    
+
+
             def __init__(this,startID,StartDirection,InitLength,graph=None,parameters=None):
                 super(AlgSnake,this).__init__(graph,parameters)
                 if StartDirection not in AlgSnake.DIRECTION_MAPS:
@@ -808,7 +808,7 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
                         this.parameters[k] = v
                 #StepInt = 1/Speed
                 this.reset()
-            
+
             def reset(this):
                 super(AlgSnake,this).reset()
                 this.parameters["Direction"] = this.parameters["StartDirection"]
@@ -830,8 +830,8 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
                 this.fruitID = this.headID
                 while this.fruitID in this.trail:
                     this.fruitID = random.choice([this.nodes[k].ID for k in this.nodes.keys()])
-                
-                
+
+
             def step(this):
                 if this.cnt==0:
                     if this.hasNextNeighbor():
@@ -864,7 +864,7 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
                             if this.parameters["StepInt"] > 1:
                                 this.parameters["StepInt"] = this.parameters["StepInt"]-1 #faster
                         this.getPixel(this.fruitID).setColor([0.0,0.0,1.0])
-                        
+
                     else: # wallcollision?
                         if this.warning:
                             this.parameters["Alive"] = False
@@ -895,6 +895,6 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
                 checkID = this.headID
                 checkID = this.getPixel(checkID).getDirectionNeighborID(this.DIRECTION_MAPS[this.parameters["Direction"]][this.startDir])
                 return not (this.isFinished() or (checkID is None))
-            
+
             def isFinished(this):
                 return not this.parameters["Alive"]

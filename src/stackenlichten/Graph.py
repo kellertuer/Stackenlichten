@@ -1,24 +1,24 @@
-from pixel import Pixel
+from .Pixel import Pixel
 
 class Graph:
     def argsort(seq):
         "Sort an array and return the permutation array"
        #http://stackoverflow.com/questions/3382352/equivalent-of-numpy-argsort-in-basic-python/3382369#3382369
         return sorted(range(len(seq)), key=seq.__getitem__)
-    
+
     def __init__(this, var=None):
         if isinstance(var,dict):
             this.nodes = var
         elif isinstance(var,Graph):
             this.nodes = var.nodes;
         else:
-            this.nodes = {} 
+            this.nodes = {}
 
     @classmethod
     def load(this,fn):
         """Graph.load(fn) – load a graph from the file fn in the format
         one line per node with its neighbors (direction/distance),
-        $Node: $NeighborID1|Direction|Distance $NeighborID2|Direction|Distance 
+        $Node: $NeighborID1|Direction|Distance $NeighborID2|Direction|Distance
         """
         nodes = dict()
         with open(fn) as f:
@@ -65,7 +65,7 @@ class Graph:
             return this.nodes[ID]
         else:
             return None
-    
+
     def permute(this,permutation):
         oldnodes = this.nodes
         this.nodes = dict()
@@ -77,7 +77,7 @@ class Graph:
                 NDists[permutation[k2]] = oldnodes[k].neighborDistance[k2]
                 NDirs[permutation[k2]] = oldnodes[k].neighborDirection[k2]
             this.nodes[newID] = Pixel(newID,NDirs,NDists)
-    
+
     def __add__(this,graph):
         """adds pixel of same node IDs
         """
@@ -115,4 +115,3 @@ class Graph:
         for k in this.nodes.keys():
             g.nodes[k] = this.nodes[k].clone()
         return g
-        
