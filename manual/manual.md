@@ -51,6 +51,6 @@ You can also glue the case to the bottom plate before glueing the three sides an
 
 but for me the glueing of the wood/ABS parts was easier without the LED being inside.
 
-The only thing left for a case is now to fix the front plate. In my tests the ABS just clamps the acryl, while for the wood cases it's a little tricky to fix the front plate
+The only thing left for a case is now to fix the front plate. In my tests the ABS just clamps the acryl, while for the wood cases it's a little tricky to fix the front plate.
 
 # The controller

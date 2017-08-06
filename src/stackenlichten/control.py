@@ -12,12 +12,16 @@ def abstractmethod(method):
     return default_abstract_method
 
 class Control:
+    """ Control – a controller for the algorithms and hence a graph state
+        to be displayed.
+    """
     # standard parameters
     PARAMETERS = {'framerate': 50}
 
     def __init__(this,algorithm,parameters=None):
         this.algorithm = algorithm
         this.parameters = Control.PARAMETERS
+        this.observers = []
         if parameters is not None:
             this.parameters = Control.PARAMETERS.copy()
             this.parameters.update(parameters)
@@ -26,6 +30,23 @@ class Control:
     def start(this):
         "start the algorithm as long as its running."
         pass
+
+    def register(this, observer):
+        if not observer in this.observers:
+            this.observers.append(observer)
+
+    def unregister(this, observer):
+        if observer in this.observers:
+            this.observers.remove(observer)
+
+    def unregister_all(this):
+        if this.observers:
+            del this.observers[:]
+
+    def update_observers(this, *args, **kwargs):
+        for observer in this.observers:
+            observer.update(*args, **kwargs)
+
 
 class SimpleControl(Control):
     def __init__(this,algorithm,parameters=None):
@@ -60,7 +81,6 @@ class DirectionControl(Control):
         cnt=0
         while not this.algorithm.isFinished():
             cnt=cnt+1
-#            print(this.algorithm.getParameter("Alive"))
             key = this.stdscr.getch()
             dir = None
             rot = None
@@ -87,7 +107,7 @@ class DirectionControl(Control):
             elif key==ord('l'):
                 rot=60
             elif key == ord(' '):
-                this.algorithm.setParameter("EndDisplayDigit",True)
+                this.update_observers({'EndDisplayDigit':True})
             elif key == ord('q'):
                 this.algorithm = mainAlgorithm(this.algorithm.SLC,AlgFadeOut(3*this.PARAMETERS['framerate'],this.algorithm))
                 print('o', end='', flush=True)
@@ -97,9 +117,9 @@ class DirectionControl(Control):
                     print('.', end='', flush=True)
                 break;
             if dir is not None:
-                this.algorithm.setParameter("Direction",dir)
+                this.update_observers({'Direction':dir})
             if rot is not None:
-                this.algorithm.setParameter("Rotate",rot)
+                this.update_observers({'Rotate':rot})
             # step
             this.algorithm.step()
             time.sleep(1/this.parameters["framerate"])

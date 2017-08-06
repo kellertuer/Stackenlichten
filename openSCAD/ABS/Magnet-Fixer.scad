@@ -16,6 +16,7 @@ nD = 2*fD;
 shortenSide = wW/tan(60)+wW;
 sH = 2*(wW/tan(60)+wW/sin(60)); //shorten inner
 Expl=0; //-1: closed, the larger the further apart
+fnN = 270;
 // concat with shfted rotated versions... bottom left right
 /* // Bottom magnets from 
             translate([2*sL/nC,0,0.5])
@@ -33,24 +34,24 @@ difference() {
 translate([0,0,3/4*wW]) hull() {
     translate([-sL/4-wW/2,0,0])
     difference() {
-    scale([2,1.5,.75]) sphere(wW, $fn=180);
-    translate([0,0,-wW]) cube([4*wW,4*wW,2*wW],center=true);
+    scale([2,1.5,.75]) sphere(wW, $fn=fnN);
+    translate([0,0,-0.5*wW]) cube([4*wW,4*wW,1*wW],center=true);
     };
     translate([+sL/4+wW/2,0,0])
     difference() {
-    scale([2,1.5,.75]) sphere(wW, $fn=180);
-    translate([0,0,-wW]) cube([4*wW,4*wW,2*wW],center=true);
+    scale([2,1.5,.75]) sphere(wW, $fn=fnN);
+    translate([0,0,-.5*wW]) cube([4*wW,4*wW,1*wW],center=true);
     };
 };
-// Magnets?
-            translate([2*sL/nC,0,wW/2+1])
-            cube(size = [1.1*mW,1.1*mW,wW], center = true);
-            translate([-2*sL/nC,0,wW/2+1])
-            cube(size = [1.1*mW,1.1*mW,wW], center = true);
+// Magnets
+   translate([2*sL/nC,0,wW/2+1])
+       cube(size = [1.1*mW,1.1*mW,wW], center = true);
+   translate([-2*sL/nC,0,wW/2+1])
+       cube(size = [1.1*mW,1.1*mW,wW], center = true);
     translate([0,-7.5])
-    scale([2,.75,1])
+    scale([2.5,.85,1])
     linear_extrude(2*wW)
-    circle(8,$fn=180);
+    circle(8,$fn=fnN);
 }
 
     translate([0,0,wW-1.5])

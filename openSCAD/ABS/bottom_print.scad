@@ -21,25 +21,39 @@ nD = 2*fD;
 shortenSide = wW/tan(60)+wW;
 sH = 2*(wW/tan(60)+wW/sin(60)); //shorten inner
 
+number="1";
+useFix=false;
+numberHundreds="";
+useHFix=false;
 bottomPlate();
 
-translate([0,44.625,-.125*wW])
-difference() {
-    cube([7,16,wW],center=true);
-    cube([5,17.1,1.1*wW],center=true);
-};
-translate([16,15.5,-.25*wW])
+tN= 4;
+
+translate([-3,44.625,-3*wW/4])
+    linear_extrude(3*wW/4,scale=[2/tN,1])
+    square([tN,10],center=true);
+translate([3,44.625,-3*wW/4])
+    linear_extrude(3*wW/4,scale=[2/tN,1])
+    square([tN,10],center=true);
+
+translate([16,15-3,-3/4*wW])
 rotate(v=[0,0,1],a=90)
-difference() {
-    cube([7,16,wW],center=true);
-    cube([5,17.1,1.1*wW],center=true);
-};
-translate([-16,15.5,-.25*wW])
+    linear_extrude(3*wW/4,scale=[2/tN,1])
+    square([tN,10],center=true);
+translate([16,15+3,-3/4*wW])
 rotate(v=[0,0,1],a=90)
-difference() {
-    cube([7,16,wW],center=true);
-    cube([5,17.1,1.1*wW],center=true);
-};
+    linear_extrude(3*wW/4,scale=[2/tN,1])
+    square([tN,10],center=true);
+
+translate([-16,15-3,-3/4*wW])
+rotate(v=[0,0,1],a=90)
+    linear_extrude(3*wW/4,scale=[2/tN,1])
+    square([tN,10],center=true);
+translate([-16,15+3,-3/4*wW])
+rotate(v=[0,0,1],a=90)
+    linear_extrude(3*wW/4,scale=[2/tN,1])
+    square([tN,10],center=true);
+
 module bottomPlate() {
     difference() {
     linear_extrude(height=wW, twist=0)
@@ -62,11 +76,37 @@ module bottomPlate() {
         translate([ 7.5-hR, 5-hR]) circle(r=hR,$fn=360);
     };
     };
-    translate([-17,6,-1*wW/4])
-    linear_extrude(wW)
+    translate([1,4.2,-0*wW/4])
+    linear_extrude(1.1*wW)
     rotate(v=[0,1,0],a=180)
-    text("@kellertuer",font="Vollkorn",size=3.5,halign="center");
+    text("@kellertuer",font="Vollkorn",size=8.5,halign="center");
+    translate([-13.5,27,-0*wW/4])
+    linear_extrude(1.2*wW)
+    rotate(v=[0,1,0],a=180)
+    text(str(number), font="Pump Triline", valign="center", halign="center",size=14);
+    translate([13.5,26,-0*wW/4])
+    linear_extrude(1.2*wW)
+    rotate(v=[0,1,0],a=180)
+    text(str(numberHundreds), font="Pump Triline", valign="center", halign="center",size=14);
     };
+    // Fix numbers
+    
+    translate([-8,38,wW/2])
+    rotate(v=[0,0,1],a=60)
+    if (useFix)
+        difference() {
+            cube([40,3.9,wW/8],center=true);
+            cube([40,1.5,wW/4],center=true);
+        }
+    if (useHFix)
+        translate([8,38,wW/2])
+        rotate(v=[0,0,1],a=-60)
+        difference() {
+            cube([40,3.9,wW/8],center=true);
+            cube([40,1.5,wW/4],center=true);
+        }
+    translate([0,8,wW/2])
+        cube([60,1,wW/8],center=true);
 };
 
 /* 
