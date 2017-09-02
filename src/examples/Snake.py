@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-import sys
+import sys, argparse, os
 # add parent folder in case the stackenlichten is not installed, Python will find it there
-import os
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0,parentdir)
 import stackenlichten as sl
@@ -35,13 +34,37 @@ def stepVars(vars):
     return v
 
 def run(argv):
-    l=30
+    #
+    # Set up the parser
+    #
+    parser = argparse.ArgumentParser(prog="Snake.py",
+                description='Play Snake on a Stackenlichten LED Display assumed to be triangles, i.e. you can move in 6 directions',
+                epilog='Stackenlichten, 2017, @kellertuer')
+    # argument to change the display
+    parser.add_argument('-d','--display',
+                choices=['fadecandy','PyMatPlot','PyTurtle'],
+                default='fadecandy', metavar='{f,m,t}',
+                help='specify a vizualization: fadecandy for the physical Stackenlichten or one of the two availavle drawings: PyMatPlot or PyTurtle.')
+    parser.add_argument("-g", "--graph",
+                metavar="GRAPH",
+                default="../graphs/triangle.77.txt", # Kellertuer's favourite
+                help="Specify the graph modelling the architecture of the Stackenlichten")
+    parser.add_argument('-f','--framerate', default=24, type=int,
+                metavar='F',
+                help='framerate used in the animation ')
+    args = parser.parse_args(argv)
+    # variables for movement
     vars = {'alpha':0,'scale':.5}
-    slc = sl.PyMatplotSLV(l,[-3*l,9*l,0,12*l]);
-    #slc = FadecandySLV();
-    graph = sl.Graph.load('../graphs/triangle77.txt')
-    #vars = {'alpha':0,'scale':.5}
-    #sample = AlgSampleFunction(f,stepVars,vars,graph.clone())
+    # Init Display
+    if args.display == 'PyMatPlot':
+        slc = sl.PyMatplotSLV(30,[-3*30,9*30,0,12*30])
+    elif args.display == 'PyTurtle':
+        slc = sl.PyTurtle(30)
+    else:
+        slc = sl.FadecandySLV()
+    # Load Graph
+    graph = sl.Graph.load(args.graph)
+    # Build algorithm structure
     myBT = sl.AlgBackground([0.75,0.75,0.75],graph.clone())
     sample2 = sl.AlgSampleFunction(f2,stepVars,vars,graph.clone())
     mAlg = sl.multAlgorithm([myBT, sample2],graph.clone())
@@ -67,7 +90,10 @@ def run(argv):
     ],True,graph.clone())
     mainAlg = sl.overlayAlgorithm([mAlg,seq],[[0.0]*3]*3,graph.clone())
     alg = sl.mainAlgorithm(slc,mainAlg)
-    c = sl.DirectionControl(alg);
+
+    # configure control
+    c = sl.DirectionControl(alg,parameters={'framerate':args.framerate});
+    # Observers
     c.register(mainAlg)
     snake.register(digit1)
     snake.register(digit2)
