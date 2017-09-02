@@ -125,6 +125,12 @@ class metaAlgorithm(Algorithm):
         super(metaAlgorithm,this).__init__(graph,parameters)
         this.algorithms = algorithms
         this.iter = 0;
+        if parameters is None:
+            this.parameters = {"FinishType":"All"}
+        else:
+            this.parameters = parameters
+        if not "FinishType" in this.parameters:
+            this.parameters["FinishType"] = "All"
     def step(this):
         if len(this.algorithms) > 0:
             this.iter = this.iter + 1;
@@ -140,8 +146,13 @@ class metaAlgorithm(Algorithm):
         for x in this.algorithms:
             x.reset()
     def isFinished(this):
-        T = [x for x in this.algorithms if not x.isFinished() ]
-        return len(T)==0
+        if this.parameters["FinishType"] == "All":
+            T = [x for x in this.algorithms if not x.isFinished() ]
+            v = len(T)==0
+        elif this.parameters["FinishType"] == "Any":
+            T = [x for x in this.algorithms if not x.isFinished() ]
+            v = len(T) < len(this.algorithms)
+        return v
     def setParameters(this,parameters):
         for a in this.algorithms:
             a.setParameters(parameters)
@@ -186,8 +197,8 @@ class iterAlgorithm(Algorithm):
         the meta algorithm just encapsulates a set of algorithms and assumes
         they all work on the same graph, i.e. the last set pixel wins
     """
-    def __init__(this,algorithms,graph=None):
-        super(iterAlgorithm,this).__init__(graph)
+    def __init__(this,algorithms,graph=None,parameters=None):
+        super(iterAlgorithm,this).__init__(graph,parameters)
         this.algorithms = algorithms;
         this.numAlg = 0
         this.actAlg = this.algorithms[0]
@@ -218,8 +229,8 @@ class iterAlgorithm(Algorithm):
             a.update(*args, **kwargs)
 
 class addAlgorithm(metaAlgorithm):
-    def __init__(this,algorithms,graph=None):
-        super(addAlgorithm,this).__init__(algorithms,graph)
+    def __init__(this,algorithms,graph=None,parameters=None):
+        super(addAlgorithm,this).__init__(algorithms,graph,parameters)
 
     def step(this):
         super(addAlgorithm,this).step()
@@ -256,7 +267,7 @@ class overlayAlgorithm(metaAlgorithm):
             # start with 1 and multiply them
             for k in this.nodes.keys():
                 this.nodes[k].setColor(this.tColors[0]);
-            c=1
+            c=0
             for x in this.algorithms:
                 trColor = this.tColors[c]
                 for k in this.nodes.keys():
@@ -557,10 +568,6 @@ class AlgSampleFunction(Algorithm):
                                     dist = this.nodes[k2].getNeighborDistance(n)
                                     samplePoint = positions[k2]
                                     positions[k] = [samplePoint[0] + np.sin(dir/180.0*np.pi)*dist,samplePoint[1] + np.cos(dir/180.0*np.pi)*dist]
-                                    #print(k2)
-                                    #print(k)
-                                    #print(dist)
-                                    #print(dir)
                                     found=True
                                     break
                         if found:
@@ -612,7 +619,7 @@ class AlgRunningLight(Algorithm):
             this.start = True
     def isFinished(this):
         return this.currentID is None and this.start == False
-    def getactualPosition(this):
+    def getPosition(this):
         "return the current node."
         return this.currentID
     def update(this, *args, **kwargs):
@@ -637,7 +644,7 @@ class AlgTrigWalkCycle(Algorithm):
     def step(this):
         if this.currAlg.isFinished(): #start next one
             this.actDir = (this.actDir+1)%(len(this.directions))
-            curPos = this.currAlg.getactualPosition();
+            curPos = this.currAlg.getPosition();
             this.currAlg = AlgTrigWalk(curPos,this.directions[this.actDir],this.currAlg.trail,this.lookaheads[this.actDir],this.currAlg)
         this.currAlg.step()
     def isFinished(this): #infinite loop
@@ -684,7 +691,7 @@ class AlgTrigWalk(Algorithm):
                 this.getPixel(this.trail[i]).setColor([1.0, 1.0,1.0]);
             # switch step
             this.startDir = (this.startDir+1)%2
-    def getactualPosition(this):
+    def getPosition(this):
         "return the current node."
         return this.currentID
     def isFinished(this):
@@ -751,17 +758,91 @@ class AlgRandomBlink(Algorithm):
     def update(this, *args, **kwargs):
         pass
 
-class AlgRobots(Algorithm):
+class AlgBasicRobot(Algorithm):
+    DIRECTION_MAPS = {
+        30:[60,0], 90:[60,120], 150:[180,120],
+        210:[180,240], 270:[300,240], 330:[300,0]}
+
+    def __init__(this,startID,trackWalker,graph=None,parameters=None):
+        super(AlgBasicRobot,this).__init__(graph,parameters)
+        this.startID=startID
+        this.parameters["color"] = [0.0,0.7,0.0]
+        this.walker = trackWalker
+        this.walker.register(this)
+        this.reset()
+    def reset(this):
+        this.positionID = this.startID
+        this.parameters["Alive"] = True
+        this.highlight=0
+    def directionID(this,ID):
+        p = this.getPixel(this.positionID)
+        # is the triangle pointing upward?
+        if (p.getDirectionDistance(60)==1) or (p.getDirectionDistance(180)==1) or (p.getDirectionDistance(300)==1):
+            startDir=0
+        elif (p.getDirectionDistance(0)==1) or (p.getDirectionDistance(120)==1) or (p.getDirectionDistance(240)==1):
+            startDir=1
+        return startDir
+    def step(this):
+        this.setBlack()
+        if this.parameters["Alive"]:
+            if this.highlight>0:
+                this.highlight = this.highlight - 1
+                c = this.parameters["color"]
+                c[2] = 1.0;
+            else:
+                c = this.parameters["color"]
+            this.getPixel(this.positionID).setColor(c)
+    def setParameters(this,parameters):
+        super(AlgBasicRobot,this).setParameters(parameters)
+        if parameters.get("Position"): # move player involved
+            this.setParameter("Position", this.parameters["Position"])
+    def setParameter(this,key,value):
+        super(AlgBasicRobot,this).setParameter(key,value)
+        if key=="Position":
+            walkerID = value
+            #yay I may move!
+            d = random.choice([30,90,150,210,270,330])
+            while not this.hasNextNeighbor(d):
+                d = random.choice([30,90,150,210,270,330])
+            checkID = this.positionID
+            startDir = this.directionID(this.positionID)
+            this.positionID = this.getPixel(checkID).getDirectionNeighborID(this.DIRECTION_MAPS[d][startDir])
+            this.update_observers({"Position":this.positionID})
+            if this.walker.getPosition() == this.positionID:
+                this.highlight=2
+                this.walker.setParameter("Die",True)
+        if key=="Die" and value:
+            this.parameters["Alive"]=False
+    def getPosition(this):
+        "return the current node."
+        return this.positionID
+    def hasNextNeighbor(this,direction):
+        "Check whether there exists a neighbor in walking direction"
+        checkID = this.positionID
+        startDir = this.directionID(this.positionID)
+        checkID = this.getPixel(checkID).getDirectionNeighborID(this.DIRECTION_MAPS[direction][startDir])
+        return not (this.isFinished() or (checkID is None))
+    def isFinished(this):
+        return not this.parameters["Alive"]
+    def update(this, *args, **kwargs):
+        d=args[0];
+        if isinstance(d,dict):
+            this.setParameters(d)
+
+class AlgWalker(Algorithm):
     """An algorithm to move your player and react to robots"""
     DIRECTION_MAPS = {
         30:[60,0], 90:[60,120], 150:[180,120],
         210:[180,240], 270:[300,240], 330:[300,0]}
 
     def __init__(this,startID,graph=None,parameters=None):
-        super(AlgRobots,this).__init__(graph,parameters)
-        this.positionID = startID
-        this.parameters = {};
-        this.parameters["Alive"] = True
+        super(AlgWalker,this).__init__(graph,parameters)
+        this.startID = startID
+        this.reset()
+    def reset(this):
+        this.positionID = this.startID
+        this.parameters["Alive"]=True
+        this.parameters["Gamescore"]= 0;
         this.highlight=0
     def directionID(this,ID):
         p = this.getPixel(this.positionID)
@@ -779,23 +860,37 @@ class AlgRobots(Algorithm):
                 c = [0.0,0.0,1.0]
             else:
                 c = [0.8,0.8,0.8]
-        else:
-            c = [1.0,0,0]
-        this.getPixel(this.positionID).setColor(c)
+            this.getPixel(this.positionID).setColor(c)
     def setParameters(this,parameters):
-        super(AlgRobots,this).setParameters(parameters)
+        super(AlgWalker,this).setParameters(parameters)
         if parameters.get("Direction"): # move player involved
             this.setParameter("Direction", this.parameters["Direction"])
+        if parameters.get("Die") and this.parameters["Die"]:
+            this.setParameter("Die",True)
     def setParameter(this,key,value):
-        super(AlgRobots,this).setParameter(key,value)
+        super(AlgWalker,this).setParameter(key,value)
         if key=="Direction":
             if this.hasNextNeighbor(value):
                 checkID = this.positionID
                 startDir = this.directionID(this.positionID)
                 this.positionID = this.getPixel(checkID).getDirectionNeighborID(this.DIRECTION_MAPS[value][startDir])
             else:
-                this.highlight=3
-    def getactualPosition(this):
+                this.highlight=2
+            if this.parameters["Alive"]:
+                this.update_observers({"Position":this.positionID})
+            this.parameters["Gamescore"] = this.parameters["Gamescore"]+1;
+        if key=="Die" and value:
+            this.parameters["Alive"] = False
+            n = this.parameters["Gamescore"]
+            nStr = str(n)
+            this.update_observers({'Gamescore':this.parameters["Gamescore"]})
+            if n>9:
+                this.update_observers({'Name':'Tens','Digit':int(nStr[0])})
+                this.update_observers({'Name':'Ones','Digit':int(nStr[1])})
+            else: # disable 10th
+                this.update_observers({'Name':'Tens','Digit':-1})
+                this.update_observers({'Name':'Ones','Digit':int(nStr)})
+    def getPosition(this):
         "return the current node."
         return this.positionID
     def hasNextNeighbor(this,direction):
@@ -824,7 +919,7 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
         super(AlgSnake,this).__init__(graph,parameters)
         if StartDirection not in AlgSnake.DIRECTION_MAPS:
             raise ValueError("This direction is not available for walking.");
-            parameters = {"StartDirection":StartDirection,"StartID":startID,"StepInt":15,"StartLength":InitLength}
+        parameters = {"StartDirection":StartDirection,"StartID":startID,"StepInt":15,"StartLength":InitLength}
         for k,v in parameters.items():
             if k not in this.parameters:
                 this.parameters[k] = v
@@ -834,7 +929,7 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
         super(AlgSnake,this).reset()
         this.parameters["Direction"] = this.parameters["StartDirection"]
         this.parameters["CurrentHead"] = this.parameters["StartID"]
-        this.parameters["GameScore"] = 0
+        this.parameters["Gamescore"] = 0
         this.parameters["Alive"] = True
         this.parameters["StepInt"] = 15
         this.headID = this.parameters["StartID"]
@@ -878,7 +973,7 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
                 for i in range(n):
                     this.getPixel(this.trail[i]).setColor([1.0, 1.0,1.0]);
                 if this.fruitID==this.headID:
-                    this.setParameter("GameScore", this.getParameter("GameScore")+1)
+                    this.setParameter("Gamescore", this.getParameter("Gamescore")+1)
                     while this.fruitID in this.trail:
                         this.fruitID = random.choice([this.nodes[k].ID for k in this.nodes.keys()])
                     this.trailNum = this.trailNum+1 # longer
@@ -894,9 +989,9 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
         # switch step
         this.cnt = (this.cnt+1)%(this.parameters["StepInt"])
         if notify:
-            n = this.parameters["GameScore"]
+            n = this.parameters["Gamescore"]
             nStr = str(n)
-            this.update_observers({'GameScore':this.parameters["GameScore"]})
+            this.update_observers({'Gamescore':this.parameters["Gamescore"]})
             if n>9:
                 this.update_observers({'Name':'Tens','Digit':int(nStr[0])})
                 this.update_observers({'Name':'Ones','Digit':int(nStr[1])})
@@ -914,7 +1009,7 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
             this.warning=False
         if key=="Rotate":
             this.parameters["Direction"]=(this.parameters["Direction"]+value)%360
-    def getactualPosition(this):
+    def getPosition(this):
         "return the current node."
         return this.headID
     def hasNextNeighbor(this):

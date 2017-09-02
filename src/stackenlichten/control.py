@@ -116,7 +116,7 @@ class DirectionControl(Control):
             elif key == ord(' '):
                 this.update_observers({'EndDisplayDigit':True})
             elif key == ord('q'):
-                this.algorithm = mainAlgorithm(this.algorithm.SLC,AlgFadeOut(3*this.PARAMETERS['framerate'],this.algorithm))
+                this.algorithm = mainAlgorithm(this.algorithm.SLC,AlgFadeOut(3*this.parameters['framerate'],this.algorithm))
                 print('o', end='', flush=True)
                 while not this.algorithm.isFinished():
                     this.algorithm.step()
@@ -131,7 +131,7 @@ class DirectionControl(Control):
             this.algorithm.step()
             time.sleep(1/this.parameters["framerate"])
             print('.', end='', flush=True)
-            if cnt%this.parameters["framerate"]==0:
+            if cnt%(10*this.parameters["framerate"])==0:
                 this.stdscr.clear()
                 this.stdscr.refresh()
         curses.endwin()
