@@ -43,11 +43,11 @@ def run(argv):
     # argument to change the display
     parser.add_argument('-d','--display',
                 choices=['fadecandy','PyMatPlot','PyTurtle'],
-                default='fadecandy', metavar='{f,m,t}',
-                help='specify a vizualization: fadecandy for the physical Stackenlichten or one of the two availavle drawings: PyMatPlot or PyTurtle.')
+                default='fadecandy', metavar='D',
+                help='specify a vizualization: [f]adecandy for the physical Stackenlichten or one of the two availavle drawings: Py[M]atPlot or Py[T]urtle.')
     parser.add_argument("-g", "--graph",
-                metavar="GRAPH",
-                default="../graphs/triangle.77.txt", # Kellertuer's favourite
+                metavar="G",
+                default="",
                 help="Specify the graph modelling the architecture of the Stackenlichten")
     parser.add_argument('-f','--framerate', default=24, type=int,
                 metavar='F',
@@ -56,14 +56,17 @@ def run(argv):
     # variables for movement
     vars = {'alpha':0,'scale':.5}
     # Init Display
-    if args.display == 'PyMatPlot':
+    if args.display == 'PyMatPlot' or args.display == 'M' or args.display == 'm':
         slc = sl.PyMatplotSLV(30,[-3*30,9*30,0,12*30])
-    elif args.display == 'PyTurtle':
+    elif args.display == 'PyTurtle' or args.display == 'T' or args.display == 't':
         slc = sl.PyTurtle(30)
-    else:
+    else: #default
         slc = sl.FadecandySLV()
     # Load Graph
-    graph = sl.Graph.load(args.graph)
+    if len(args.graph) > 0:
+        graph = sl.Graph.load(args.graph)
+    else:
+        raise ValueError("No graph specified")
     # Build algorithm structure
     myBT = sl.AlgBackground([0.75,0.75,0.75],graph.clone())
     sample2 = sl.AlgSampleFunction(f2,stepVars,vars,graph.clone())

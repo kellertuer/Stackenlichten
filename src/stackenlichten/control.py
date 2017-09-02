@@ -47,7 +47,10 @@ class Control:
         for observer in this.observers:
             observer.update(*args, **kwargs)
 
-
+"""SimpleControl
+    provide the most simple control for an algorithm, i.e. just run the algorithm and check for an keyboardinterrupt to end the algorithm before
+    it finished.
+"""
 class SimpleControl(Control):
     def __init__(this,algorithm,parameters=None):
         super(SimpleControl,this).__init__(algorithm,parameters)
@@ -67,6 +70,10 @@ class SimpleControl(Control):
                 print('.', end='', flush=True)
             print("\n\nKthxbye.")
 
+"""DirectionControl -
+    provide directions controls (f,r,e,d,c,v for the 6 directions, k,l for left/
+    right).
+"""
 class DirectionControl(Control):
     def __init__(this,algorithm,parameters=None):
         super(DirectionControl,this).__init__(algorithm,parameters)

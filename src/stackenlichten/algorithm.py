@@ -751,120 +751,180 @@ class AlgRandomBlink(Algorithm):
     def update(this, *args, **kwargs):
         pass
 
+class AlgRobots(Algorithm):
+    """An algorithm to move your player and react to robots"""
+    DIRECTION_MAPS = {
+        30:[60,0], 90:[60,120], 150:[180,120],
+        210:[180,240], 270:[300,240], 330:[300,0]}
+
+    def __init__(this,startID,graph=None,parameters=None):
+        super(AlgRobots,this).__init__(graph,parameters)
+        this.positionID = startID
+        this.parameters = {};
+        this.parameters["Alive"] = True
+        this.highlight=0
+    def directionID(this,ID):
+        p = this.getPixel(this.positionID)
+        # is the triangle pointing upward?
+        if (p.getDirectionDistance(60)==1) or (p.getDirectionDistance(180)==1) or (p.getDirectionDistance(300)==1):
+            startDir=0
+        elif (p.getDirectionDistance(0)==1) or (p.getDirectionDistance(120)==1) or (p.getDirectionDistance(240)==1):
+            startDir=1
+        return startDir
+    def step(this):
+        this.setBlack()
+        if this.parameters["Alive"]:
+            if this.highlight>0:
+                this.highlight = this.highlight - 1
+                c = [0.0,0.0,1.0]
+            else:
+                c = [0.8,0.8,0.8]
+        else:
+            c = [1.0,0,0]
+        this.getPixel(this.positionID).setColor(c)
+    def setParameters(this,parameters):
+        super(AlgRobots,this).setParameters(parameters)
+        if parameters.get("Direction"): # move player involved
+            this.setParameter("Direction", this.parameters["Direction"])
+    def setParameter(this,key,value):
+        super(AlgRobots,this).setParameter(key,value)
+        if key=="Direction":
+            if this.hasNextNeighbor(value):
+                checkID = this.positionID
+                startDir = this.directionID(this.positionID)
+                this.positionID = this.getPixel(checkID).getDirectionNeighborID(this.DIRECTION_MAPS[value][startDir])
+            else:
+                this.highlight=3
+    def getactualPosition(this):
+        "return the current node."
+        return this.positionID
+    def hasNextNeighbor(this,direction):
+        "Check whether there exists a neighbor in walking direction"
+        checkID = this.positionID
+        startDir = this.directionID(this.positionID)
+        checkID = this.getPixel(checkID).getDirectionNeighborID(this.DIRECTION_MAPS[direction][startDir])
+        return not (this.isFinished() or (checkID is None))
+    def isFinished(this):
+        return not this.parameters["Alive"]
+    def update(this, *args, **kwargs):
+        d=args[0];
+        if isinstance(d,dict):
+            this.setParameters(d)
+
 class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
-            """
-            An algorithm running along a direction starting from a pixel with a tail#
-
-            """
-            # we have to alternate, these are for /\ triangles, for \/ start with the
-            # second term each entry
-            DIRECTION_MAPS = {30:[60,0], 90:[60,120], 150:[180,120], 210:[180,240], 270:[300,240], 330:[300,0]}
-            def __init__(this,startID,StartDirection,InitLength,graph=None,parameters=None):
-                super(AlgSnake,this).__init__(graph,parameters)
-                if StartDirection not in AlgSnake.DIRECTION_MAPS:
-                    raise ValueError("This direction is not available for walking.");
-                parameters = {"StartDirection":StartDirection,"StartID":startID,"StepInt":15,"StartLength":InitLength}
-                for k,v in parameters.items():
-                    if k not in this.parameters:
-                        this.parameters[k] = v
+    """
+    An algorithm running along a direction starting from a pixel with a tail#
+    """
+    # we have to alternate, these are for /\ triangles, for \/ start with the
+    # second term each entry
+    DIRECTION_MAPS = {
+        30:[60,0], 90:[60,120], 150:[180,120],
+        210:[180,240], 270:[300,240], 330:[300,0]}
+    def __init__(this,startID,StartDirection,InitLength,graph=None,parameters=None):
+        super(AlgSnake,this).__init__(graph,parameters)
+        if StartDirection not in AlgSnake.DIRECTION_MAPS:
+            raise ValueError("This direction is not available for walking.");
+            parameters = {"StartDirection":StartDirection,"StartID":startID,"StepInt":15,"StartLength":InitLength}
+        for k,v in parameters.items():
+            if k not in this.parameters:
+                this.parameters[k] = v
                 #StepInt = 1/Speed
-                this.reset()
-            def reset(this):
-                super(AlgSnake,this).reset()
-                this.parameters["Direction"] = this.parameters["StartDirection"]
-                this.parameters["CurrentHead"] = this.parameters["StartID"]
-                this.parameters["GameScore"] = 0
-                this.parameters["Alive"] = True
-                this.parameters["StepInt"] = 15
-                this.headID = this.parameters["StartID"]
-                p = this.getPixel(this.headID)
-                # is the triangle pointing upward?
-                if (p.getDirectionDistance(60)==1) or (p.getDirectionDistance(180)==1) or (p.getDirectionDistance(300)==1):
+        this.reset()
+    def reset(this):
+        super(AlgSnake,this).reset()
+        this.parameters["Direction"] = this.parameters["StartDirection"]
+        this.parameters["CurrentHead"] = this.parameters["StartID"]
+        this.parameters["GameScore"] = 0
+        this.parameters["Alive"] = True
+        this.parameters["StepInt"] = 15
+        this.headID = this.parameters["StartID"]
+        p = this.getPixel(this.headID)
+        # is the triangle pointing upward?
+        if (p.getDirectionDistance(60)==1) or (p.getDirectionDistance(180)==1) or (p.getDirectionDistance(300)==1):
                     this.startDir=0
-                elif (p.getDirectionDistance(0)==1) or (p.getDirectionDistance(120)==1) or (p.getDirectionDistance(240)==1):
-                    this.startDir=1
-                this.trail = [this.parameters["StartID"]]*this.parameters["StartLength"]
-                this.trailNum = this.parameters["StartLength"]
-                this.cnt = 0
-                this.warning=False
-                this.fruitID = this.headID
-                while this.fruitID in this.trail:
-                    this.fruitID = random.choice([this.nodes[k].ID for k in this.nodes.keys()])
-            def step(this):
-                notify = False
-                if this.cnt==0:
-                    if this.hasNextNeighbor():
-                        thisDir = this.DIRECTION_MAPS[this.parameters["Direction"]][this.startDir]
-                        thisP = this.getPixel(this.headID);
-                        #this collision tests
-                        newHead = thisP.getDirectionNeighborID(thisDir)
-                        if (newHead in this.trail) and (newHead != this.trail[1]):
-                            # and not second, in order to not get stuck in corners
-                            if this.warning:
-                                this.parameters["Alive"] = False
-                                notify=True
-                            else:
-                                this.warning = True
-                        this.headID = thisP.getDirectionNeighborID(thisDir)
-                        this.startDir = (this.startDir+1)%2
-                        # off old trail
-                        for i in range(len(this.trail)):
-                            this.getPixel(this.trail[i]).setColor([0.0,0.0,0.0]);
-                        # update trail
-                        this.trail.insert(0,this.headID)
-                        this.trail = this.trail[0:this.trailNum]
-                        n = len(this.trail)
-                        for i in range(n):
-                            this.getPixel(this.trail[i]).setColor([1.0, 1.0,1.0]);
-                        if this.fruitID==this.headID:
-                            this.setParameter("GameScore", this.getParameter("GameScore")+1)
-                            while this.fruitID in this.trail:
-                                this.fruitID = random.choice([this.nodes[k].ID for k in this.nodes.keys()])
-                            this.trailNum = this.trailNum+1 # longer
-                            if this.parameters["StepInt"] > 1:
-                                this.parameters["StepInt"] = this.parameters["StepInt"]-1 #faster
-                        this.getPixel(this.fruitID).setColor([0.0,0.0,1.0])
-                    else: # wallcollision?
-                        if this.warning:
-                            this.parameters["Alive"] = False
-                            notify=True
-                        else:
-                            this.warning = True
-                # switch step
-                this.cnt = (this.cnt+1)%(this.parameters["StepInt"])
-                if notify:
-                    n = this.parameters["GameScore"]
-                    nStr = str(n)
-                    this.update_observers({'GameScore':this.parameters["GameScore"]})
-                    if n>9:
-                        this.update_observers({'Name':'Tens','Digit':int(nStr[0])})
-                        this.update_observers({'Name':'Ones','Digit':int(nStr[1])})
-                    else: # disable 10th
-                        this.update_observers({'Name':'Tens','Digit':-1})
-                        this.update_observers({'Name':'Ones','Digit':int(nStr)})
-
-            def setParameters(this,parameters):
-                super(AlgSnake,this).setParameters(parameters)
-                if parameters.get("Direction") or parameters.get("Rotate"):
-                    this.warning=False
-                this.parameters["Direction"] = (this.parameters["Direction"] + this.parameters.get("Rotate",0))%360
-            def setParameter(this,key,value):
-                super(AlgSnake,this).setParameter(key,value)
-                if key=="Direction" or key=="Rotate":
-                    this.warning=False
-                if key=="Rotate":
-                    this.parameters["Direction"]=(this.parameters["Direction"]+value)%360
-            def getactualPosition(this):
-                "return the current node."
-                return this.headID
-            def hasNextNeighbor(this):
-                "Check whether there exists a neighbor in walking direction"
-                checkID = this.headID
-                checkID = this.getPixel(checkID).getDirectionNeighborID(this.DIRECTION_MAPS[this.parameters["Direction"]][this.startDir])
-                return not (this.isFinished() or (checkID is None))
-            def isFinished(this):
-                return not this.parameters["Alive"]
-            def update(this, *args, **kwargs):
-                d=args[0];
-                if isinstance(d,dict):
-                    this.setParameters(d)
+        elif (p.getDirectionDistance(0)==1) or (p.getDirectionDistance(120)==1) or (p.getDirectionDistance(240)==1):
+                this.startDir=1
+        this.trail = [this.parameters["StartID"]]*this.parameters["StartLength"]
+        this.trailNum = this.parameters["StartLength"]
+        this.cnt = 0
+        this.warning=False
+        this.fruitID = this.headID
+        while this.fruitID in this.trail:
+            this.fruitID = random.choice([this.nodes[k].ID for k in this.nodes.keys()])
+    def step(this):
+        notify = False
+        if this.cnt==0:
+            if this.hasNextNeighbor():
+                thisDir = this.DIRECTION_MAPS[this.parameters["Direction"]][this.startDir]
+                thisP = this.getPixel(this.headID);
+                #this collision tests
+                newHead = thisP.getDirectionNeighborID(thisDir)
+                if (newHead in this.trail) and (newHead != this.trail[1]):
+                    # and not second, in order to not get stuck in corners
+                    if this.warning:
+                        this.parameters["Alive"] = False
+                        notify=True
+                    else:
+                        this.warning = True
+                this.headID = thisP.getDirectionNeighborID(thisDir)
+                this.startDir = (this.startDir+1)%2
+                # off old trail
+                for i in range(len(this.trail)):
+                    this.getPixel(this.trail[i]).setColor([0.0,0.0,0.0]);
+                # update trail
+                this.trail.insert(0,this.headID)
+                this.trail = this.trail[0:this.trailNum]
+                n = len(this.trail)
+                for i in range(n):
+                    this.getPixel(this.trail[i]).setColor([1.0, 1.0,1.0]);
+                if this.fruitID==this.headID:
+                    this.setParameter("GameScore", this.getParameter("GameScore")+1)
+                    while this.fruitID in this.trail:
+                        this.fruitID = random.choice([this.nodes[k].ID for k in this.nodes.keys()])
+                    this.trailNum = this.trailNum+1 # longer
+                    if this.parameters["StepInt"] > 1:
+                        this.parameters["StepInt"] = this.parameters["StepInt"]-1 #faster
+                this.getPixel(this.fruitID).setColor([0.0,0.0,1.0])
+            else: # wallcollision?
+                if this.warning:
+                    this.parameters["Alive"] = False
+                    notify=True
+                else:
+                    this.warning = True
+        # switch step
+        this.cnt = (this.cnt+1)%(this.parameters["StepInt"])
+        if notify:
+            n = this.parameters["GameScore"]
+            nStr = str(n)
+            this.update_observers({'GameScore':this.parameters["GameScore"]})
+            if n>9:
+                this.update_observers({'Name':'Tens','Digit':int(nStr[0])})
+                this.update_observers({'Name':'Ones','Digit':int(nStr[1])})
+            else: # disable 10th
+                this.update_observers({'Name':'Tens','Digit':-1})
+                this.update_observers({'Name':'Ones','Digit':int(nStr)})
+    def setParameters(this,parameters):
+        super(AlgSnake,this).setParameters(parameters)
+        if parameters.get("Direction") or parameters.get("Rotate"):
+            this.warning=False
+        this.parameters["Direction"] = (this.parameters["Direction"] + this.parameters.get("Rotate",0))%360
+    def setParameter(this,key,value):
+        super(AlgSnake,this).setParameter(key,value)
+        if key=="Direction" or key=="Rotate":
+            this.warning=False
+        if key=="Rotate":
+            this.parameters["Direction"]=(this.parameters["Direction"]+value)%360
+    def getactualPosition(this):
+        "return the current node."
+        return this.headID
+    def hasNextNeighbor(this):
+        "Check whether there exists a neighbor in walking direction"
+        checkID = this.headID
+        checkID = this.getPixel(checkID).getDirectionNeighborID(this.DIRECTION_MAPS[this.parameters["Direction"]][this.startDir])
+        return not (this.isFinished() or (checkID is None))
+    def isFinished(this):
+        return not this.parameters["Alive"]
+    def update(this, *args, **kwargs):
+        d=args[0];
+        if isinstance(d,dict):
+            this.setParameters(d)
