@@ -62,7 +62,7 @@ class SimpleControl(Control):
                 time.sleep(1/this.parameters["framerate"])
                 print('.', end='', flush=True)
         except KeyboardInterrupt:
-            this.algorithm = mainAlgorithm(this.algorithm.SLC,AlgFadeOut(2*this.PARAMETERS['framerate'],this.algorithm))
+            this.algorithm = mainAlgorithm(this.algorithm.SLC,AlgFadeOut(2*this.parameters['framerate'],this.algorithm))
             print('o', end='', flush=True)
             while not this.algorithm.isFinished():
                 this.algorithm.step()

@@ -477,6 +477,79 @@ class AlgDiffusion(Algorithm):
     def update(this, *args, **kwargs):
         pass
 
+class AlgRandomPoint(Algorithm):
+    """A class modelling a (random) point with (random) fade in, duration, and fadeout.
+    """
+    def __init__(this,graph=None,parameters=None):
+        super(AlgRandomPoint,this).__init__(graph,parameters)
+        this.repeat = this.parameters.get("repeat",False)
+        this.newRand = this.parameters.get("repeatrandom",False)
+        this.randStyle = this.parameters.get("randomPositionStyle","global")
+        this.ID = this.parameters.get("ID",0)
+        #choice of global vs neighbor
+        this.reset(True)
+
+    def reset(this,newRand=False):
+        if newRand:
+
+            if this.parameters.get("ID",0) > 0:
+                this.localID = this.parameters["ID"]
+            else:
+                if this.ID > 0 and this.randStyle=="neighbor": # we have a position and look for a random neighbor
+                    this.ID = random.choice(this.getPixel(this.ID).getNeighborIDs())
+                else: #this.randStyle == "global" or no first ID yet;
+                    this.ID = random.choice(range(1,this.getNumNodes()))
+            if this.parameters.get("fadein_variance",0) > 0:
+                this.fadein = max(round(random.gauss(this.parameters.get("fadein",0),this.parameters.get("fadein_variance",0))),0)
+            else:
+                this.fadein = this.parameters.get("fadein",0)
+            if this.parameters.get("fadeout_variance",0) > 0:
+                this.fadeout = max(round(random.gauss(this.parameters.get("fadeout",0),this.parameters.get("fadeout_variance",0))),0)
+            else:
+                this.fadeout = this.parameters.get("fadeout",0)
+            if this.parameters.get("duration_variance",0) > 0:
+                this.duration = max(round(random.gauss(this.parameters.get("duration",0),this.parameters.get("duration_variance",0))),0)
+            else:
+                this.duration = this.parameters.get("duration",0)
+            if this.parameters.get("pause_variance",0) > 0:
+                this.pause = max(round(random.gauss(this.parameters.get("pause",0),this.parameters.get("pause_variance",0))),0)
+            else:
+                this.pause = this.parameters.get("pause",0)
+            # scale?
+            s = this.parameters.get("scale",1)
+            if  s > 1:
+                this.fadein = this.fadein*s
+                this.duration = this.duration*s
+                this.fadeout = this.fadeout*s
+                this.pause = this.pause*s
+            this.lengths = [this.fadein, this.fadein+this.duration, this.fadein+this.duration+this.fadeout, this.fadein+this.duration+this.fadeout+this.pause]
+        this.count=0
+
+    def step(this):
+        if (this.count < this.lengths[3]):
+            this.count = this.count + 1
+            if this.count <= this.lengths[0]: # fade_in
+                if this.fadein > 0:
+                    v = float(this.count)/float(this.fadein)
+                else:
+                    v=0.0;
+            elif this.count <= this.lengths[1]: # on
+                v = 1.0
+            elif this.count <= this.lengths[2]: # fadeout
+                if this.fadeout>0:
+                    v = float(this.lengths[2]-this.count)/float(this.fadeout)
+                else:
+                    v = 0.0;
+            else: #out/pause
+                v = 0.0
+            this.getPixel(this.ID).setColor([v,v,v])
+            if this.count==this.lengths[3]: #last step?
+                if this.repeat:
+                    this.reset(this.newRand)
+
+    def isFinished(this):
+        return not ( (this.count < this.lengths[3]) and this.repeat)
+
 class AlgRandomPoints(Algorithm):
     """AlgRandomPoints – generate (and destruct)
     """

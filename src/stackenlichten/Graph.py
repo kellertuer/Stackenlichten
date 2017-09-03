@@ -99,6 +99,9 @@ class Graph:
         for k in this.nodes.keys():
             this.nodes[k] *= graph.nodes[k]
 
+    def getNumNodes(this):
+        return len(this.nodes)
+
     def setBlack(this):
         for k,n in this.nodes.items():
             n.setColor([0,0,0])

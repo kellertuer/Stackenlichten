@@ -7,7 +7,7 @@ class Pixel:
     neighborDirection = {}
     nbeighborDistance = {}
     brightness = 1.0
-    
+
     def __init__(this, ID, neighborDirection = {}, neighborDistance = {}, color = [0,0,0]):
         'initialize pixel with a color and its neighbors'
         this.ID = ID
@@ -32,11 +32,11 @@ class Pixel:
             neighborStrings += '(#'+str(k)+' '+str(this.neighborDirection[k])+':'+str(this.neighborDistance[k])+') '
         neighborStrings = neighborStrings[:-1] #remove last string
         return '#'+str(this.ID)+' ['+str(this.color[0])+','+str(this.color[1])+','+str(this.color[2])+'] with neighbors '+neighborStrings
-        
+
     def dimm(this,brightness):
         'Dim this pixel down to brightness, which is a value between 1 (full brightness) and 0 (off) '
         this.brightness = max(min(brightness,1),0)
-        
+
     def setColor(this,color, brightness=1.0):
         'set color to a value and reset brightness'
         this.color = color
@@ -48,7 +48,7 @@ class Pixel:
 
     def isNeighbor(this,pixel):
         return pixel.ID in this.neighborDirection.keys()
-        
+
     def addNeighbor(this,pixel,direction,distance):
         this.neighborDirection[pixel.ID] = direction
         this.neighborDistance[pixel.ID] = distance
@@ -69,17 +69,17 @@ class Pixel:
             return this.neighborDistance[pixel.ID]
         else:
             None
-    
+
     def getNeighborIDs(this):
-        return this.neighborDistance.keys()
-    
+        return list(this.neighborDistance.keys())
+
     def getDirectionDistance(this,direction):
         "get the Distance a pixel is at in given direction"
         for k in this.neighborDirection.keys():
             if this.neighborDirection[k]  == direction:
                 return this.neighborDistance[k]
         return None
-    
+
     def getDirectionNeighborID(this,direction):
         "get the Distance a pixel is at in given direction"
         for k in this.neighborDirection.keys():
