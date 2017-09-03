@@ -1,0 +1,168 @@
+\documentclass[border=0mm]{standalone}
+\usepackage[no-math]{fontspec}
+\usepackage{xunicode,xltxtra}
+\usepackage{tikz,pgfplots}
+\usetikzlibrary{calc,backgrounds,pgfplots.colormaps}
+% \defaultfontfeatures{Mapping=tex-text}
+% \setromanfont[Ligatures={Common},ItalicFont={Vollkorn-Italic},BoldFont={Vollkorn-Bold}, BoldItalicFont={Vollkorn-BoldItalic}]{Vollkorn}
+%\setromanfont[Ligatures={Common}]{Gill Sans}
+\setromanfont[Ligatures={Common}]{Futura Black}
+\setromanfont[Ligatures={Common}]{Paddington}
+\setsansfont[Ligatures={Common}]{Pump Triline}
+%
+% Mono
+\definecolor{borderC}{HTML}{FABC89}
+\definecolor{mainLight}{HTML}{529696}
+\definecolor{mainC}{HTML}{268282}
+\definecolor{fontC}{HTML}{055858}
+\definecolor{bgC}{HTML}{ffffff}
+% Nook 2016
+% \definecolor{borderC}{HTML}{DC5D81}
+% \definecolor{mainLight}{HTML}{FFD396}
+% \definecolor{mainC}{HTML}{46A67F}
+% \definecolor{fontC}{HTML}{C23960}
+% \definecolor{bgC}{HTML}{FFD396}
+% 80s1
+% \definecolor{borderC}{HTML}{EB6741}
+% \definecolor{mainLight}{HTML}{8BD43B}
+% \definecolor{mainC}{HTML}{4A86A7}
+% \definecolor{fontC}{HTML}{0B4869}
+% \definecolor{bgC}{HTML}{BFF08A}
+% 80sw
+% \definecolor{borderC}{HTML}{FF4224}
+% \definecolor{mainLight}{HTML}{84E1FB}
+% \definecolor{mainC}{HTML}{FFBD24}
+% \definecolor{fontC}{HTML}{000000}
+% \definecolor{bgC}{HTML}{84E1FB}
+% BW
+% \definecolor{borderC}{HTML}{333333}
+% \definecolor{mainLight}{HTML}{EEEEEE}
+% \definecolor{mainC}{HTML}{999999}
+% \definecolor{fontC}{HTML}{000000}
+% \definecolor{bgC}{HTML}{CCCCCC}
+\colorlet{bg}{bgC}
+\colorlet{fg}{white}
+\tikzset{base/.style={borderC}}
+\tikzset{main/.style={fill=bg,draw=fg}}
+\tikzset{border/.style={borderC,thick}}
+\tikzset{verts/.style={borderC!50!black!50!white,line width=1.25pt}}
+\newcommand\wTh{0.4} %woodThickness, short W in comments
+\newcommand\neoOff{.07} %neoclassizism
+\begin{document}
+  \begin{tikzpicture}[background rectangle/.style={fill=white,draw=none},show background rectangle]
+    % fix background of triangle
+    % draw circles
+    \draw[draw=mainC,fill=bgC,very thick] ($(0,0)!0.567!(0,4)$) circle (4.75);
+    \draw[fill=mainC,draw=bg] (-4,0) -- (4,0) -- (0,{4*sqrt(3)}) -- cycle;
+    % border
+    \coordinate (A1) at (-4,0);
+    \coordinate (A2) at (-2.5,0);
+    \coordinate (A3) at (-2.5,\wTh);
+    \coordinate (A4) at (-1.5,\wTh);
+    \coordinate (A5) at (-1.5,0);
+    \coordinate (A6) at (-.5,0);
+    \coordinate (A7) at (-.5,\wTh);
+    \coordinate (A8) at (.5,\wTh);
+    \coordinate (A9) at (.5,0);
+    \coordinate (A10) at (1.5,0);
+    \coordinate (A11) at (1.5,\wTh);
+    \coordinate (A12) at (2.5,\wTh);
+    \coordinate (A13) at (2.5,0);
+    \coordinate (A14) at (4,0);
+    
+    \path[shift={(-2,{2*sqrt(3)})},rotate=60,main] (-4,0) coordinate (B1)  (-2.5,0) coordinate (B2) (-2.5,-\wTh)
+    coordinate (B3) (-1.5,-\wTh) coordinate (B4) (-1.5,0) coordinate (B5)
+    (-.5,0) coordinate (B6) (-.5,-\wTh) coordinate (B7) (.5,-\wTh)
+    coordinate (B8) (.5,0) coordinate (B9) (1.5,0) coordinate (B10)
+    (1.5,-\wTh) coordinate (B11) (2.5,-\wTh) coordinate (B12) (2.5,0)
+    coordinate (B13) (4,0) coordinate (B14);
+    %
+    \path[shift={(2,{2*sqrt(3)})},rotate=-60,main] (-4,0) coordinate (C1)  (-2.5,0) coordinate (C2) (-2.5,-\wTh)
+    coordinate (C3) (-1.5,-\wTh) coordinate (C4) (-1.5,0) coordinate (C5)
+    (-.5,0) coordinate (C6) (-.5,-\wTh) coordinate (C7) (.5,-\wTh)
+    coordinate (C8) (.5,0) coordinate (C9) (1.5,0) coordinate (C10)
+    (1.5,-\wTh) coordinate (C11) (2.5,-\wTh) coordinate (C12) (2.5,0)
+    coordinate (C13) (4,0) coordinate (C14);
+
+    \node[scale=4] (N) at ($(0,0)!0.567!(0,4)$) {\Huge\color{mainLight}\sffamily S};
+
+    % background
+    \foreach \x in {0,0.05,...,1.0} {%
+      \draw[draw=borderC, draw opacity=0.5, fill=mainC, fill opacity=0, thin] ($(A1)!\x!(A14)$) -- ($(B14)!\x!(B1)$) -- (A1) -- cycle;
+      \draw[draw=borderC, draw opacity=0.5, fill=mainC, fill opacity=0, thin] ($(A1)!\x!(A14)$) -- ($(C14)!\x!(C1)$) -- (A14) -- cycle;
+      \draw[draw=borderC, draw opacity=0.5, fill=mainC, fill opacity=0, thin] ($(C14)!\x!(C1)$) -- ($(B14)!\x!(B1)$) -- (C1) -- cycle;
+    }
+    \foreach \i in {1,2,3}{%
+    \draw[border]
+    ($(A1)+(.55*\i*\neoOff,\i*\neoOff)$)
+%    (A1)
+    -- ($(A2)+(-\i*\neoOff,\i*\neoOff)$)
+    -- ($(A3)+(-\i*\neoOff,\i*\neoOff)$) -- ($(A4) + (+\i*\neoOff,\i*\neoOff)$)
+    -- ($(A5)+(+\i*\neoOff,\i*\neoOff)$) -- ($(A6) + (-\i*\neoOff,\i*\neoOff)$)
+    -- ($(A7)+(-\i*\neoOff,\i*\neoOff)$) -- ($(A8) + (+\i*\neoOff,\i*\neoOff)$)
+    -- ($(A9)+(+\i*\neoOff,\i*\neoOff)$) -- ($(A10) + (-\i*\neoOff,\i*\neoOff)$)
+    -- ($(A11)+(-\i*\neoOff,\i*\neoOff)$) -- ($(A12) + (+\i*\neoOff,\i*\neoOff)$)
+    -- ($(A13)+(+\i*\neoOff,\i*\neoOff)$)
+    --
+   ($(A14) + (-.55*\i*\neoOff,\i*\neoOff)$)
+%   (A14)
+    ;
+    \draw[border]
+   ($(B1)+([rotate=60].55*\i*\neoOff,-\i*\neoOff)$)
+%   (B1)
+    -- ($(B2)+([rotate=60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B3)+([rotate=60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B4)+([rotate=60]+\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B5)+([rotate=60]+\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B6)+([rotate=60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B7)+([rotate=60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B8)+([rotate=60]+\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B9)+([rotate=60]+\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B10)+([rotate=60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B11)+([rotate=60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B12)+([rotate=60]\i*\neoOff,-\i*\neoOff)$)
+    -- ($(B13)+([rotate=60]\i*\neoOff,-\i*\neoOff)$)
+    --
+   ($(B14)+([rotate=60]-.55*\i*\neoOff,-\i*\neoOff)$)
+%    (B14)
+    ;
+    \draw[border]
+    ($(C1)+([rotate=-60].55*\i*\neoOff,-\i*\neoOff)$)
+%    (C1)
+    -- ($(C2)+([rotate=-60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C3)+([rotate=-60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C4)+([rotate=-60]+\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C5)+([rotate=-60]+\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C6)+([rotate=-60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C7)+([rotate=-60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C8)+([rotate=-60]+\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C9)+([rotate=-60]+\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C10)+([rotate=-60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C11)+([rotate=-60]-\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C12)+([rotate=-60]\i*\neoOff,-\i*\neoOff)$)
+    -- ($(C13)+([rotate=-60]\i*\neoOff,-\i*\neoOff)$)
+    -- 
+    ($(C14)+([rotate=-60]-.55*\i*\neoOff,-\i*\neoOff)$)
+%   (C14)
+    ;
+    }
+    % frame
+    \draw[bg] (A1) -- (A14) -- (B14) -- cycle;
+    \draw[bg] ($(A1)+(210:0.05)$) -- ($(A14)+(330:0.05)$) -- ($(B14)+(90:0.05)$) -- cycle;
+    \draw[fill=bg,draw=bg] (A2) -- (A3) -- (A4) -- (A5);
+    \draw[fill=bg,draw=bg] (A6) -- (A7) -- (A8) -- (A9);
+    \draw[fill=bg,draw=bg] (A10) -- (A11) -- (A12) -- (A13);
+    \draw[fill=bg,draw=bg,thick] (A2) -- (A5) (A6) -- (A9) (A10) -- (A13);
+    \draw[fill=bg,draw=bg] (B2) -- (B3) -- (B4) -- (B5);
+    \draw[fill=bg,draw=bg] (B6) -- (B7) -- (B8) -- (B9);
+    \draw[fill=bg,draw=bg] (B10) -- (B11) -- (B12) -- (B13);
+    \draw[fill=bg,draw=bg,thick] (B2) -- (B5) (B6) -- (B9) (B10) -- (B13);
+    \draw[fill=bg,draw=bg] (C2) -- (C3) -- (C4) -- (C5);
+    \draw[fill=bg,draw=bg] (C6) -- (C7) -- (C8) -- (C9);
+    \draw[fill=bg,draw=bg] (C10) -- (C11) -- (C12) -- (C13);
+    \draw[fill=bg,draw=bg,thick] (C2) -- (C5) (C6) -- (C9) (C10) -- (C13);
+    \node[scale=1.2] (A) at (0,-.50) {\Huge%
+    \color{fontC}
+    Stackenlichten};
+  \end{tikzpicture}
+\end{document}

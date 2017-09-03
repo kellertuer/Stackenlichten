@@ -37,8 +37,8 @@ def run(argv):
     #
     # Set up the parser
     #
-    parser = argparse.ArgumentParser(prog="Random.py",
-                description='Put a few points randomly with random fade in and fadeout as well as duration and pause on the graph',
+    parser = argparse.ArgumentParser(prog="NorthLight.py",
+                description='Put the usual pattern in viridis as a background and a lighthouse style north light on top',
                 epilog='Stackenlichten, 2017, @kellertuer')
     # argument to change the display
     parser.add_argument('-d','--display',
