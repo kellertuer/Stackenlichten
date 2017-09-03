@@ -228,6 +228,33 @@ class iterAlgorithm(Algorithm):
         for a in this.algorithms:
             a.update(*args, **kwargs)
 
+class replicatePixelAlgorithm(Algorithm):
+    """
+    replicateAlgorithm -- take one algorithm but replicate the result
+from one pixel to several others
+    """
+
+    def __init__(this,alg,origID,copyIDs,graph=None,parameters=None):
+        super(replicatePixelAlgorithm,this).__init__(graph,parameters)
+        this.alg = alg
+        this.origID = origID
+        this.copyIDs = copyIDs
+    def step(this):
+        "perform a step/frame of the algorithm"
+        this.alg.step()
+        c = this.alg.getPixel(this.origID).getColor()
+        this.getPixel(this.origID).setColor(c)
+        for id in this.copyIDs:
+            this.getPixel(id).setColor(c)
+    def setParameters(this,parameters):
+        this.alg.setParameters(parameters)
+    def setParameter(this,key,value):
+        this.als.setParameter(key,value)
+    def getParameter(this,key):
+        return this.alg.getParameter(key)
+    def isFinished(this):
+        return this.alg.isFinished()
+
 class addAlgorithm(metaAlgorithm):
     def __init__(this,algorithms,graph=None,parameters=None):
         super(addAlgorithm,this).__init__(algorithms,graph,parameters)
@@ -493,7 +520,7 @@ class AlgRandomPoint(Algorithm):
         if newRand:
 
             if this.parameters.get("ID",0) > 0:
-                this.localID = this.parameters["ID"]
+                this.ID = this.parameters["ID"]
             else:
                 if this.ID > 0 and this.randStyle=="neighbor": # we have a position and look for a random neighbor
                     this.ID = random.choice(this.getPixel(this.ID).getNeighborIDs())
