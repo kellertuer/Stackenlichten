@@ -11,7 +11,7 @@ stack different forms of Lichten.
 ![status](img/number13.jpg)
 
 ## Code
-Based on the fadecandy chip and its accompanying python code, I work on several methods to perform artistic lights and games on such trixel sets.
+Based on the fadecandy chip and its accompanying python code, The code for Stackenlichten encapsulates the interface to the pixel and provides an easy way to implement image and pixel algorithms on graphs.
 
 ## Build your own
 In order to build your own Trixels, see [Manual.md](manual/manual.md).

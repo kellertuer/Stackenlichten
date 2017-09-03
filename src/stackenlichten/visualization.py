@@ -50,7 +50,7 @@ class PyTurtleSLV():
 
     def __init__(this,length=30):
         """
-        PyTurtleSLC() initialize the vizualization using the python turtle module
+        PyTurtleSLV() initialize the vizualization using the python turtle module
         """
         print("""                              ~~~ Stackenlichten ~~~
            Let\'s blink in lichten. But with German stacken and blochen AND Turtles!
