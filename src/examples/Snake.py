@@ -42,7 +42,7 @@ def run(argv):
                 epilog='Stackenlichten, 2017, @kellertuer')
     # argument to change the display
     parser.add_argument('-d','--display',
-                choices=['fadecandy','PyMatPlot','PyTurtle'],
+                choices=['fadecandy','PyMatPlot','PyTurtle','PyGame'],
                 default='fadecandy', metavar='D',
                 help='specify a vizualization: [f]adecandy for the physical Stackenlichten or one of the two availavle drawings: Py[M]atPlot or Py[T]urtle.')
     parser.add_argument("-g", "--graph",
@@ -59,7 +59,10 @@ def run(argv):
     if args.display == 'PyMatPlot' or args.display == 'M' or args.display == 'm':
         slc = sl.PyMatplotSLV(30,[-3*30,9*30,0,12*30])
     elif args.display == 'PyTurtle' or args.display == 'T' or args.display == 't':
-        slc = sl.PyTurtle(30)
+        slc = sl.PyTurtleSLV(30)
+    elif args.display == 'PyGame' or args.display == 'G' or args.display == 'g':
+        slc = sl.PyGameSLV(30,[30*x for x in [-2,10,-2,10]],
+        {"framerate":args.framerate})
     else: #default
         slc = sl.FadecandySLV()
     # Load Graph
@@ -95,7 +98,7 @@ def run(argv):
     alg = sl.mainAlgorithm(slc,mainAlg)
 
     # configure control
-    c = sl.DirectionControl(alg,parameters={'framerate':args.framerate});
+    c = sl.DirectionControl(alg,{"framerate":args.framerate});
     # Observers
     c.register(mainAlg)
     snake.register(digit1)

@@ -4,6 +4,9 @@ from .Graph import Graph
 from .opc import Client
 import matplotlib.pyplot as plt
 import matplotlib.collections as mpc
+import pygame
+import time
+import turtle as t
 
 def abstractmethod(method):
     def default_abstract_method(*args, **kwargs):
@@ -16,7 +19,12 @@ def abstractmethod(method):
 class SLV:
     "StackenLichtenVisualization - the connector to the USB board"
 
-    MAX_BRIGHTNESS = 255
+    PARAMETERS = {"framerate":50, "Brightness":255}
+
+    def __init__(this,parameters=None):
+        this.parameters = SLV.PARAMETERS.copy()
+        if parameters is not None:
+            this.parameters.update(parameters)
 
     @abstractmethod
     def render(this, graph,scale=1):
@@ -26,11 +34,12 @@ class SLV:
 class FadecandySLV(SLV):
     client = None
 
-    def __init__(this,url='localhost:7890'):
+    def __init__(this,url='localhost:7890',parameters=None):
         """
         FadecandySLC() initializes the Open Pixel Control (OPC) to connect to
         the usual localhost fadecandy server.
         """
+        super(FadecandySLV,this).__init__(parameters)
         print("""                              ~~~ Stackenlichten ~~~
            Let\'s blink in lichten. But with German stacken and blochen.
                                                                      @kellertuer
@@ -45,13 +54,15 @@ class FadecandySLV(SLV):
                  raise ValueError("The graph node id " + str(k) * " is too large for the fadecandy board (max 512 LEDs).\nPlease reorder or reduce the number")
             data[k-1] = tuple( np.round(v) )
         this.client.put_pixels(data)
+        time.sleep(1/this.parameters["framerate"])
 
-class PyTurtleSLV():
+class PyTurtleSLV(SLV):
 
-    def __init__(this,length=30):
+    def __init__(this,length=30,parameters=None):
         """
         PyTurtleSLV() initialize the vizualization using the python turtle module
         """
+        super(PyTurtleSLV,this).__init__(parameters)
         print("""                              ~~~ Stackenlichten ~~~
            Let\'s blink in lichten. But with German stacken and blochen AND Turtles!
                                                                     @kellertuer
@@ -131,10 +142,11 @@ class PyTurtleSLV():
             for k in drawnList.keys():
                 finished = finished & drawnList[k]
         t.update()
+        time.sleep(1/this.parameters["framerate"])
 
-class PyMatplotSLV():
+class PyMatplotSLV(SLV):
 
-    def __init__(this,length=30,limits=[-300,300,-300,300]):
+    def __init__(this,length=30,limits=[-300,300,-300,300],parameters=None):
         """
         PyMatplotSLC() initialize the vizualization using the python matplot lib
         """
@@ -142,6 +154,7 @@ class PyMatplotSLV():
            Let\'s blink in lichten. But with German stacken and blochen AND matplot!
                                                                     @kellertuer
         Moin.""")
+        super(PyMatplotSLV,this).__init__(parameters)
         this.length=length;
         this.fig = plt.figure()
         this.ax = this.fig.gca()
@@ -221,4 +234,92 @@ class PyMatplotSLV():
             sys.exit()
         this.ax.add_collection(mpc.PatchCollection(this.patches,match_original=True))
         plt.draw()
-        plt.pause(0.0000005)
+        plt.pause(1/this.parameters["framerate"])
+
+class PyGameSLV(SLV):
+
+    def __init__(this,length=30,limits=[-300,300,-300,300],parameters=None):
+        """
+        PyGameSLC() initialize the vizualization using the python matplot lib
+        """
+        print("""                              ~~~ Stackenlichten ~~~
+           Let\'s blink in lichten. But with German stacken and blochen AND matplot!
+                                                                    @kellertuer
+        Moin.""")
+        super(PyGameSLV,this).__init__(parameters)
+        this.length=length;
+        pygame.init()
+        this.screen = pygame.display.set_mode( (limits[1]-limits[0],limits[3]-limits[2]))
+        this.limits = limits;
+        this.clock = pygame.time.Clock()
+        this.screen.fill( (0,0,0) )
+        pygame.display.update()
+
+    def has_been_closed(this):
+        pygame.quite()
+
+    def triangleAt(this,pos=(0.0,0.0),dir=90,length=15,fill=(1.0,1.0,1.0)):
+        #pos = pos + (-this.limits[0],this.limits[2])
+        height = np.sqrt(3)/6*length
+        base = [pos[0] + np.sin(dir/180.0*np.pi+np.pi/2.0)*height, pos[1] + np.cos(dir/180.0*np.pi + np.pi/2.0)*height]
+        firstP = [base[0] + np.sin(dir/180.0*np.pi)*this.length/2, base[1] + np.cos(dir/180.0*np.pi)*this.length/2]
+        secondP = [base[0] - np.sin(dir/180.0*np.pi+np.pi/2)*3.0*height, base[1] - np.cos(dir/180.0*np.pi+np.pi/2)*3.0*height]
+        thirdP = [base[0] - np.sin(dir/180.0*np.pi)*this.length/2, base[1] - np.cos(dir/180.0*np.pi)*this.length/2]
+        f2 = tuple([int(round(255*x)) for x in fill])
+        flipud = [[x+length,this.limits[3]-this.limits[2]-y-height] for [x,y] in [firstP,thirdP,secondP]]
+        pygame.draw.polygon(this.screen,f2,flipud,0)
+
+    def render(this,graph):
+        finished = False
+        drawnList = dict()
+        positions = dict()
+        upward = dict()
+        for k in graph.nodes.keys():
+            drawnList[k] = False
+        Start = True
+        startPoint = [0.0,0.0]
+        # clear
+        this.screen.fill( (0,0,0) )
+        while not finished:
+            # look for next index
+            for k,n in graph.nodes.items(): #k neighbor id, n its index
+                if not drawnList[k]:
+                    if Start:
+                        nextID = k
+                        dir = 90
+                        dist = 0
+                        break
+                    else:
+                        found=False
+                        for k2 in drawnList.keys():
+                            if drawnList[k2]:
+                                if graph.nodes[k2].isNeighbor(n):
+                                    nextID = k
+                                    dir = graph.nodes[k2].getNeighborDirection(n)
+                                    dist = graph.nodes[k2].getNeighborDistance(n)
+                                    samplePoint = positions[k2]
+                                    found=True
+                                    break
+                        if found:
+                            break
+            # do we have an upward triangle?
+            upward[nextID] = (graph.nodes[nextID].getDirectionDistance(60)==1) or (graph.nodes[nextID].getDirectionDistance(180)==1) or (graph.nodes[nextID].getDirectionDistance(300)==1)
+            if Start:
+                Start = False
+                positions[nextID] = startPoint
+            else:
+                # updirection is 0 degree, hence we invert sin and cos
+                positions[nextID] = [samplePoint[0] + np.sqrt(3)/3*this.length*np.sin(dir/180.0*np.pi)*dist,samplePoint[1] + np.sqrt(3)/3*this.length*np.cos(dir/180.0*np.pi)*dist]
+            b = graph.nodes[nextID].getColor();
+            thisP = positions[nextID]
+            if upward[nextID]:
+                this.triangleAt(pos=(thisP[0],thisP[1]),dir=90,length=this.length,fill=(b[0],b[1],b[2]))
+            else:
+                this.triangleAt(pos=(thisP[0],thisP[1]),dir=270,length=this.length,fill=(b[0],b[1],b[2]))
+            drawnList[nextID] = True
+            finished = True
+            for k in drawnList.keys():
+                finished = finished & drawnList[k]
+        #t = this.clock.tick(this.parameters["framerate"])
+        pygame.display.update()
+        time.sleep(1/this.parameters["framerate"])

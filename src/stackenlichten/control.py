@@ -59,14 +59,13 @@ class SimpleControl(Control):
         try: #Check for Keypresses
             while not this.algorithm.isFinished():
                 this.algorithm.step()
-                time.sleep(1/this.parameters["framerate"])
+                # time.sleep(1/this.parameters["framerate"])
                 print('.', end='', flush=True)
         except KeyboardInterrupt:
             this.algorithm = mainAlgorithm(this.algorithm.SLC,AlgFadeOut(2*this.parameters['framerate'],this.algorithm))
             print('o', end='', flush=True)
             while not this.algorithm.isFinished():
                 this.algorithm.step()
-                time.sleep(1/this.parameters["framerate"])
                 print('.', end='', flush=True)
             print("\n\nKthxbye.")
 
@@ -120,7 +119,7 @@ class DirectionControl(Control):
                 print('o', end='', flush=True)
                 while not this.algorithm.isFinished():
                     this.algorithm.step()
-                    time.sleep(1/this.parameters["framerate"])
+                    #time.sleep(1/this.parameters["framerate"])
                     print('.', end='', flush=True)
                 break;
             if dir is not None:
@@ -129,7 +128,7 @@ class DirectionControl(Control):
                 this.update_observers({'Rotate':rot})
             # step
             this.algorithm.step()
-            time.sleep(1/this.parameters["framerate"])
+            #time.sleep(1/this.parameters["framerate"])
             print('.', end='', flush=True)
             if cnt%(10*this.parameters["framerate"])==0:
                 this.stdscr.clear()

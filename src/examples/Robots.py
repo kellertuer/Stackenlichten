@@ -33,10 +33,12 @@ def run(argv):
     if args.display == 'PyMatPlot' or args.display == 'M' or args.display == 'm':
         slc = sl.PyMatplotSLV(30,[-3*30,9*30,0,12*30])
     elif args.display == 'PyTurtle' or args.display == 'T' or args.display == 't':
-        slc = sl.PyTurtle(30)
+        slc = sl.PyTurtleSLV(30)
+    elif args.display == 'PyGame' or args.display == 'G' or args.display == 'g':
+        slc = sl.PyGameSLV(30,[30*x for x in [-2,10,-2,10]],
+    {"framerate":args.framerate})
     else: #default
-        slc = sl.FadecandySLV()
-    # Load Graph
+        slc = sl.FadecandySLV()    # Load Graph
     if len(args.graph) > 0:
         graph = sl.Graph.load(args.graph)
     else:
@@ -59,7 +61,7 @@ def run(argv):
     alg = sl.mainAlgorithm(slc,seqAlg)
 
     # configure control
-    c = sl.DirectionControl(alg,parameters={'framerate':args.framerate});
+    c = sl.DirectionControl(alg,{"framerate":args.framerate});
     # Observers
     c.register(walker)
     c.register(digit1)
