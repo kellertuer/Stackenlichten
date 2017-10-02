@@ -11,11 +11,17 @@
 \setsansfont[Ligatures={Common}]{Pump Triline}
 %
 % Mono
-\definecolor{borderC}{HTML}{FABC89}
-\definecolor{mainLight}{HTML}{529696}
-\definecolor{mainC}{HTML}{268282}
-\definecolor{fontC}{HTML}{055858}
-\definecolor{bgC}{HTML}{ffffff}
+%\definecolor{borderC}{HTML}{FABC89}
+%\definecolor{mainLight}{HTML}{529696}
+%\definecolor{mainC}{HTML}{268282}
+%\definecolor{fontC}{HTML}{055858}
+%\definecolor{bgC}{HTML}{ffffff}
+% Mono black
+\definecolor{borderC}{HTML}{055858}
+\definecolor{mainLight}{HTML}{944809}
+\definecolor{mainC}{HTML}{D9853F}
+\definecolor{fontC}{HTML}{FFC596}
+\definecolor{bgC}{HTML}{000000}
 % Nook 2016
 % \definecolor{borderC}{HTML}{DC5D81}
 % \definecolor{mainLight}{HTML}{FFD396}
@@ -49,7 +55,7 @@
 \newcommand\wTh{0.4} %woodThickness, short W in comments
 \newcommand\neoOff{.07} %neoclassizism
 \begin{document}
-  \begin{tikzpicture}[background rectangle/.style={fill=white,draw=none},show background rectangle]
+  \begin{tikzpicture}[background rectangle/.style={fill=bgC,draw=none},show background rectangle]
     % fix background of triangle
     % draw circles
     \draw[draw=mainC,fill=bgC,very thick] ($(0,0)!0.567!(0,4)$) circle (4.75);
