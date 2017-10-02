@@ -665,15 +665,14 @@ class AlgSampleFunction(Algorithm):
                         found=False
                         for k2 in sampledList.keys():
                             if sampledList[k2]:
-                                if this.nodes[k2].isNeighbor(n):
+                                if this.nodes[k2].isNeighbor(n) and this.nodes[k2].getNeighborDistance(n)>0:
                                     nextID = k
                                     dir = this.nodes[k2].getNeighborDirection(n)
                                     dist = this.nodes[k2].getNeighborDistance(n)
-                                    if dist > 0: # do not sample over special boundary
-                                        samplePoint = positions[k2]
-                                        positions[k] = [samplePoint[0] + np.sin(dir/180.0*np.pi)*dist,samplePoint[1] + np.cos(dir/180.0*np.pi)*dist]
-                                        found=True
-                                        break
+                                    samplePoint = positions[k2]
+                                    positions[k] = [samplePoint[0] + np.sin(dir/180.0*np.pi)*dist,samplePoint[1] + np.cos(dir/180.0*np.pi)*dist]
+                                    found=True
+                                    break
                         if found:
                             break
             # updirection is 0 degree, hence we invert sin and cos
@@ -1071,6 +1070,8 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
                 this.headID = thisP.getDirectionNeighborID(thisDir)
                 if thisP.getDirectionDistance(thisDir) > 0: #only switch if not on special boundary
                     this.startDir = (this.startDir+1)%2
+                if thisP.getDirectionDistance(thisDir) == -2: #mirror boundary, switch also direction
+                    this.parameters["Direction"] = (this.parameters["Direction"]+180)%360
                 # off old trail
                 for i in range(len(this.trail)):
                     this.getPixel(this.trail[i]).setColor([0.0,0.0,0.0]);
