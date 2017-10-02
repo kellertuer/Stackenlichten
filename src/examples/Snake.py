@@ -30,7 +30,7 @@ def f2(pts,vars):
 
 def stepVars(vars):
     v = dict(vars)
-    v['alpha'] = np.mod(v['alpha'] + np.pi/180/5,2*np.pi)
+    v['alpha'] = np.mod(v['alpha'] + np.pi/180/3,2*np.pi)
     return v
 
 def run(argv):
@@ -42,7 +42,7 @@ def run(argv):
                 epilog='Stackenlichten, 2017, @kellertuer')
     # argument to change the display
     parser.add_argument('-d','--display',
-                choices=['fadecandy','PyMatPlot','PyTurtle','PyGame'],
+                choices=['fadecandy','f','F','PyMatPlot','m','M','PyTurtle','T','t','PyGame','G','g'],
                 default='fadecandy', metavar='D',
                 help='specify a vizualization: [f]adecandy for the physical Stackenlichten or one of the two availavle drawings: Py[M]atPlot or Py[T]urtle.')
     parser.add_argument("-g", "--graph",
@@ -57,7 +57,7 @@ def run(argv):
     vars = {'alpha':0,'scale':.5}
     # Init Display
     if args.display == 'PyMatPlot' or args.display == 'M' or args.display == 'm':
-        slc = sl.PyMatplotSLV(30,[-3*30,9*30,0,12*30])
+        slc = sl.PyMatplotSLV(30,[-30,11*30,-30,9*30])
     elif args.display == 'PyTurtle' or args.display == 'T' or args.display == 't':
         slc = sl.PyTurtleSLV(30)
     elif args.display == 'PyGame' or args.display == 'G' or args.display == 'g':
@@ -72,25 +72,25 @@ def run(argv):
         raise ValueError("No graph specified")
     # Build algorithm structure
     myBT = sl.AlgBackground([0.75,0.75,0.75],graph.clone())
-    sample2 = sl.AlgSampleFunction(f2,stepVars,vars,graph.clone())
+    sample2 = sl.AlgSampleFunction(f,stepVars,vars,graph.clone())
     mAlg = sl.multAlgorithm([myBT, sample2],graph.clone())
-    snake = sl.AlgSnake(28,90,5,graph.clone())
-    digit1 = sl.AlgDisplayDigit(4,68,0,90,210,graph.clone())
+    snake = sl.AlgSnake(39,90,5,graph.clone())
+    digit1 = sl.AlgDisplayDigit(4,65,0,90,210,graph.clone())
     digit1.setParameter('Name','Tens')
-    digit2 = sl.AlgDisplayDigit(2,59,0,90,210,graph.clone())
+    digit2 = sl.AlgDisplayDigit(2,71,0,90,210,graph.clone())
     digit2.setParameter('Name','Ones')
     sl.AlgDisplayDigit(4,68,0,90,210,graph.clone())
     seq = sl.sequentialAlgorithm([
-      sl.AlgDisplayDigit(9,55,15,90,210,graph.clone()),
-      sl.AlgDisplayDigit(8,55,15,90,210,graph.clone()),
-      sl.AlgDisplayDigit(7,55,15,90,210,graph.clone()),
-      sl.AlgDisplayDigit(6,55,15,90,210,graph.clone()),
-      sl.AlgDisplayDigit(5,55,15,90,210,graph.clone()),
-      sl.AlgDisplayDigit(4,55,15,90,210,graph.clone()),
-      sl.AlgDisplayDigit(3,55,15,90,210,graph.clone()),
-      sl.AlgDisplayDigit(2,55,15,90,210,graph.clone()),
-      sl.AlgDisplayDigit(1,55,15,90,210,graph.clone()),
-      sl.AlgDisplayDigit(0,55,15,90,210,graph.clone()),
+      sl.AlgDisplayDigit(9,82,15,90,210,graph.clone()),
+      sl.AlgDisplayDigit(8,82,15,90,210,graph.clone()),
+      sl.AlgDisplayDigit(7,82,15,90,210,graph.clone()),
+      sl.AlgDisplayDigit(6,82,15,90,210,graph.clone()),
+      sl.AlgDisplayDigit(5,82,15,90,210,graph.clone()),
+      sl.AlgDisplayDigit(4,82,15,90,210,graph.clone()),
+      sl.AlgDisplayDigit(3,82,15,90,210,graph.clone()),
+      sl.AlgDisplayDigit(2,82,15,90,210,graph.clone()),
+      sl.AlgDisplayDigit(1,82,15,90,210,graph.clone()),
+      sl.AlgDisplayDigit(0,82,15,90,210,graph.clone()),
       snake,
       sl.addAlgorithm([digit1,digit2],graph.clone())
     ],True,graph.clone())

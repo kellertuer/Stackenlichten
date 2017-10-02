@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
 from graph import Graph
-from pixel import Pixel
+from Pixel import Pixel
 from Stackenlichten import *
 from algorithm import *
 from control import *

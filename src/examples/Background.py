@@ -37,8 +37,8 @@ def run(argv):
     #
     # Set up the parser
     #
-    parser = argparse.ArgumentParser(prog="NorthLight.py",
-                description='Put the usual pattern in viridis as a background and a lighthouse style north light on top',
+    parser = argparse.ArgumentParser(prog="Background.py",
+                description='Simple Test backgroundns',
                 epilog='Stackenlichten, 2017, @kellertuer')
     # argument to change the display
     parser.add_argument('-d','--display',
@@ -71,29 +71,12 @@ def run(argv):
     else:
         raise ValueError("No graph specified")
     # Build algorithm structure
-    point = sl.AlgRandomPoint(graph.clone(),{
-            "fadein":3,
-            "fadein_variance":0,
-            "duration":10,
-            "duration_variance":5,
-            "fadeout":3,
-            "fadeout_variance":0,
-            "pause":9,
-            "pause_variance":8,
-            "repeat":True,
-            "scale":args.framerate,
-            "repeatrandom":True,
-            "randomPositionStyle":"neighbor",
-            "ID":100})
-    myBT = sl.AlgBackground([0.4,0.4,0.4],graph.clone())
-    sample = sl.AlgBackground([0.993248, 0.906157,0.143936],graph.clone())
-    sample2 = sl.AlgSampleFunction(f,stepVars,vars,graph.clone())
-    mAlg = sl.multAlgorithm([myBT, sample2],graph.clone())
-    aAlg = sl.replicatePixelAlgorithm(point,100,[97,98,99],graph.clone())
-    mAlg2 = sl.multAlgorithm([aAlg, sample],graph.clone())
-    mainAlg = sl.addAlgorithm([mAlg,mAlg2],graph.clone())
-    alg = sl.mainAlgorithm(slc,mainAlg)
-    c = sl.SimpleControl(alg,parameters={'framerate':args.framerate});
+    myBT = sl.AlgBackground([1,.3,.3],graph.clone())
+    # myBT = sl.AlgSampleFunction(f,stepVars,vars,graph.clone())
+    alg = sl.mainAlgorithm(slc,myBT)
+
+    # configure control
+    c = sl.SimpleControl(alg,{"framerate":args.framerate});
     c.start()
 
 if __name__ == "__main__":

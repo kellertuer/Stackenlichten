@@ -21,13 +21,17 @@ class Graph:
         $Node: $NeighborID1|Direction|Distance $NeighborID2|Direction|Distance
         """
         nodes = dict()
+        newID = 0;
         with open(fn) as f:
             for line in f:
                 NDirs = {}
                 NDists = {}
                 split1 = line.rstrip('\n').split(":");
                 if len(split1) != 2:
-                    raise ValueError("expected an ID followed by a colon and its neighbors per line.")
+                    if newID > 0:
+                        raise ValueError("expected an ID followed by a colon and its neighbors per line, in line after ID #"+str(newID)+".")
+                    else:
+                        raise ValueError("expected an ID followed by a colon and its neighbors per line in the first line.")
                 try:
                     newID = int(split1[0]);
                     #print()

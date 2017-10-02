@@ -21,35 +21,36 @@ nD = 2*fD;
 shortenSide = wW/tan(60)+wW;
 sH = 2*(wW/tan(60)+wW/sin(60)); //shorten inner
 
-number="1";
+number="4";
 useFix=false;
-numberHundreds="";
+numberHundreds="2";
 useHFix=false;
 bottomPlate();
 
 tN= 4;
+dist = 3.75;
 
-translate([-3,44.625,-3*wW/4])
+translate([-1*dist,44.625,-3*wW/4])
     linear_extrude(3*wW/4,scale=[2/tN,1])
     square([tN,10],center=true);
-translate([3,44.625,-3*wW/4])
-    linear_extrude(3*wW/4,scale=[2/tN,1])
-    square([tN,10],center=true);
-
-translate([16,15-3,-3/4*wW])
-rotate(v=[0,0,1],a=90)
-    linear_extrude(3*wW/4,scale=[2/tN,1])
-    square([tN,10],center=true);
-translate([16,15+3,-3/4*wW])
-rotate(v=[0,0,1],a=90)
+translate([dist,44.625,-3*wW/4])
     linear_extrude(3*wW/4,scale=[2/tN,1])
     square([tN,10],center=true);
 
-translate([-16,15-3,-3/4*wW])
+translate([16,15-dist,-3/4*wW])
 rotate(v=[0,0,1],a=90)
     linear_extrude(3*wW/4,scale=[2/tN,1])
     square([tN,10],center=true);
-translate([-16,15+3,-3/4*wW])
+translate([16,15+dist,-3/4*wW])
+rotate(v=[0,0,1],a=90)
+    linear_extrude(3*wW/4,scale=[2/tN,1])
+    square([tN,10],center=true);
+
+translate([-16,15-dist,-3/4*wW])
+rotate(v=[0,0,1],a=90)
+    linear_extrude(3*wW/4,scale=[2/tN,1])
+    square([tN,10],center=true);
+translate([-16,15+dist,-3/4*wW])
 rotate(v=[0,0,1],a=90)
     linear_extrude(3*wW/4,scale=[2/tN,1])
     square([tN,10],center=true);
@@ -90,8 +91,7 @@ module bottomPlate() {
     text(str(numberHundreds), font="Pump Triline", valign="center", halign="center",size=14);
     };
     // Fix numbers
-    
-    translate([-8,38,wW/2])
+    translate([-8,38,wW-wW/16])
     rotate(v=[0,0,1],a=60)
     if (useFix)
         difference() {
@@ -99,13 +99,13 @@ module bottomPlate() {
             cube([40,1.5,wW/4],center=true);
         }
     if (useHFix)
-        translate([8,38,wW/2])
+        #translate([8,38,wW-wW/16])
         rotate(v=[0,0,1],a=-60)
         difference() {
             cube([40,3.9,wW/8],center=true);
             cube([40,1.5,wW/4],center=true);
         }
-    translate([0,8,wW/2])
+    translate([0,8,wW-wW/16])
         cube([60,1,wW/8],center=true);
 };
 

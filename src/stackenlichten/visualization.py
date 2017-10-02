@@ -19,7 +19,7 @@ def abstractmethod(method):
 class SLV:
     "StackenLichtenVisualization - the connector to the USB board"
 
-    PARAMETERS = {"framerate":50, "Brightness":255}
+    PARAMETERS = {"framerate":50, "brightness":255}
 
     def __init__(this,parameters=None):
         this.parameters = SLV.PARAMETERS.copy()
@@ -49,7 +49,7 @@ class FadecandySLV(SLV):
     def render(this, graph,scale=1):
         data = [ (0,0,0) ] * 512
         for k in graph.nodes.keys():
-            v = [i*scale*this.MAX_BRIGHTNESS*graph.nodes[k].brightness for i in graph.nodes[k].getColor()]
+            v = [i*scale*this.parameters["brightness"]*graph.nodes[k].brightness for i in graph.nodes[k].getColor()]
             if k > 512:
                  raise ValueError("The graph node id " + str(k) * " is too large for the fadecandy board (max 512 LEDs).\nPlease reorder or reduce the number")
             data[k-1] = tuple( np.round(v) )
@@ -125,7 +125,7 @@ class PyTurtleSLV(SLV):
                         Start = False
                         break
                     else:
-                        if graph.nodes[this.currentID].isNeighbor(n):
+                        if graph.nodes[this.currentID].isNeighbor(n) and graph.nodes[this.currentID].getNeighborDistance(n)>0:
                             nextID = k
                             dir = graph.nodes[this.currentID].getNeighborDirection(n)
                             dist = graph.nodes[this.currentID].getNeighborDistance(n)
@@ -146,7 +146,7 @@ class PyTurtleSLV(SLV):
 
 class PyMatplotSLV(SLV):
 
-    def __init__(this,length=30,limits=[-300,300,-300,300],parameters=None):
+    def __init__(this,length=30,limits=[-30,600,-30,600],parameters=None):
         """
         PyMatplotSLC() initialize the vizualization using the python matplot lib
         """
@@ -203,7 +203,7 @@ class PyMatplotSLV(SLV):
                         found=False
                         for k2 in drawnList.keys():
                             if drawnList[k2]:
-                                if graph.nodes[k2].isNeighbor(n):
+                                if graph.nodes[k2].isNeighbor(n) and graph.nodes[k2].getNeighborDistance(n) > 0:
                                     nextID = k
                                     dir = graph.nodes[k2].getNeighborDirection(n)
                                     dist = graph.nodes[k2].getNeighborDistance(n)
@@ -293,7 +293,7 @@ class PyGameSLV(SLV):
                         found=False
                         for k2 in drawnList.keys():
                             if drawnList[k2]:
-                                if graph.nodes[k2].isNeighbor(n):
+                                if graph.nodes[k2].isNeighbor(n) and graph.nodes[k2].getNeighborDistance(n):
                                     nextID = k
                                     dir = graph.nodes[k2].getNeighborDirection(n)
                                     dist = graph.nodes[k2].getNeighborDistance(n)

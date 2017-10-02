@@ -231,7 +231,7 @@ class iterAlgorithm(Algorithm):
 class replicatePixelAlgorithm(Algorithm):
     """
     replicateAlgorithm -- take one algorithm but replicate the result
-from one pixel to several others
+    from one pixel to several others
     """
 
     def __init__(this,alg,origID,copyIDs,graph=None,parameters=None):
@@ -383,7 +383,8 @@ class AlgBackground(Algorithm):
 class AlgDisplayDigit(Algorithm):
     """An hardcoded algorithm to display italic numbers
     (keep dirRight to 90, dirDown to 210 if you'Re unsure)
-    the posTopLeft should be an uowards pointing triangle
+    the posTopLeft should be an uowards pointing triangle.
+    Digits do not run over the (special) boundary.
     """
     # HARDCODED!
     DIGITS = [
@@ -406,7 +407,9 @@ class AlgDisplayDigit(Algorithm):
         #8
         [[1,1,1,1,1,0],[1,1,0,0,1,1],[1,1,1,1,1,1],[1,1,0,0,1,1],[0,1,1,1,1,1]],
         #9
-        [[1,1,1,1,1,0],[1,1,0,0,1,1],[0,1,1,1,1,1],[0,0,0,0,1,1],[0,0,1,1,1,1]]]
+        [[1,1,1,1,1,0],[1,1,0,0,1,1],[0,1,1,1,1,1],[0,0,0,0,1,1],[0,0,1,1,1,1]],
+        #10-white
+        [[1,1,1,1,1,1],[1,1,1,1,1,1],[1,1,1,1,1,1],[1,1,1,1,1,1],[1,1,1,1,1,1]]]
     def __init__(this,digit,posTopLeft,duration,dirRight=90,dirDown=210,graph=None):
         super(AlgDisplayDigit,this).__init__(graph)
         this.parameters["DisplayDigitDuration"] = duration
@@ -423,7 +426,7 @@ class AlgDisplayDigit(Algorithm):
     def step(this):
         # cnt=0,pause=0 means infinite pause...
         # put digit on the graph if valid number
-        if this.getParameter("Digit")>=0 and this.getParameter("Digit")<=9:
+        if this.getParameter("Digit")>=0 and this.getParameter("Digit")<=10:
             thisDigit = this.DIGITS[this.getParameter("Digit")]
             firstInLineID = this.TLID
             for i,row in enumerate(thisDigit):
@@ -666,10 +669,11 @@ class AlgSampleFunction(Algorithm):
                                     nextID = k
                                     dir = this.nodes[k2].getNeighborDirection(n)
                                     dist = this.nodes[k2].getNeighborDistance(n)
-                                    samplePoint = positions[k2]
-                                    positions[k] = [samplePoint[0] + np.sin(dir/180.0*np.pi)*dist,samplePoint[1] + np.cos(dir/180.0*np.pi)*dist]
-                                    found=True
-                                    break
+                                    if dist > 0: # do not sample over special boundary
+                                        samplePoint = positions[k2]
+                                        positions[k] = [samplePoint[0] + np.sin(dir/180.0*np.pi)*dist,samplePoint[1] + np.cos(dir/180.0*np.pi)*dist]
+                                        found=True
+                                        break
                         if found:
                             break
             # updirection is 0 degree, hence we invert sin and cos
@@ -790,7 +794,8 @@ class AlgTrigWalk(Algorithm):
             for i in range(n):
                 this.getPixel(this.trail[i]).setColor([1.0, 1.0,1.0]);
             # switch step
-            this.startDir = (this.startDir+1)%2
+            if thisP.getDirectionDistance(thisDir) > 0: # not special boundary
+                this.startDir = (this.startDir+1)%2 # only change in normal cases
     def getPosition(this):
         "return the current node."
         return this.currentID
@@ -944,7 +949,7 @@ class AlgWalker(Algorithm):
         this.parameters["Alive"]=True
         this.parameters["Gamescore"]= 0;
         this.highlight=0
-    def directionID(this,ID):
+    def directionID(this):
         p = this.getPixel(this.positionID)
         # is the triangle pointing upward?
         if (p.getDirectionDistance(60)==1) or (p.getDirectionDistance(180)==1) or (p.getDirectionDistance(300)==1):
@@ -972,8 +977,8 @@ class AlgWalker(Algorithm):
         if key=="Direction":
             if this.hasNextNeighbor(value):
                 checkID = this.positionID
-                startDir = this.directionID(this.positionID)
-                this.positionID = this.getPixel(checkID).getDirectionNeighborID(this.DIRECTION_MAPS[value][startDir])
+                startDir = this.directionID()
+                this.getPixel(checkID).getDirectionNeighborID(this.DIRECTION_MAPS[value][startDir])
             else:
                 this.highlight=2
             if this.parameters["Alive"]:
@@ -1032,6 +1037,8 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
         this.parameters["Gamescore"] = 0
         this.parameters["Alive"] = True
         this.parameters["StepInt"] = 15
+        this.parameters["pearColor"] = [1.0,0.0,0.0]
+        this.parameters["snakeColor"] = [1.0,1.0,1.0]
         this.headID = this.parameters["StartID"]
         p = this.getPixel(this.headID)
         # is the triangle pointing upward?
@@ -1062,7 +1069,8 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
                     else:
                         this.warning = True
                 this.headID = thisP.getDirectionNeighborID(thisDir)
-                this.startDir = (this.startDir+1)%2
+                if thisP.getDirectionDistance(thisDir) > 0: #only switch if not on special boundary
+                    this.startDir = (this.startDir+1)%2
                 # off old trail
                 for i in range(len(this.trail)):
                     this.getPixel(this.trail[i]).setColor([0.0,0.0,0.0]);
@@ -1071,7 +1079,7 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
                 this.trail = this.trail[0:this.trailNum]
                 n = len(this.trail)
                 for i in range(n):
-                    this.getPixel(this.trail[i]).setColor([1.0, 1.0,1.0]);
+                    this.getPixel(this.trail[i]).setColor(this.parameters["snakeColor"]);
                 if this.fruitID==this.headID:
                     this.setParameter("Gamescore", this.getParameter("Gamescore")+1)
                     while this.fruitID in this.trail:
@@ -1079,7 +1087,7 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
                     this.trailNum = this.trailNum+1 # longer
                     if this.parameters["StepInt"] > 1:
                         this.parameters["StepInt"] = this.parameters["StepInt"]-1 #faster
-                this.getPixel(this.fruitID).setColor([0.0,0.0,1.0])
+                this.getPixel(this.fruitID).setColor(this.parameters["pearColor"])
             else: # wallcollision?
                 if this.warning:
                     this.parameters["Alive"] = False

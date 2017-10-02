@@ -31,28 +31,26 @@ fnN = 270;
    translate([sL/4+wW/2,wW/2,0]) circle(wW,$fn=360);
 };*/
 difference() {
-translate([0,0,3/4*wW]) hull() {
+translate([0,0,3/4*wW])
+    linear_extrude(3*wW/4)
+    hull() {
     translate([-sL/4-wW/2,0,0])
-    difference() {
-    scale([2,1.5,.75]) sphere(wW, $fn=fnN);
-    translate([0,0,-0.5*wW]) cube([4*wW,4*wW,1*wW],center=true);
-    };
+    circle(wW,$fn=fnN);
     translate([+sL/4+wW/2,0,0])
-    difference() {
-    scale([2,1.5,.75]) sphere(wW, $fn=fnN);
-    translate([0,0,-.5*wW]) cube([4*wW,4*wW,1*wW],center=true);
+    circle(wW,$fn=fnN);
     };
-};
 // Magnets
    translate([2*sL/nC,0,wW/2+1])
        cube(size = [1.1*mW,1.1*mW,wW], center = true);
    translate([-2*sL/nC,0,wW/2+1])
        cube(size = [1.1*mW,1.1*mW,wW], center = true);
-    translate([0,-7.5])
+   translate([0,-7.5])
     scale([2.5,.85,1])
     linear_extrude(2*wW)
     circle(8,$fn=fnN);
 }
 
-    translate([0,0,wW-1.5])
+   # translate([0,0,wW-1.5])
         cube([sL/2-2*wW,.9,1],center=true);
+
+echo(sL/2-2*wW);

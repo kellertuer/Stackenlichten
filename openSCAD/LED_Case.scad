@@ -15,22 +15,22 @@ suppExact = false;
 LEDDir = 14.5;
 OuterDir = 16.5;
 InnerDir = 10;
-height=3;
+height=3.4;
 // Helper
 hSp = 0.5;
 //inner Helper
 //outer helpers
-/*translate([0,0,10])
+th=0.15;
+translate([0,0,10+th])
       difference () {
-        cylinder(d1=5.8,d2=5.8,h=height-0.75,$fn=360);
-        translate([0,0,-.31]) cylinder(d1=5.4,d2=5.4,h=height-0.75,$fn=360);
-};*/
+        cylinder(d1=5.8,d2=5.8,h=height-0.75-th,$fn=360);
+        translate([0,0,0]) cylinder(d1=4.75,d2=4.75,h=height-0.75,$fn=360);
+};
 // Base
 difference() {
     cylinder(10, 6, 3, $fn=360);
 translate([-0.05,0,1.95]) cube([4.2,24,4.1],center=true);
 }
-
 translate([0,0,4])
 difference() {
 linear_extrude(6) polygon([for ( i = [-1:steps]) (i==-1) ? [0,0] : 
