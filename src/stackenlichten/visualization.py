@@ -34,7 +34,7 @@ class SLV:
 class FadecandySLV(SLV):
     client = None
 
-    def __init__(this,url='localhost:7890',parameters=None):
+    def __init__(this,parameters=None):
         """
         FadecandySLC() initializes the Open Pixel Control (OPC) to connect to
         the usual localhost fadecandy server.
@@ -44,7 +44,8 @@ class FadecandySLV(SLV):
            Let\'s blink in lichten. But with German stacken and blochen.
                                                                      @kellertuer
         Moin.""")
-        this.client = Client(url)
+        this.client = Client(parameters.get("url",'localhost:7890'))
+        #this.client.set_interpolation(False)
 
     def render(this, graph,scale=1):
         data = [ (0,0,0) ] * 512

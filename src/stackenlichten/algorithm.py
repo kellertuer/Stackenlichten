@@ -1,5 +1,6 @@
 from .Graph import Graph
 from .Pixel import Pixel
+import includes.colormaps as cm
 import numpy as np
 import random
 import math
@@ -469,6 +470,27 @@ class AlgDisplayDigit(Algorithm):
             if (not 'Digit' in d) or (d.get('Name','') == this.getParameter('Name')):
                 this.setParameters(d)
 
+class AlgApplyColormap(Algorithm):
+    """Apply colormap to all pixel, either a channel or the mean gray value is used"""
+    def __init__(this,graph=None,parameters=None):
+        super(AlgApplyColormap,this).__init__(graph,parameters)
+        this.cm = parameters.get("Colormap",cm.viridis)
+        this.type = parameters.get("Type","Gray")
+    def step(this):
+        for k in this.nodes.keys():
+            c = this.getPixel(k).getColor()
+            if this.type == "Gray":
+                c2 = list(this.cm(sum(c)/3.0)[0:3])
+            elif this.type == "Red":
+                c2 = list(this.cm(c[0])[0:3])
+            elif this.type == "Blue":
+                c2 = list(this.cm(c[1])[0:3])
+            elif this.type == "Green":
+                c2 = list(this.cm(c[2])[0:3])
+            this.getPixel(k).setColor(c2)
+    def isFinished(this):
+        return False
+
 class AlgDiffusion(Algorithm):
     """Algorithm to perform Diffusion on the colors
     """
@@ -619,6 +641,49 @@ class AlgRandomPoints(Algorithm):
     def update(this, *args, **kwargs):
         pass
 
+class AlgSpreadPoint(Algorithm):
+    """manipulates the internal graph at a given position and spreads that value to its neighbors (and their neighbors, and their,... until a specified depth)
+    """
+    def __init__(this,graph=None,parameters=None):
+        super(AlgSpreadPoint,this).__init__(graph,parameters)
+        this.ID = this.parameters.get("ID",1)
+        this.depth = this.parameters.get("Depth",1)
+    def setParameters(this,parameters):
+        super(AlgSpreadPoint,this).setParameters(parameters)
+        if parameters.get("ID"):
+            this.ID = parameters.get("ID")
+        if parameters.get("ID"):
+            this.depth = parameters.get("depth")
+    def setParameter(this,key,value):
+        super(AlgSpreadPoint,this).setParameter(key,value)
+        if key=="ID":
+            this.ID = value
+        if key=="Depth":
+            this.depth=value
+    def update(this, *args, **kwargs):
+        d=args[0];
+        if isinstance(d,dict):
+            this.setParameters(d)
+    def step(this):
+        actDepth=0
+        IDList = [this.ID]
+        visitedIDs = [this.ID]
+        while actDepth < this.depth:
+            newList = []
+            # run through all neighbors at level actDepth
+            for lID in IDList:
+                p = this.getPixel(lID)
+                color = p.getColor()
+                colorFaded = [(this.depth-actDepth)/(this.depth+1-actDepth)*i for i in color]
+                # run through all neighbors
+                for nID in p.getNeighborIDs():
+                    if nID not in visitedIDs:
+                        newList.append(nID)
+                        visitedIDs.append(nID)
+                        this.getPixel(nID).setColor(colorFaded)
+            IDList = newList
+            actDepth = actDepth + 1
+
 class AlgFadeOut(Algorithm):
     def __init__(this,frames=30,graph=None):
         super(AlgFadeOut,this).__init__(graph)
@@ -689,32 +754,37 @@ class AlgSampleFunction(Algorithm):
 
 class AlgRunningLight(Algorithm):
     """The algorithm performs a simple running light ordered by id"""
-    def __init__(this,randomColor=True,restart=True,sort=False,graph=None):
+    def __init__(this,graph=None,parameters=None):
         """Initialize the Runninglight.
         Variables:
-        * randomColor – random color (if set true)
-        * repeatSequence - repeat or not"""
-        super(AlgRunningLight,this).__init__(graph)
-        this.sort = sort
-        if sort:
+        * random – random color (if set true)
+        * repeat - repeat or not"""
+        super(AlgRunningLight,this).__init__(graph,parameters)
+        this.sort = parameters.get("Sort",True)
+        if this.sort:
             this._iterator = iter(sorted(this.nodes.keys()))
         else:
             this._iterator = iter(this.nodes.keys())
-        this.restart = restart
+        this.restart = parameters.get("Restart",True)
+        this.Depth = parameters.get("Depth",1)
         this.currentID = None
         this.start = True
+        this.spread = AlgSpreadPoint(this,{"ID":None,"Depth":this.Depth})
     def step(this):
         this.start=False
         if this.currentID is not None:
-            #remove last
-            this.getPixel(this.currentID).setColor([0, 0,0])
+            #remove all last ones
+            this.setBlack()
         try:
             this.currentID = this._iterator.__next__()
         except StopIteration:
             this.currentID = None
         if this.currentID is not None:
             this.getPixel(this.currentID).setColor([1.0, 1.0,1.0]);
+            this.spread.setParameter("ID",this.currentID);
+            this.spread.step()
         elif this.restart:
+            this.setBlack()
             if this.sort:
                 this._iterator = iter(sorted(this.nodes.keys()))
             else:

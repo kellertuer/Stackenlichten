@@ -21,9 +21,9 @@ nD = 2*fD;
 shortenSide = wW/tan(60)+wW;
 sH = 2*(wW/tan(60)+wW/sin(60)); //shorten inner
 
-number="4";
+number="9";
 useFix=false;
-numberHundreds="2";
+numberHundreds="9";
 useHFix=false;
 bottomPlate();
 
@@ -85,7 +85,7 @@ module bottomPlate() {
     linear_extrude(1.2*wW)
     rotate(v=[0,1,0],a=180)
     text(str(number), font="Pump Triline", valign="center", halign="center",size=14);
-    translate([13.5,26,-0*wW/4])
+    translate([13.5,27,-0*wW/4])
     linear_extrude(1.2*wW)
     rotate(v=[0,1,0],a=180)
     text(str(numberHundreds), font="Pump Triline", valign="center", halign="center",size=14);
@@ -99,13 +99,13 @@ module bottomPlate() {
             cube([40,1.5,wW/4],center=true);
         }
     if (useHFix)
-        #translate([8,38,wW-wW/16])
+        translate([8,38,wW-wW/16])
         rotate(v=[0,0,1],a=-60)
         difference() {
             cube([40,3.9,wW/8],center=true);
             cube([40,1.5,wW/4],center=true);
         }
-    translate([0,8,wW-wW/16])
+    #translate([0,8,wW-wW/16])
         cube([60,1,wW/8],center=true);
 };
 

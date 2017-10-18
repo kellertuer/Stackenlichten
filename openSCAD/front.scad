@@ -21,8 +21,14 @@ nD = 2*fC+2; //number of Divisions, due to 2fC+1 segments and one segment that s
 // Generate triangle
 PointLine = concat(genSide(),genSide(-120,[sL/4,sL*sqrt(3)/4]),genSide(120,[-sL/4,sL*sqrt(3)/4]));
 
-linear_extrude(height=fW, twist=0) polygon(points=PointLine);
-
+linear_extrude(height=fW, twist=0)
+difference() {
+    polygon(points=PointLine);
+    translate([0,1.5*wW,0])
+        text("k",font="Pump Triline",size=30,halign="center");
+};
+/* translate([0,sL*sqrt(3)/8,.5])
+    #cube([sL/2,1,1],center=true);
 /*
  * Helping Functions - Generate one side of the triangle recursion olé olé
  */

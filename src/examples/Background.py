@@ -6,78 +6,44 @@ os.sys.path.insert(0,parentdir)
 import stackenlichten as sl
 import numpy as np
 import includes.colormaps as cm
-def f(pts,vars):
-    x = pts[0]*vars['scale']
-    y = pts[1]*vars['scale']
-    a = vars['alpha']
-    value = (np.sin(np.cos(a)*x-np.sin(a)*y)
-        + np.cos(np.sin(a)*x+np.cos(a)*y)
-        + np.sin(np.cos(2*a)*x+np.sin(a)*y)
-        + np.cos(-np.sin(2*a)*x+np.cos(a)*y)
-        +4)/8
-    return list(cm.viridis(value)[0:3])
-
-def f2(pts,vars):
-    x = pts[0]*vars['scale']
-    y = pts[1]*vars['scale']
-    a = -2*vars['alpha']
-    value = (np.sin(np.cos(a)*x-np.sin(a)*y)
-        + np.cos(np.sin(a)*x+np.cos(a)*y)
-        + np.sin(np.cos(2*a)*x+np.sin(a)*y)
-        + np.cos(-np.sin(2*a)*x+np.cos(a)*y)
-        +4)/8
-    return list(cm.magma(value)[0:3])
+from BaseExample import Example
 
 def stepVars(vars):
     v = dict(vars)
     v['alpha'] = np.mod(v['alpha'] + np.pi/180/5,2*np.pi)
     return v
 
-def run(argv):
-    #
-    # Set up the parser
-    #
-    parser = argparse.ArgumentParser(prog="Background.py",
-                description='Simple Test backgroundns',
-                epilog='Stackenlichten, 2017, @kellertuer')
-    # argument to change the display
-    parser.add_argument('-d','--display',
-                choices=['fadecandy','f','F','PyMatPlot','m','M','PyTurtle','T','t','PyGame','G','g'],
-                default='fadecandy', metavar='D',
-                help='specify a vizualization: [f]adecandy for the physical Stackenlichten or one of the two availavle drawings: Py[M]atPlot or Py[T]urtle.')
-    parser.add_argument("-g", "--graph",
-                metavar="G",
-                default="",
-                help="Specify the graph modelling the architecture of the Stackenlichten")
-    parser.add_argument('-f','--framerate', default=24, type=int,
-                metavar='F',
-                help='framerate used in the animation ')
-    args = parser.parse_args(argv)
-    # variables for movement
-    vars = {'alpha':0,'scale':.5}
-    # Init Display
-    if args.display == 'PyMatPlot' or args.display == 'M' or args.display == 'm':
-        slc = sl.PyMatplotSLV(30,[-3*30,15*30,0,13*30])
-    elif args.display == 'PyTurtle' or args.display == 'T' or args.display == 't':
-        slc = sl.PyTurtleSLV(30)
-    elif args.display == 'PyGame' or args.display == 'G' or args.display == 'g':
-        slc = sl.PyGameSLV(30,[30*x for x in [-2,10,-2,10]],
-        {"framerate":args.framerate})
-    else: #default
-        slc = sl.FadecandySLV()
-    # Load Graph
-    if len(args.graph) > 0:
-        graph = sl.Graph.load(args.graph)
-    else:
-        raise ValueError("No graph specified")
-    # Build algorithm structure
-    myBT = sl.AlgBackground([1,.3,.3],graph.clone())
-    # myBT = sl.AlgSampleFunction(f,stepVars,vars,graph.clone())
-    alg = sl.mainAlgorithm(slc,myBT)
+class BackgroundExample(Example):
+    defaultcolor = [255,0,128]
+    def __init__(this):
+        super(BackgroundExample,this).__init__("Backgorund.py",
+            "A simple test for plain colors")
+        # Add individual arguments
+        this.parser.add_argument("-cr","--colorred",
+        metavar="CR",default=this.defaultcolor[0],type=int,choices=range(256),
+        help="Red Channel of background color")
+        this.parser.add_argument("-cg","--colorgreen",
+        metavar="CG",default=this.defaultcolor[1],type=int,choices=range(256),
+        help="Green Channel of background color")
+        this.parser.add_argument("-cb","--colorblue",
+        metavar="CB",default=this.defaultcolor[2],type=int,choices=range(256),
+        help="Blue Channel of background color")
+    def parse_args(this,argv):
+        super(BackgroundExample,this).parse_args(argv)
+        # Build algorithm structure
+        backgroundAlg = sl.AlgBackground([
+            this.args.colorred/255.0,
+            this.args.colorgreen/255.0,
+            this.args.colorblue/255.0],this.graph.clone())
+        this.setMainAlgorithm(sl.mainAlgorithm(this.slc,backgroundAlg))
+        this.setControl(sl.SimpleControl(
+            this.getMainAlgorithm(),
+            parameters={'framerate':this.args.framerate}))
 
-    # configure control
-    c = sl.SimpleControl(alg,{"framerate":args.framerate});
-    c.start()
+def run(argv):
+    s = BackgroundExample()
+    s.parse_args(argv)
+    s.start()
 
 if __name__ == "__main__":
         run(sys.argv[1:])

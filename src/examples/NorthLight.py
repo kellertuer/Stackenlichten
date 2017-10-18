@@ -57,14 +57,14 @@ def run(argv):
     vars = {'alpha':0,'scale':.5}
     # Init Display
     if args.display == 'PyMatPlot' or args.display == 'M' or args.display == 'm':
-        slc = sl.PyMatplotSLV(30,[-3*30,15*30,0,13*30])
+        slc = sl.PyMatplotSLV(30,[-3*30,15*30,0,13*30],{"framerate":args.framerate})
     elif args.display == 'PyTurtle' or args.display == 'T' or args.display == 't':
-        slc = sl.PyTurtleSLV(30)
+        slc = sl.PyTurtleSLV(30,{"framerate":args.framerate})
     elif args.display == 'PyGame' or args.display == 'G' or args.display == 'g':
         slc = sl.PyGameSLV(30,[30*x for x in [-2,10,-2,10]],
         {"framerate":args.framerate})
     else: #default
-        slc = sl.FadecandySLV()
+        slc = sl.FadecandySLV({"framerate":args.framerate})
     # Load Graph
     if len(args.graph) > 0:
         graph = sl.Graph.load(args.graph)
@@ -85,7 +85,8 @@ def run(argv):
             "repeatrandom":True,
             "randomPositionStyle":"neighbor",
             "ID":100})
-    myBT = sl.AlgBackground([0.4,0.4,0.4],graph.clone())
+    myBT = sl.AlgBackground([0.3,0.3,0.3],graph.clone())
+    #myBT = sl.AlgBackground([0.4,0.4,0.4],graph.clone())
     sample = sl.AlgBackground([0.993248, 0.906157,0.143936],graph.clone())
     sample2 = sl.AlgSampleFunction(f,stepVars,vars,graph.clone())
     mAlg = sl.multAlgorithm([myBT, sample2],graph.clone())
