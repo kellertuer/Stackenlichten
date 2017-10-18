@@ -6,6 +6,7 @@ os.sys.path.insert(0,parentdir)
 import stackenlichten as sl
 import numpy as np
 import includes.colormaps as cm
+from BaseExample import Example
 def f(pts,vars):
     x = pts[0]*vars['scale']
     y = pts[1]*vars['scale']
@@ -33,69 +34,39 @@ def stepVars(vars):
     v['alpha'] = np.mod(v['alpha'] + np.pi/180/5,2*np.pi)
     return v
 
-def run(argv):
-    #
-    # Set up the parser
-    #
-    parser = argparse.ArgumentParser(prog="NorthLight.py",
-                description='Put the usual pattern in viridis as a background and a lighthouse style north light on top',
-                epilog='Stackenlichten, 2017, @kellertuer')
-    # argument to change the display
-    parser.add_argument('-d','--display',
-                choices=['fadecandy','f','F','PyMatPlot','m','M','PyTurtle','T','t','PyGame','G','g'],
-                default='fadecandy', metavar='D',
-                help='specify a vizualization: [f]adecandy for the physical Stackenlichten or one of the two availavle drawings: Py[M]atPlot or Py[T]urtle.')
-    parser.add_argument("-g", "--graph",
-                metavar="G",
-                default="",
-                help="Specify the graph modelling the architecture of the Stackenlichten")
-    parser.add_argument('-f','--framerate', default=24, type=int,
-                metavar='F',
-                help='framerate used in the animation ')
-    args = parser.parse_args(argv)
-    # variables for movement
-    vars = {'alpha':0,'scale':.5}
-    # Init Display
-    if args.display == 'PyMatPlot' or args.display == 'M' or args.display == 'm':
-        slc = sl.PyMatplotSLV(30,[-3*30,15*30,0,13*30],{"framerate":args.framerate})
-    elif args.display == 'PyTurtle' or args.display == 'T' or args.display == 't':
-        slc = sl.PyTurtleSLV(30,{"framerate":args.framerate})
-    elif args.display == 'PyGame' or args.display == 'G' or args.display == 'g':
-        slc = sl.PyGameSLV(30,[30*x for x in [-2,10,-2,10]],
-        {"framerate":args.framerate})
-    else: #default
-        slc = sl.FadecandySLV({"framerate":args.framerate})
-    # Load Graph
-    if len(args.graph) > 0:
-        graph = sl.Graph.load(args.graph)
-    else:
-        raise ValueError("No graph specified")
-    # Build algorithm structure
-    point = sl.AlgRandomPoint(graph.clone(),{
-            "fadein":3,
-            "fadein_variance":0,
-            "duration":10,
-            "duration_variance":5,
-            "fadeout":3,
-            "fadeout_variance":0,
-            "pause":9,
-            "pause_variance":8,
-            "repeat":True,
-            "scale":args.framerate,
+class NorthLightExample(Example):
+    def __init__(this):
+        super(NorthLightExample,this).__init__("NorthLight.py",
+            "Put the usual pattern in viridis as a background and a lighthouse style north light on top")
+        this.vars = {'alpha':0,'scale':.5}
+    def parse_args(this,argv):
+        super(NorthLightExample,this).parse_args(argv)
+        # Build algorithm structure
+        point = sl.AlgRandomPoint(this.graph.clone(),{
+            "fadein":3, "fadein_variance":0,
+            "duration":10, "duration_variance":5,
+            "fadeout":3, "fadeout_variance":0,
+            "pause":9, "pause_variance":8,
+            "repeat":True, "scale":this.args.framerate,
             "repeatrandom":True,
             "randomPositionStyle":"neighbor",
             "ID":100})
-    myBT = sl.AlgBackground([0.3,0.3,0.3],graph.clone())
-    #myBT = sl.AlgBackground([0.4,0.4,0.4],graph.clone())
-    sample = sl.AlgBackground([0.993248, 0.906157,0.143936],graph.clone())
-    sample2 = sl.AlgSampleFunction(f,stepVars,vars,graph.clone())
-    mAlg = sl.multAlgorithm([myBT, sample2],graph.clone())
-    aAlg = sl.replicatePixelAlgorithm(point,100,[97,98,99],graph.clone())
-    mAlg2 = sl.multAlgorithm([aAlg, sample],graph.clone())
-    mainAlg = sl.addAlgorithm([mAlg,mAlg2],graph.clone())
-    alg = sl.mainAlgorithm(slc,mainAlg)
-    c = sl.SimpleControl(alg,parameters={'framerate':args.framerate});
-    c.start()
+        myBT = sl.AlgBackground([0.3,0.3,0.3],this.graph.clone())
+        sample = sl.AlgBackground([0.993248, 0.906157,0.143936],this.graph.clone())
+        sample2 = sl.AlgSampleFunction(f,stepVars,this.vars,this.graph.clone())
+        mAlg = sl.multAlgorithm([myBT, sample2],this.graph.clone())
+        aAlg = sl.replicatePixelAlgorithm(point,100,[97,98,99],this.graph.clone())
+        mAlg2 = sl.multAlgorithm([aAlg, sample],this.graph.clone())
+        northLightAlg = sl.addAlgorithm([mAlg,mAlg2],this.graph.clone())
+        this.setMainAlgorithm(sl.mainAlgorithm(this.slc,northLightAlg))
+        this.setControl(sl.SimpleControl(
+            this.getMainAlgorithm(),
+            parameters={'framerate':this.args.framerate}))
+
+def run(argv):
+    s = NorthLightExample()
+    s.parse_args(argv)
+    s.start()
 
 if __name__ == "__main__":
         run(sys.argv[1:])
