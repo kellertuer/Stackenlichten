@@ -60,13 +60,13 @@ class SimpleControl(Control):
             while not this.algorithm.isFinished():
                 this.algorithm.step()
                 # time.sleep(1/this.parameters["framerate"])
-                print('.', end='', flush=True)
+                # print('.', end='', flush=True)
         except KeyboardInterrupt:
             this.algorithm = mainAlgorithm(this.algorithm.SLC,AlgFadeOut(2*this.parameters['framerate'],this.algorithm))
             print('o', end='', flush=True)
             while not this.algorithm.isFinished():
                 this.algorithm.step()
-                print('.', end='', flush=True)
+                #print('.', end='', flush=True)
             print("\n\nKthxbye.")
 
 """DirectionControl -

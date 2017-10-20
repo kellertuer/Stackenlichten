@@ -300,7 +300,7 @@ class overlayAlgorithm(metaAlgorithm):
                 trColor = this.tColors[c]
                 for k in this.nodes.keys():
                     thisC = x.nodes[k].getColor()
-                    if thisC!=trColor:
+                    if any(thisC[i]!=trColor[i] for i in range(3)):
                         this.nodes[k].setColor(thisC)
                 c = c+1
 
@@ -751,6 +751,39 @@ class AlgSampleFunction(Algorithm):
         this.FctValues.get('finished',False)
     def update(this, *args, **kwargs):
         pass
+
+class AlgRunSequence(Algorithm):
+    trigs19 = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,
+        18,20,21,51,50,52,53,75,74,76,77,91,90,92,93,99,98,100,
+        98,97,95,96,86,85,83,84,66,65,63,64,38,37,35,36,
+        35,34,33,32,31,30,29,28,27,26,25,24,23,22,
+        23,49,48,54,55,73,72,78,79,89,88,94,
+        88,87,81,82,68,67,61,62,40,39,
+        40,41,42,43,44,45,46,47,
+        46,56,57,71,70,80,
+        70,69,59,60,
+        59,58,57,71,70,69]
+    def __init__(this, sequence=None, graph=None, parameters=None):
+        super(AlgRunSequence,this).__init__(graph,parameters)
+        if sequence is None:
+            sequence = this.trigs19
+        if this.parameters.get("AddReverse",True):
+            this.seq = sequence+list(reversed(sequence))
+        else:
+            this.seq = sequence;
+        this.repeat = this.parameters.get("Repeat",True)
+        this.pos = 0;
+        this.curID = this.seq[0];
+    def step(this):
+        if not this.isFinished():
+            this.pos = (this.pos+1)%len(this.seq)
+            this.getPixel(this.curID).setColor([0,0,0])
+            this.curID = this.seq[this.pos]
+            this.getPixel(this.curID).setColor([1,1,1])
+    def isFinished(this):
+        return (not this.repeat) and this.pos==len(this.sequence)
+
+
 
 class AlgRunningLight(Algorithm):
     """The algorithm performs a simple running light ordered by id"""
