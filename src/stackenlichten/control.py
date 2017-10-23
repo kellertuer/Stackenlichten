@@ -56,6 +56,7 @@ class SimpleControl(Control):
         super(SimpleControl,this).__init__(algorithm,parameters)
 
     def start(this):
+        out=False
         try: #Check for Keypresses
             while not this.algorithm.isFinished():
                 this.algorithm.step()
@@ -66,8 +67,13 @@ class SimpleControl(Control):
             print('o', end='', flush=True)
             while not this.algorithm.isFinished():
                 this.algorithm.step()
-                #print('.', end='', flush=True)
-            print("\n\nKthxbye.")
+            out=True
+        if not out:
+            this.algorithm = mainAlgorithm(this.algorithm.SLC,AlgFadeOut(3*this.parameters['framerate'],this.algorithm))
+            while not this.algorithm.isFinished():
+                this.algorithm.step()
+                #time.sleep(1/this.parameters["framerate"])
+        print("\n\nKthxbye.")
 
 """DirectionControl -
     provide directions controls (f,r,e,d,c,v for the 6 directions, k,l for left/
@@ -85,6 +91,7 @@ class DirectionControl(Control):
     def start(this):
         key = ''
         cnt=0
+        out=False
         while not this.algorithm.isFinished():
             cnt=cnt+1
             key = this.stdscr.getch()
@@ -120,7 +127,8 @@ class DirectionControl(Control):
                 while not this.algorithm.isFinished():
                     this.algorithm.step()
                     #time.sleep(1/this.parameters["framerate"])
-                    print('.', end='', flush=True)
+                    #print('.', end='', flush=True)
+                out=True
                 break;
             if dir is not None:
                 this.update_observers({'Direction':dir})
@@ -129,9 +137,12 @@ class DirectionControl(Control):
             # step
             this.algorithm.step()
             #time.sleep(1/this.parameters["framerate"])
-            print('.', end='', flush=True)
-            if cnt%(10*this.parameters["framerate"])==0:
-                this.stdscr.clear()
-                this.stdscr.refresh()
+            #print('.', end='', flush=True)
+        if not out:
+            this.algorithm = mainAlgorithm(this.algorithm.SLC,AlgFadeOut(3*this.parameters['framerate'],this.algorithm))
+            while not this.algorithm.isFinished():
+                this.algorithm.step()
+                #time.sleep(1/this.parameters["framerate"])
+                #print('.', end='', flush=True)
         curses.endwin()
         print("\n\nKthxbye.")

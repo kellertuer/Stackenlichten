@@ -40,18 +40,23 @@ class RunTriangleExample(Example):
         this.parser.add_argument("-cb","--colorblue",
         metavar="CB",default=this.defaultcolor[2],type=int,choices=range(256),
         help="Blue Channel of background color")
+        this.parser.add_argument("-bg","--background",
+        metavar="BG",default=False,type=bool,
+        help="Include a background (default: False)")
     def parse_args(this,argv):
         super(RunTriangleExample,this).parse_args(argv)
         # Build algorithm structure
-        color = [this.args.colorred/255.0,
+        bAlg = sl.AlgBackground([this.args.colorred/255.0,
             this.args.colorgreen/255.0,
-            this.args.colorblue/255.0]
-        sampleAlg = sl.AlgSampleFunction(f,stepVars,this.vars,this.graph.clone())
-        bAlg = sl.AlgBackground(color,this.graph.clone())
+            this.args.colorblue/255.0],this.graph.clone())
         fAlg = sl.AlgRunSequence(None,this.graph.clone())
         combAlg = sl.multAlgorithm([bAlg,fAlg],this.graph.clone());
-        ovAlg = sl.overlayAlgorithm([sampleAlg,combAlg],[(0,0,0),(0,0,0)],this.graph.clone());
-        this.setMainAlgorithm(sl.mainAlgorithm(this.slc,ovAlg))
+        if this.args.background:
+            sampleAlg = sl.AlgSampleFunction(f,stepVars,this.vars,this.graph.clone())
+            ovAlg = sl.overlayAlgorithm([sampleAlg,combAlg],[(0,0,0),(0,0,0)],this.graph.clone());
+            this.setMainAlgorithm(sl.mainAlgorithm(this.slc,ovAlg))
+        else:
+            this.setMainAlgorithm(sl.mainAlgorithm(this.slc,combAlg))
         this.setControl(sl.SimpleControl(
             this.getMainAlgorithm(),
             parameters={'framerate':this.args.framerate}))

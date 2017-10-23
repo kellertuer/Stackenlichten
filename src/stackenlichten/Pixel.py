@@ -81,7 +81,7 @@ class Pixel:
         return None
 
     def getDirectionNeighborID(this,direction):
-        "get the Distance a pixel is at in given direction"
+        "get the ID of a pixel is at in given direction"
         for k in this.neighborDirection.keys():
             if this.neighborDirection[k]  == direction:
                 return k

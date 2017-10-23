@@ -23,7 +23,6 @@ class Algorithm(Graph):
 
     PARAMS = {"OSF" : 1}
     DIRECTION_MAPS = {0:[0,0], 30:[60,0], 60:[60,60], 90:[60,120], 120:[120,120], 150:[180,120], 180:[180,180], 210:[180,240], 240:[240,240], 270:[300,240], 300:[300,300], 330:[300,0]}
-
     def __init__(this,graph=None,parameters=None):
         "Initialize the algorithm to act on a certain graph object"
         super(Algorithm,this).__init__(graph)
@@ -271,8 +270,8 @@ class addAlgorithm(metaAlgorithm):
                     this.nodes[k] += x.nodes[k]
 
 class multAlgorithm(metaAlgorithm):
-    def __init__(this,algorithms,graph=None):
-        super(multAlgorithm,this).__init__(algorithms,graph)
+    def __init__(this,algorithms,graph=None,parameters=None):
+        super(multAlgorithm,this).__init__(algorithms,graph,parameters)
 
     def step(this):
         super(multAlgorithm,this).step()
@@ -285,8 +284,8 @@ class multAlgorithm(metaAlgorithm):
                     this.nodes[k] *= x.nodes[k]
 
 class overlayAlgorithm(metaAlgorithm):
-    def __init__(this,algorithms,transparentcolors,graph=None):
-        super(overlayAlgorithm,this).__init__(algorithms,graph)
+    def __init__(this,algorithms,transparentcolors,graph=None,parameters=None):
+        super(overlayAlgorithm,this).__init__(algorithms,graph,parameters)
         this.tColors = transparentcolors
 
     def step(this):
@@ -783,7 +782,54 @@ class AlgRunSequence(Algorithm):
     def isFinished(this):
         return (not this.repeat) and this.pos==len(this.sequence)
 
+class AlgLine(Algorithm):
+    """Draws a line."""
+    def __init__(this,graph=None,parameters=None):
+        """Use the parameters `ID` and `Dir` to specify
+            the node and the line direction. Furthermore:
+            * `Halfline` to true to only have the direction eminating from ID
+            * `Duration` in number of frames
+            *  and not the complete line.
+        """
+        super(AlgLine,this).__init__(graph,parameters)
+        this.ID = this.parameters.get("ID")
+        this.Dir = this.parameters.get("Dir")
+        this.halfline = this.parameters.get("Halfline",False)
+        this.duration = this.parameters.get("Duration",1)
+        this.cnt = 0
+        p = this.getPixel(this.ID)
+        if (p.getDirectionDistance(60)==1) or (p.getDirectionDistance(180)==1) or (p.getDirectionDistance(300)==1):
+            this.startDir=0
+        elif (p.getDirectionDistance(0)==1) or (p.getDirectionDistance(120)==1) or (p.getDirectionDistance(240)==1):
+            this.startDir=1
+    def reset(this):
+        super(AlgLine,this).reset()
+        this.cnt=0
 
+    def step(this):
+        if not this.isFinished():
+            this.cnt = this.cnt + 1
+            cP = this.ID
+            continueLine = True
+            sD=this.startDir
+            while continueLine:
+                this.getPixel(cP).setColor((255,255,255))
+                cP = this.getPixel(cP).getDirectionNeighborID(this.DIRECTION_MAPS[this.Dir][sD])
+                sD = (sD+1)%2
+                continueLine = (cP is not None)
+            if not this.halfline:
+                dir2 = (this.Dir+180)%360
+                cP = this.ID
+                sD=this.startDir
+                continueLine = True
+                while continueLine:
+                    this.getPixel(cP).setColor((255,255,255))
+                    cP = this.getPixel(cP).getDirectionNeighborID(this.DIRECTION_MAPS[dir2][sD])
+                    sD = (sD+1)%2
+                    continueLine = (cP is not None)
+
+    def isFinished(this):
+        return not (this.cnt < this.duration)
 
 class AlgRunningLight(Algorithm):
     """The algorithm performs a simple running light ordered by id"""
@@ -966,9 +1012,6 @@ class AlgRandomBlink(Algorithm):
         pass
 
 class AlgBasicRobot(Algorithm):
-    DIRECTION_MAPS = {
-        30:[60,0], 90:[60,120], 150:[180,120],
-        210:[180,240], 270:[300,240], 330:[300,0]}
 
     def __init__(this,startID,trackWalker,graph=None,parameters=None):
         super(AlgBasicRobot,this).__init__(graph,parameters)
@@ -1038,10 +1081,6 @@ class AlgBasicRobot(Algorithm):
 
 class AlgWalker(Algorithm):
     """An algorithm to move your player and react to robots"""
-    DIRECTION_MAPS = {
-        30:[60,0], 90:[60,120], 150:[180,120],
-        210:[180,240], 270:[300,240], 330:[300,0]}
-
     def __init__(this,startID,graph=None,parameters=None):
         super(AlgWalker,this).__init__(graph,parameters)
         this.startID = startID
@@ -1119,9 +1158,6 @@ class AlgSnake(Algorithm): #(AlgTrigWalkAlgorithm):
     """
     # we have to alternate, these are for /\ triangles, for \/ start with the
     # second term each entry
-    DIRECTION_MAPS = {
-        30:[60,0], 90:[60,120], 150:[180,120],
-        210:[180,240], 270:[300,240], 330:[300,0]}
     def __init__(this,startID,StartDirection,InitLength,graph=None,parameters=None):
         super(AlgSnake,this).__init__(graph,parameters)
         if StartDirection not in AlgSnake.DIRECTION_MAPS:
