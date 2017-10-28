@@ -108,7 +108,13 @@ class Graph:
 
     def setBlack(this):
         for k,n in this.nodes.items():
-            n.setColor([0,0,0])
+            n.setColor([0.0,0.0,0.0])
+
+    def invert(this):
+        for k,n in this.nodes.items():
+            a = n.getColor();
+            n.setColor([1.0 - x for x in a])
+
 
     def __repr__(this):
         Descr = "A Graph with nodes\n"
