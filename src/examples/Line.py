@@ -36,7 +36,7 @@ def stepVars(vars):
     return v
 
 class LineExample(Example):
-    defaultcolor = [128,0,64]
+    defaultcolor = [0,0,0]
     def __init__(this):
         super(LineExample,this).__init__("Line.py",
             "A Line.")
