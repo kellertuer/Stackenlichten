@@ -43,17 +43,17 @@ class Example:
         else:
             raise ValueError("No graph specified")
         # display
-        this.DiplayParams = {
+        this.DisplayParams = {
             "framerate":this.args.framerate,
             "brightness":this.args.brightness}
         if any(this.args.display == s for s in {'PyMatPlot','M','m'}):
             this.slc = sl.PyMatplotSLV(this.pixelSize,this.pixelFrame,this.DisplayParams)
         elif any(this.args.display == s for s in {'PyTurtle','T','t'}):
-            this.slc = sl.PyTurtleSLV(this.pixelSize,this.DiplayParams)
+            this.slc = sl.PyTurtleSLV(this.pixelSize,this.DisplayParams)
         elif any(this.args.display == s for s in {'PyGame','G','g'}):
             this.slc = sl.PyGameSLV(this.pixelSize,this.pixelFrame,thiis.DisplayParams)
         else: #default
-            this.slc = sl.FadecandySLV(this.DiplayParams)
+            this.slc = sl.FadecandySLV(this.DisplayParams)
     def setMainAlgorithm(this,mA):
         this.mainAlg = mA
     def getMainAlgorithm(this):

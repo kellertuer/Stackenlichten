@@ -19,7 +19,7 @@ First of all produce 3 [side plates](../openSCAD/side.scad) and a [bottom plate]
 ![print/cut one the bottom plate](./img/bottom_plain.png)
 ![print/cut three the sides plate](./img/side_plain.png)
 
-take the magnets and glue them into the two holes of each of the three sides with opposing magnetization (I still have to check which one has the outpointing north pole in my construction – but mainly you have to stick to the same throughout your project).
+take the magnets and glue them into the two holes of each of the three sides with opposing magnetization. If you look at a side, e.g. the outside of a plate, make sure that the right magnet is a magnetic south pole (i.e. using a compass the north pole points to the right magnet) and the left magnet is a north pole (i.e. the compass south points towards this one). If you fixed that for one side use this to adjust all others.
 
 Glue all three parts together using either wood glue or aceton.
 

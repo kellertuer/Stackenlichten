@@ -797,6 +797,8 @@ class AlgLine(Algorithm):
         this.halfline = this.parameters.get("Halfline",False)
         this.duration = this.parameters.get("Duration",1)
         this.cnt = 0
+        this.initStartDir()
+    def initStartDir(this):
         p = this.getPixel(this.ID)
         if (p.getDirectionDistance(60)==1) or (p.getDirectionDistance(180)==1) or (p.getDirectionDistance(300)==1):
             this.startDir=0
@@ -830,6 +832,35 @@ class AlgLine(Algorithm):
 
     def isFinished(this):
         return not (this.cnt < this.duration)
+    def setParameters(this,parameters):
+        super(AlgLine,this).setParameters(parameters)
+        for key,value in parameters.items():
+            if key=="Direction": # move ID
+                this.updateID(value)
+    def setParameter(this,key,value):
+        super(AlgSnake,this).setParameter(key,value)
+        if key=="Direction": # move ID
+            this.updateID(value)
+    def updateID(this,direction):
+        p = this.getPixel(this.ID)
+        if (p.getDirectionDistance(60)==1) or (p.getDirectionDistance(180)==1) or (p.getDirectionDistance(300)==1):
+            sD=0
+        elif (p.getDirectionDistance(0)==1) or (p.getDirectionDistance(120)==1) or (p.getDirectionDistance(240)==1):
+            sD=1
+        newID = p.getDirectionNeighborID(this.DIRECTION_MAPS[direction][sD])
+        if newID is not None:
+            this.ID = newID
+        this.initStartDir()
+
+    def hasNextNeighbor(this):
+        "Check whether there exists a neighbor in walking direction"
+        checkID = this.headID
+        checkID = this.getPixel(checkID).getDirectionNeighborID(this.DIRECTION_MAPS[this.parameters["Direction"]][this.startDir])
+        return not (this.isFinished() or (checkID is None))
+    def update(this, *args, **kwargs):
+        d=args[0];
+        if isinstance(d,dict):
+            this.setParameters(d)
 
 class AlgRunningLight(Algorithm):
     """The algorithm performs a simple running light ordered by id"""

@@ -1,4 +1,4 @@
-from opc import Client        # Der OPC Client
+from opc import Client        # OPC Client laden
 import time
 from numpy.random import randint
 c = Client('localhost:7890')  # Verbinden

@@ -21,9 +21,9 @@ nD = 2*fD;
 shortenSide = wW/tan(60)+wW;
 sH = 2*(wW/tan(60)+wW/sin(60)); //shorten inner
 
-number="9";
+number="6";
 useFix=false;
-numberHundreds="9";
+numberHundreds="5";
 useHFix=false;
 bottomPlate();
 

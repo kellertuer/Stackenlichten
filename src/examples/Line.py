@@ -52,6 +52,8 @@ class LineExample(Example):
         this.parser.add_argument("-cb","--colorblue",
         metavar="CB",default=this.defaultcolor[2],type=int,choices=range(256),
         help="Blue Channel of background color")
+        this.parser.add_argument("-sb",'--samplebackground',action="store_true",default=False,help="Sample a function (true) or take a color as background (false, default).")
+        this.parser.add_argument("-sf",'--sampleforeground',action="store_true",default=False,help="Sample a function (true) or take a color (white - [CR,CG,.CB], default).")
         this.parser.add_argument("-s","--speed",
         metavar="S",default=30,type=int,
         help="Speed of rotation")
@@ -59,28 +61,41 @@ class LineExample(Example):
         metavar="ID",type=int,help="ID of center pixel")
     def parse_args(this,argv):
         super(LineExample,this).parse_args(argv)
+        r = this.args.colorred
+        g = this.args.colorgreen
+        b = this.args.colorblue
         # Build algorithm structure
-        bAlg = sl.AlgSampleFunction(f,stepVars,this.vars,this.graph.clone())
-        bAlg2 = sl.AlgSampleFunction(f2,stepVars,this.vars,this.graph.clone())
-        bAlg2 = sl.AlgBackground([
-            this.args.colorred/255.0,this.args.colorgreen/255.0,this.args.colorblue/255.0
-        ],
-        this.graph.clone()
-        )
-        fAlg = sl.sequentialAlgorithm([
-            sl.AlgLine(this.graph.clone(),{"ID":this.args.id,"Dir":0,"Duration":this.args.speed}),
-            sl.AlgLine(this.graph.clone(),{"ID":this.args.id,"Dir":30,"Duration":this.args.speed}),
-            sl.AlgLine(this.graph.clone(),{"ID":this.args.id,"Dir":60,"Duration":this.args.speed}),
-            sl.AlgLine(this.graph.clone(),{"ID":this.args.id,"Dir":90,"Duration":this.args.speed}),
-            sl.AlgLine(this.graph.clone(),{"ID":this.args.id,"Dir":120,"Duration":this.args.speed}),
-            sl.AlgLine(this.graph.clone(),{"ID":this.args.id,"Dir":150,"Duration":this.args.speed})
-        ],True,this.graph.clone())
-        combAlg = sl.multAlgorithm([bAlg,fAlg],this.graph.clone(),{"FinishType":"Any"});
-        addAlg = sl.overlayAlgorithm([bAlg2,combAlg],[(0,0,0),(0,0,0)],this.graph.clone())
+        if this.args.sampleforeground:
+            bAlg = sl.AlgSampleFunction(f,stepVars,this.vars,this.graph.clone())
+        else:
+            if r==255 and g==255 and b==255: # hack
+                c = [0.001,0.001,0.001]
+            else:
+                c = [1.0-r/255.0,1.0-g/255.0,1.0-b/255.0]
+            bAlg = sl.AlgBackground(c,this.graph.clone())
+        if this.args.samplebackground:
+            bAlg2 = sl.AlgSampleFunction(f2,stepVars,this.vars,this.graph.clone())
+        else:
+            bAlg2 = sl.AlgBackground([r/255.0,g/255.0,b/255.0],
+                this.graph.clone())
+        l1 = sl.AlgLine(this.graph.clone(),{"ID":this.args.id,"Dir":0,"Duration":this.args.speed})
+        l2 = sl.AlgLine(this.graph.clone(),{"ID":this.args.id,"Dir":30,"Duration":this.args.speed})
+        l3 =    sl.AlgLine(this.graph.clone(),{"ID":this.args.id,"Dir":60,"Duration":this.args.speed})
+        l4 =     sl.AlgLine(this.graph.clone(),{"ID":this.args.id,"Dir":90,"Duration":this.args.speed})
+        l5 = sl.AlgLine(this.graph.clone(),{"ID":this.args.id,"Dir":120,"Duration":this.args.speed})
+        l6 = sl.AlgLine(this.graph.clone(),{"ID":this.args.id,"Dir":150,"Duration":this.args.speed})
+        fAlg = sl.sequentialAlgorithm([l1,l2,l3,l4,l5,l6],True,this.graph.clone())
+        combAlg = sl.multAlgorithm([bAlg,fAlg],this.graph.clone(),{"FinishType":"Any"});  addAlg = sl.overlayAlgorithm([bAlg2,combAlg],[(0,0,0),(0,0,0)],this.graph.clone())
         this.setMainAlgorithm(sl.mainAlgorithm(this.slc,addAlg))
-        this.setControl(sl.SimpleControl(
+        this.setControl(sl.DirectionControl(
             this.getMainAlgorithm(),
             parameters={'framerate':this.args.framerate}))
+        this.getControl().register(l1)
+        this.getControl().register(l2)
+        this.getControl().register(l3)
+        this.getControl().register(l4)
+        this.getControl().register(l5)
+        this.getControl().register(l6)
 
 def run(argv):
     s = LineExample()
