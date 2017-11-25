@@ -13,6 +13,9 @@ stack different forms of Lichten.
 ## Code
 Based on the fadecandy chip and its accompanying python code, The code for Stackenlichten encapsulates the interface to the pixel and provides an easy way to implement image and pixel algorithms on graphs.
 
+## A Talk with a Demo
+There was a Talk at the [MetaNook 2017](https://metanook.de) by [@kellertuer](https://twitter.com/kellertuer) (in german though). The slides can be viewed [here](http://ronnybergmann.net/vortraege/2017-11-Stackenlichten-MetaNook.pdf) and a recording is available on the [Youtube channel of the MetaNook](https://www.youtube.com/watch?v=ggBUx7R-tWU) (demo starts at about 44 minutes).
+
 ## Build your own
 In order to build your own Trixels, see [Manual.md](manual/manual.md).
 
