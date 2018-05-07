@@ -21,15 +21,16 @@ nD = 2*fD;
 shortenSide = wW/tan(60)+wW;
 sH = 2*(wW/tan(60)+wW/sin(60)); //shorten inner
 
-number="6";
+number="3";
 useFix=false;
-numberHundreds="5";
+numberHundreds="2";
 useHFix=false;
+//fix global rotation for export
+rotate(v=[0,1,0],a=180)
+union(){
 bottomPlate();
-
 tN= 4;
 dist = 3.75;
-
 translate([-1*dist,44.625,-3*wW/4])
     linear_extrude(3*wW/4,scale=[2/tN,1])
     square([tN,10],center=true);
@@ -54,7 +55,7 @@ translate([-16,15+dist,-3/4*wW])
 rotate(v=[0,0,1],a=90)
     linear_extrude(3*wW/4,scale=[2/tN,1])
     square([tN,10],center=true);
-
+}
 module bottomPlate() {
     difference() {
     linear_extrude(height=wW, twist=0)
@@ -105,7 +106,7 @@ module bottomPlate() {
             cube([40,3.9,wW/8],center=true);
             cube([40,1.5,wW/4],center=true);
         }
-    #translate([0,8,wW-wW/16])
+    translate([0,8,wW-wW/16])
         cube([60,1,wW/8],center=true);
 };
 

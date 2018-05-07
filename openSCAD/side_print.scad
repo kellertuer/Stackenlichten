@@ -8,6 +8,9 @@ fD = 4;    // number on fingers downwards
 pW = 12; //width of plug inlet
 pD = 8; //depth of plug inlet
 pS = 40; //shift from baseline of plug inlet
+SideTolerance=0.15; //Shorten fingers (side) to smaller – less than half print with (so for .4 nozzle: .15?)
+BottomPlateHoleTolerance = 0.15; //extend holes for bottom plate by...
+
 //lower cable channel:
 eW = 8*wW; //larger ellipse width
 eH = 4*wW; //ellipse heigt
@@ -24,12 +27,16 @@ sH = 2*(wW/tan(60)+wW/sin(60)); //shorten inner
 Expl=0; //-1: closed, the larger the further apart
 // concat with shfted rotated versions... bottom left right
 
-printExt = 0.5;
+
 numberStr="23";
 fixNumber=false;
-type="Number";
+//type="Number";
 //type="Triangle";
-//type="Stackenlichten";
+type="Stackenlichten";
+
+//fix global rotation for export
+//rotate(v=[0,1,0],a=180)
+rotate(v=[1,0,0],a=180)
 SLside();
 
 module SLside() {
@@ -39,7 +46,7 @@ module SLside() {
         linear_extrude(height=wW, twist=0)
         difference() {
             midFC = (fC + 1)/2;
-            SidePointLine = concat(genSide(0,[0,0], shortenSide,shortenSide+wW,fW),
+            SidePointLine = concat(genSide(0,[0,0], shortenSide,shortenSide+wW,fW), 
                 genDepth(0,[sL/2-shortenSide/2-wW,0],[0,0],wW),
                 [[sL/2-shortenSide/2,-bD],[-sL/2+shortenSide/2+wW,-bD]],
                 -genDepth(0,[sL/2-shortenSide/2-wW,bD],[0,0],wW)   );
@@ -54,7 +61,7 @@ module SLside() {
             //Bottom plate holes
             for (i = [1:fC]) {
                 translate([-sL/2+2*i*sL/nC,3*bD/4])
-                square([sL/nC+printExt,wW+printExt], center = true);
+                square([sL/nC+BottomPlateHoleTolerance,wW+BottomPlateHoleTolerance], center = true);
             };
         };
     //magnet holes front plates
@@ -86,7 +93,7 @@ module SLside() {
     // emphasize bottom plate holders 
     for (i = [1:fC]) {
         translate([-sL/2+2*i*sL/nC,3*bD/4,0])
-        cube([sL/nC+3+printExt,wW+3+printExt,4], center = true);
+        cube([sL/nC+3+BottomPlateHoleTolerance,wW+3+BottomPlateHoleTolerance,4], center = true);
     };
     // cable channel at the bottom
     translate([0,bD,0])
@@ -174,7 +181,14 @@ module SLside() {
     translate([0,3.8*sL/16,wW-1/2])
     #    cube([13*sL/16,1,1],center=true);
     // Fix/Foots
-    
+    if (type=="Stackenlichten") {//fix e and i
+           translate([16,3.1*sL/16,wW-1/2])
+        cube([13*sL/128,1,1],center=true);
+    translate([11.5,6.3*sL/16,wW-1/2])
+        cube([13*sL/128,1,1],center=true);
+    translate([-18,4.9*sL/16,wW-1/2])
+        cube([13*sL/128,1,1],center=true);
+    }
 }
 
 function genSide(a=0,v=[0,0],sLe=0,sRi=0,h=wW) = generateSide([rotM(a)*[-(sL-sLe)/2,0]+v],0,a,v,sLe,sRi,h);   
@@ -199,8 +213,8 @@ function generateInnerSide(pL,i,a,v,sLe,sRi,h) = (i==fC) ? concat(pL,[rotM(a)*[(
 function genDepth(a=0,v=[0,0],start=[0,0],h=wW) = generateDepth([start+v],0,a,v,h,start);
 function generateDepth(pL,i,a,v,h,start) = (i==fD) ? pL
     : generateDepth(concat(pL,[
-        rotM(a)*(start+[0,-(2*i+1)*bD/nD])+v, rotM(a)*(start+[h,-(2*i+1)*bD/nD])+v,
-        rotM(a)*(start+[h,-(2*i+2)*bD/nD])+v, rotM(a)*(start+[0,-(2*i+2)*bD/nD])+v
+        rotM(a)*(start+[0,-SideTolerance-(2*i+1)*bD/nD])+v, rotM(a)*(start+[h,-SideTolerance-(2*i+1)*bD/nD])+v,
+        rotM(a)*(start+[h,SideTolerance-(2*i+2)*bD/nD])+v, rotM(a)*(start+[0,SideTolerance-(2*i+2)*bD/nD])+v
         ]),i+1,a,v,h,start);
 /*
  * Small Helpers
