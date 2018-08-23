@@ -21,9 +21,9 @@ nD = 2*fD;
 shortenSide = wW/tan(60)+wW;
 sH = 2*(wW/tan(60)+wW/sin(60)); //shorten inner
 
-number="3";
+number="9";
 useFix=false;
-numberHundreds="2";
+numberHundreds="";
 useHFix=false;
 //fix global rotation for export
 rotate(v=[0,1,0],a=180)

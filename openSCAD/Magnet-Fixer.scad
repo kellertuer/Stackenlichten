@@ -30,6 +30,8 @@ fnN = 270;
    translate([sL/4+wW/2,-wW/2,0]) circle(wW,$fn=360);
    translate([sL/4+wW/2,wW/2,0]) circle(wW,$fn=360);
 };*/
+rotate(v=[1,0,0],a=180) union() {
+
 difference() {
 translate([0,0,3/4*wW])
     linear_extrude(3*wW/4)
@@ -52,5 +54,4 @@ translate([0,0,3/4*wW])
 
    # translate([0,0,wW-1.5])
         cube([sL/2-2*wW,.9,1],center=true);
-
-echo(sL/2-2*wW);
+}

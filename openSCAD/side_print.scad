@@ -8,8 +8,8 @@ fD = 4;    // number on fingers downwards
 pW = 12; //width of plug inlet
 pD = 8; //depth of plug inlet
 pS = 40; //shift from baseline of plug inlet
-SideTolerance=0.15; //Shorten fingers (side) to smaller – less than half print with (so for .4 nozzle: .15?)
-BottomPlateHoleTolerance = 0.15; //extend holes for bottom plate by...
+SideTolerance=0.175; //Shorten fingers (side) to smaller – less than half print with (so for .4 nozzle: .15?)
+BottomPlateHoleTolerance = 0.5; //extend holes for bottom plate by...
 
 //lower cable channel:
 eW = 8*wW; //larger ellipse width
@@ -28,14 +28,13 @@ Expl=0; //-1: closed, the larger the further apart
 // concat with shfted rotated versions... bottom left right
 
 
-numberStr="23";
+numberStr="3";
 fixNumber=false;
-//type="Number";
+type="Number";
 //type="Triangle";
-type="Stackenlichten";
+//type="Stackenlichten";
 
 //fix global rotation for export
-//rotate(v=[0,1,0],a=180)
 rotate(v=[1,0,0],a=180)
 SLside();
 

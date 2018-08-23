@@ -48,6 +48,23 @@ translate([5,-5])
     rotate(v=[0,0,1], a=-45) rotate(v=[1,0,0],a=90) linear_extrude(7,center=true)
         scale([.9,1.666]) circle(3,$fn=360);
 }
+translate([0,0,4]) rotate(v=[0,0,1],a=180)
+difference() {
+linear_extrude(6) polygon([for ( i = [-1:steps]) (i==-1) ? [0,0] : 
+         [OuterDir/3*sin(sAngle1 + i/steps*stA1),OuterDir/3*cos(sAngle1 + i/steps*stA1)]]);
+translate([5,5]) 
+    rotate(v=[0,0,1], a=45) rotate(v=[1,0,0],a=90) linear_extrude(7,center=true)
+        scale([.9,1.666]) circle(3,$fn=360);
+}
+translate([0,0,4]) rotate(v=[0,0,1],a=-180)
+difference() {
+linear_extrude(6) polygon([for ( i = [-1:steps]) (i==-1) ? [0,0] : 
+         [OuterDir/3*sin(sAngle2 + i/steps*stA2),OuterDir/3*cos(sAngle2 + i/steps*stA2)]]);
+translate([5,-5]) 
+    rotate(v=[0,0,1], a=-45) rotate(v=[1,0,0],a=90) linear_extrude(7,center=true)
+        scale([.9,1.666]) circle(3,$fn=360);
+}
+
 //Side Ring
 translate([0,0,9]) linear_extrude(height)
 difference() {
